@@ -17,6 +17,9 @@
 html, body {
   font-family: 'Roboto', 'Helvetica', sans-serif;
 }
+.hidden {
+  display: none;
+}
 .faerun-layout .faerun-header .mdl-textfield {
   padding: 0px;
   margin-top: 41px;
@@ -87,56 +90,19 @@ html, body {
   font-weight: 700;
 }
 
-.faerun-content {
-  max-width: 1080px;
+#loader-select-set {
+  position: absolute;
+  width: 208px;
+  margin-top: -10px;
 }
 
-.faerun-charts {
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-              -ms-grid-row-align: center;
-          align-items: center;
+#main {
+  height: 100%;
 }
-.faerun-chart:nth-child(1) {
-  color: #ACEC00;
-}
-.faerun-chart:nth-child(2) {
-  color: #00BBD6;
-}
-.faerun-chart:nth-child(3) {
-  color: #BA65C9;
-}
-.faerun-chart:nth-child(4) {
-  color: #EF3C79;
-}
-.faerun-graphs {
-  padding: 16px 32px;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-direction: column;
-      -ms-flex-direction: column;
-          flex-direction: column;
-  -webkit-align-items: stretch;
-      -ms-flex-align: stretch;
-          align-items: stretch;
-}
-/* TODO: Find a proper solution to have the graphs
- * not float around outside their container in IE10/11.
- * Using a browserhacks.com solution for now.
- */
-_:-ms-input-placeholder, :root .faerun-graphs {
-  min-height: 664px;
-}
-_:-ms-input-placeholder, :root .faerun-graph {
-  max-height: 300px;
-}
-/* TODO end */
-.faerun-graph:nth-child(1) {
-  color: #00b9d8;
-}
-.faerun-graph:nth-child(2) {
-  color: #d9006e;
+
+#lore {
+  width: 100%;
+  height: 100%;
 }
 
 .faerun-cards {
