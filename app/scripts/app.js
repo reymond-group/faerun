@@ -3,7 +3,9 @@
     var socket = null;
     var lore = null;
     var availableSets = null;
+    var availableMaps = null;
     var currentSet = null;
+    var currentMap = null;
     var socketWorker = new Worker('scripts/socketWorker.js');
 
     // Events
@@ -34,8 +36,18 @@
     var loaderSelectSet = document.getElementById('loader-select-set');
 
     selectSet.addEventListener('change', function() {
+        currentSet = availableSets[selectSet.value];
         socketWorker.postMessage({ cmd: 'load', message: selectSet.value });
         selectSet.parentElement.style.pointerEvents = 'none';
+        show(loaderSelectSet);
+    }, false);
+
+    var selectColorMap = document.getElementById('select-color-map');
+
+    selectColorMap.addEventListener('change', function() {
+        currentMap = availableMaps[selectColorMap.value];
+        socketWorker.postMessage({ cmd: 'loadmap', message: JSON.stringify({ set_id: currentSet.id, map_id: currentMap.id })});
+        selectColorMap.parentElement.style.pointerEvents = 'none';
         show(loaderSelectSet);
     }, false);
 
@@ -43,10 +55,15 @@
     function populateServerSets() {
         removeChildren(selectSet);
         appendEmptyOption(selectSet);
-        for(var i = 0; i < availableSets.length; i++) {
-            currentSet = availableSets[i];
-            appendOption(selectSet, currentSet[0], currentSet[1]);
-        }
+        for(key in availableSets)
+            appendOption(selectSet, key, availableSets[key].name);
+    }
+
+    function populateColorMaps() {
+        removeChildren(selectColorMap);
+        appendEmptyOption(selectColorMap);
+        for(key in availableMaps)
+            appendOption(selectColorMap, key, availableMaps[key].name);
     }
 
     // Socket.IO communication
@@ -56,15 +73,21 @@
         socketWorker.onmessage = function(e){
             var cmd = e.data.cmd;
             var message = e.data.message;
-
+            console.log(e.data);
             if(cmd === 'initresponse') {
-                availableSets = message;
+                availableSets = {};
+                for(var i = 0; i < message.length; i++) availableSets[message[i].id] = message[i];
                 populateServerSets();
             }
             else if(cmd === 'loadresponse') {
                 selectSet.parentElement.style.pointerEvents = 'auto';
-                document.getElementById('datatitle').innerHTML = currentSet[1];
+                document.getElementById('datatitle').innerHTML = currentSet.name;
                 hide(loaderSelectSet);
+
+                availableMaps = {};
+                for(var i = 0; i < message.maps.length; i++) availableMaps[message.maps[i].id] = message.maps[i];
+                populateColorMaps();
+
                 for(var i = 0; i < message.data.length; i++) message.data[i] = new Uint16Array(message.data[i])
 
                 var pointHelper = new Lore.PointHelper(lore, 'TestGeometry', 'default');
