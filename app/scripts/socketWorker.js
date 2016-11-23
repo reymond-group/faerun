@@ -1,5 +1,5 @@
 importScripts('/libs/socketio/socket.io-1.4.5.js');
-var socket = socket = io.connect('http://46.101.234.147:8080/underdark');
+var socket = socket = io.connect('http://localhost:8080/underdark');
 
 socket.on('initresponse', function(msg) {
     postMessage({ cmd: 'initresponse', message: msg.data });

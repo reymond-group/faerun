@@ -7,13 +7,26 @@
     var socketWorker = new Worker('scripts/socketWorker.js');
 
     // Events
-    var fullscreenSwitch = document.getElementById('switch-fullscreen');
-    fullscreenSwitch.addEventListener('change', function() {
-        if(fullscreenSwitch.checked) {
+    var switchFullscreen = document.getElementById('switch-fullscreen');
+    switchFullscreen.addEventListener('change', function() {
+        if(switchFullscreen.checked) {
             launchIntoFullscreen(document.documentElement);
         }
         else {
             exitFullscreen();
+        }
+    }, false);
+
+    var labelSwitchColor = document.getElementById('label-switch-color');
+    var switchColor = document.getElementById('switch-color');
+    switchColor.addEventListener('change', function() {
+        if(switchColor.checked) {
+            labelSwitchColor.innerHTML = 'Light Background';
+            lore.setClearColor(Lore.Color.fromHex('#DADFE1'));
+        }
+        else {
+            labelSwitchColor.innerHTML = 'Dark Background';
+            lore.setClearColor(Lore.Color.fromHex('#001821'));
         }
     }, false);
 
