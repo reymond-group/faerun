@@ -30,3 +30,10 @@ Faerun.csvToArray = function (str, dataTypes) {
 
   return arrays;
 }
+
+Faerun.parseUrlParams = function() {
+  var search = location.search.substring(1);
+   return JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
+}
+
+Faerun.schemblUrl = 'https://www.surechembl.org/chemical/';
