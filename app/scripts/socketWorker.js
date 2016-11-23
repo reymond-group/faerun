@@ -11,6 +11,12 @@ socket.on('loadresponse', function(msg) {
     postMessage({ cmd: 'loadresponse', message: { data: arr, data_types: msg.data_types, maps: msg.maps } });
 });
 
+socket.on('loadmapresponse', function(msg) { 
+    var arr = toArray(msg.data);
+    for(var i = 0; i < arr.length; i++) arr[i] = arr[i].buffer;
+    postMessage({ cmd: 'loadmapresponse', message: { data: arr, data_types: msg.data_types } });
+});
+
 onmessage = function(e) {
     var cmd = e.data.cmd;
     var message = e.data.message;
