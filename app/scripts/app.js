@@ -90,14 +90,14 @@
                 for(var i = 0; i < message.maps.length; i++) availableMaps[message.maps[i].id] = message.maps[i];
                 populateColorMaps();
 
-                for(var i = 0; i < message.data.length; i++) message.data[i] = new Uint16Array(message.data[i])
+                for(var i = 0; i < message.data.length; i++) message.data[i] = Faerun.initArrayFromBuffer(message.data_types[i], message.data[i])
 
                 pointHelper = new Lore.PointHelper(lore, 'TestGeometry', 'default');
                 pointHelper.setPositionsXYZColor(message.data[0], message.data[1], message.data[2], new Lore.Color(0.1, 0.2, 0.8));
                 octreeHelper = new Lore.OctreeHelper(lore, 'OctreeGeometry', 'default', pointHelper);
             }
             else if(cmd === 'loadmapresponse') {
-                for(var i = 0; i < message.data.length; i++) message.data[i] = new Uint16Array(message.data[i])
+                for(var i = 0; i < message.data.length; i++) message.data[i] = Faerun.initArrayFromBuffer(message.data_types[i], message.data[i])
                 pointHelper.updateRGB(message.data[0], message.data[1], message.data[2]);
             }
         }; 
