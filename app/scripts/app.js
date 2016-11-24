@@ -9,6 +9,7 @@
     var currentSet = null;
     var currentMap = null;
     var socketWorker = new Worker('scripts/socketWorker.js');
+    var loader = document.getElementById('loader');
 
     // Events
     var switchFullscreen = document.getElementById('switch-fullscreen');
@@ -30,18 +31,17 @@
         }
         else {
             labelSwitchColor.innerHTML = 'Dark Background';
-            lore.setClearColor(Lore.Color.fromHex('#001821'));
+            lore.setClearColor(Lore.Color.fromHex('#212121'));
         }
     }, false);
 
     var selectSet = document.getElementById('select-set');
-    var loaderSelectSet = document.getElementById('loader-select-set');
 
     selectSet.addEventListener('change', function() {
         currentSet = availableSets[selectSet.value];
         socketWorker.postMessage({ cmd: 'load', message: selectSet.value });
         selectSet.parentElement.style.pointerEvents = 'none';
-        show(loaderSelectSet);
+        show(loader);
     }, false);
 
     var selectColorMap = document.getElementById('select-color-map');
@@ -50,7 +50,7 @@
         currentMap = availableMaps[selectColorMap.value];
         socketWorker.postMessage({ cmd: 'loadmap', message: JSON.stringify({ set_id: currentSet.id, map_id: currentMap.id })});
         selectColorMap.parentElement.style.pointerEvents = 'none';
-        show(loaderSelectSet);
+        show(loader);
     }, false);
 
     // UI - data
@@ -82,10 +82,6 @@
                 populateServerSets();
             }
             else if(cmd === 'loadresponse') {
-                selectSet.parentElement.style.pointerEvents = 'auto';
-                document.getElementById('datatitle').innerHTML = currentSet.name;
-                hide(loaderSelectSet);
-
                 availableMaps = {};
                 for(var i = 0; i < message.maps.length; i++) availableMaps[message.maps[i].id] = message.maps[i];
                 populateColorMaps();
@@ -95,10 +91,19 @@
                 pointHelper = new Lore.PointHelper(lore, 'TestGeometry', 'default');
                 pointHelper.setPositionsXYZColor(message.data[0], message.data[1], message.data[2], new Lore.Color(0.1, 0.2, 0.8));
                 octreeHelper = new Lore.OctreeHelper(lore, 'OctreeGeometry', 'default', pointHelper);
+
+                document.getElementById('datatitle').innerHTML = currentSet.name;
+                selectSet.parentElement.style.pointerEvents = 'auto';
+                hide(loader);
             }
             else if(cmd === 'loadmapresponse') {
                 for(var i = 0; i < message.data.length; i++) message.data[i] = Faerun.initArrayFromBuffer(message.data_types[i], message.data[i])
                 pointHelper.updateRGB(message.data[0], message.data[1], message.data[2]);
+
+
+                document.getElementById('datatitle').innerHTML = currentSet.name + ' &middot; ' + currentMap.name;
+                selectColorMap.parentElement.style.pointerEvents = 'auto';
+                hide(loader);
             }
         }; 
     });

@@ -97,6 +97,7 @@ html, body {
 }
 
 #main {
+  position: relative;
   height: 100%;
 }
 
@@ -164,4 +165,20 @@ html, body {
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
+}
+
+#loader {
+  position: absolute;
+  z-index: 999999;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+#loader #loader-inner {
+  position: absolute;
+  top: 10px;
+  left: 40px;
 }
