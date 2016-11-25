@@ -30,6 +30,8 @@
 
     <script src="libs/socketio/socket.io-1.4.5.js"></script>
     <script src="libs/lore/lore.min.js"></script>
+    <script src="libs/smilesDrawer/smiles.js"></script>
+    <script src="libs/smilesDrawer/smilesDrawer.js"></script>
     <script defer src="libs/mdl-selectified/mdl-selectified.min.js"></script>
 
     <link rel="stylesheet" href="libs/mdl-selectified/mdl-selectified.min.css">
@@ -37,6 +39,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://code.getmdl.io/1.2.1/material.blue_grey-blue.min.css" />
     <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="libs/smilesDrawer/smilesDrawer.css">
   </head>
   <body>
     <div class="faerun-layout mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
@@ -98,6 +101,9 @@
             <input type="checkbox" id="switch-color" class="mdl-switch__input">
             <span id="label-switch-color" class="mdl-switch__label">Dark Background</span>
           </label>
+
+          <div id="structure-view" style="width:150px; height:150px; background-color: #222">
+          </div>
         </div>
       </div>
       <main id="main" class="mdl-layout__content mdl-color--grey-900">

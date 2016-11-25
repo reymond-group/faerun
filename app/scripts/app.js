@@ -2,6 +2,7 @@
     // Globals
     var socket = null;
     var lore = null;
+    var smilesDrawer = null;
     var pointHelper = null;
     var octreeHelper = null;
     var availableSets = null;
@@ -71,11 +72,12 @@
     // Socket.IO communication
     document.addEventListener("DOMContentLoaded", function(event) {
         lore = Lore.init('lore', { clearColor: '#212121' });
-        
+        smilesDrawer = new SmilesDrawer();
+
         socketWorker.onmessage = function(e){
             var cmd = e.data.cmd;
             var message = e.data.message;
-            console.log(e.data);
+            // console.log(e.data);
             if(cmd === 'initresponse') {
                 availableSets = {};
                 for(var i = 0; i < message.length; i++) availableSets[message[i].id] = message[i];
@@ -91,6 +93,9 @@
                 pointHelper = new Lore.PointHelper(lore, 'TestGeometry', 'default');
                 pointHelper.setPositionsXYZColor(message.data[0], message.data[1], message.data[2], new Lore.Color(0.1, 0.2, 0.8));
                 octreeHelper = new Lore.OctreeHelper(lore, 'OctreeGeometry', 'default', pointHelper);
+                octreeHelper.addEventListener('singlehoveredchanged', function(e) {
+                    socketWorker.postMessage({ cmd: 'loaddetails', message: { set_id: currentSet.id, index: e.e.index, single: true } });
+                });
 
                 document.getElementById('datatitle').innerHTML = currentSet.name;
                 selectSet.parentElement.style.pointerEvents = 'auto';
@@ -104,6 +109,10 @@
                 document.getElementById('datatitle').innerHTML = currentSet.name + ' &middot; ' + currentMap.name;
                 selectColorMap.parentElement.style.pointerEvents = 'auto';
                 hide(loader);
+            }
+            else if(cmd === 'loaddetailsresponse') {
+                var data = smiles.parse(message[0].trim());
+                smilesDrawer.draw(data, 'structure-view', false)
             }
         }; 
     });
