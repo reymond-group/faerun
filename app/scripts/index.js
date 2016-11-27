@@ -9,7 +9,7 @@
     var availableMaps = null;
     var currentSet = null;
     var currentMap = null;
-    var socketWorker = new Worker('scripts/socketWorker.js');
+    var socketWorker = new Worker('scripts/socketWorkerIndex.js');
     var loader = document.getElementById('loader');
 
     // Events
@@ -90,11 +90,14 @@
 
                 for(var i = 0; i < message.data.length; i++) message.data[i] = Faerun.initArrayFromBuffer(message.data_types[i], message.data[i])
 
+                updateCoordinatesHelper(message.size);
+
                 pointHelper = new Lore.PointHelper(lore, 'TestGeometry', 'default');
+                pointHelper.setFogDistance(message.size * 2 + 200);
                 pointHelper.setPositionsXYZColor(message.data[0], message.data[1], message.data[2], new Lore.Color(0.1, 0.2, 0.8));
                 octreeHelper = new Lore.OctreeHelper(lore, 'OctreeGeometry', 'default', pointHelper);
                 octreeHelper.addEventListener('singlehoveredchanged', function(e) {
-                    socketWorker.postMessage({ cmd: 'loaddetails', message: { set_id: currentSet.id, index: e.e.index, single: true } });
+                    socketWorker.postMessage({ cmd: 'loadsmiles', message: { set_id: currentSet.id, index: e.e.index } });
                 });
 
                 document.getElementById('datatitle').innerHTML = currentSet.name;
@@ -110,14 +113,41 @@
                 selectColorMap.parentElement.style.pointerEvents = 'auto';
                 hide(loader);
             }
-            else if(cmd === 'loaddetailsresponse') {
-                var data = smiles.parse(message[0].trim());
+            else if(cmd === 'loadsmilesresponse') {
+                var data = smiles.parse(message.trim());
+                
                 smilesDrawer.draw(data, 'structure-view', false)
             }
         }; 
     });
 
     // Helpers
+    function updateCoordinatesHelper(size) {
+        var coordinatesHelper = new Lore.CoordinatesHelper(lore, 'Coordinates', 'coordinates', {
+            position: new Lore.Vector3f(0, 0, 0),
+            axis: {
+                x: { length: size, color: Lore.Color.fromHex('#097692') },
+                y: { length: size, color: Lore.Color.fromHex('#097692') },
+                z: { length: size, color: Lore.Color.fromHex('#097692') }
+            },
+            ticks: {
+                x: { length: 10, color: Lore.Color.fromHex('#097692') },
+                y: { length: 10, color: Lore.Color.fromHex('#097692') },
+                z: { length: 10, color: Lore.Color.fromHex('#097692') }
+            },
+            box: {
+                enabled: false,
+                x: { color: Lore.Color.fromHex('#004F6E') },
+                y: { color: Lore.Color.fromHex('#004F6E') },
+                z: { color: Lore.Color.fromHex('#004F6E') }
+            }
+        });
+
+        var halfSize = size / 2.0;
+        lore.controls.setRadius(size * Math.sqrt(3) + 100);
+        lore.controls.setLookAt(new Lore.Vector3f(halfSize, halfSize, halfSize));
+    }
+
     function launchIntoFullscreen(element) {
         if(element.requestFullscreen) {
             element.requestFullscreen();

@@ -1,8 +1,8 @@
 importScripts('/libs/socketio/socket.io-1.4.5.js');
 importScripts('/scripts/faerun-common.js');
 
-var socket = socket = io.connect('http://130.92.75.77:8080/underdark');
-//var socket = socket = io.connect('http://127.0.0.1:8080/underdark');
+//var socket = socket = io.connect('http://130.92.75.77:8080/underdark');
+var socket = socket = io.connect('http://192.168.1.3:8080/underdark');
 
 socket.on('initresponse', function(msg) {
     postMessage({ cmd: 'initresponse', message: msg.data });
@@ -11,7 +11,7 @@ socket.on('initresponse', function(msg) {
 socket.on('loadresponse', function(msg) { 
     var arr = Faerun.csvToArray(msg.data, msg.data_types);
     for(var i = 0; i < arr.length; i++) arr[i] = arr[i].buffer;
-    postMessage({ cmd: 'loadresponse', message: { data: arr, data_types: msg.data_types, maps: msg.maps } });
+    postMessage({ cmd: 'loadresponse', message: { data: arr, data_types: msg.data_types, maps: msg.maps, size: msg.size } });
 });
 
 socket.on('loadmapresponse', function(msg) { 
@@ -20,8 +20,8 @@ socket.on('loadmapresponse', function(msg) {
     postMessage({ cmd: 'loadmapresponse', message: { data: arr, data_types: msg.data_types } });
 });
 
-socket.on('loaddetailsresponse', function(msg) {
-    postMessage({ cmd: 'loaddetailsresponse', message: msg.data });
+socket.on('loadsmilesresponse', function(msg) {
+    postMessage({ cmd: 'loadsmilesresponse', message: msg.data });
 });
 
 onmessage = function(e) {

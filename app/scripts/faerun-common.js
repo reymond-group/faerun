@@ -61,4 +61,50 @@ Faerun.parseUrlParams = function() {
    return JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
 }
 
+Faerun.getCoords = function(arr, scale) {
+  scale = scale || 500;
+
+  // Avoid points on the lines
+  var fraction = Math.round(scale / 20);
+
+  var x_arr = new Uint16Array(arr.length);
+  var y_arr = new Uint16Array(arr.length);
+  var z_arr = new Uint16Array(arr.length);
+
+  var x_arr_tmp = new Float32Array(arr.length);
+  var y_arr_tmp = new Float32Array(arr.length);
+  var z_arr_tmp = new Float32Array(arr.length);
+
+  var max = { x: -Number.MAX_VALUE, y: -Number.MAX_VALUE, z: -Number.MAX_VALUE };
+  var min = { x: Number.MAX_VALUE, y: Number.MAX_VALUE, z: Number.MAX_VALUE };
+
+  for(var i = 0; i < arr.length; i++) {
+    var values = arr[i].split(',');
+    var x = parseFloat(values[0].trim());
+    var y = parseFloat(values[1].trim());
+    var z = parseFloat(values[2].trim());
+
+    if(max.x < x) max.x = x;
+    if(max.y < y) max.y = y;
+    if(max.z < z) max.z = z;
+
+    if(min.x > x) min.x = x;
+    if(min.y > y) min.y = y;
+    if(min.z > z) min.z = z;
+
+    x_arr_tmp[i] = x;
+    y_arr_tmp[i] = y;
+    z_arr_tmp[i] = z;
+  }
+
+  // Normalize the values
+  for(var i = 0; i < arr.length; i++) {
+    x_arr[i] = Math.round((x_arr_tmp[i] - min.x) / (max.x - min.x) * scale) + fraction;
+    y_arr[i] = Math.round((y_arr_tmp[i] - min.y) / (max.y - min.y) * scale) + fraction;
+    z_arr[i] = Math.round((z_arr_tmp[i] - min.z) / (max.z - min.z) * scale) + fraction;
+  }
+
+  return { x: x_arr, y: y_arr, z: z_arr, scale: scale + 2 * fraction };
+}
+
 Faerun.schemblUrl = 'https://www.surechembl.org/chemical/';

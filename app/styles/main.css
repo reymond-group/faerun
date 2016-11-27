@@ -180,5 +180,5 @@ html, body {
 #loader #loader-inner {
   position: absolute;
   top: 10px;
-  left: 40px;
+  right: 40px;
 }

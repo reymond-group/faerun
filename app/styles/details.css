@@ -78,6 +78,15 @@ html, body {
   color: inherit;
   width: calc(100% - 80px);
 }
+.mdl-demo .mdl-card .mdl-card__supporting-text.no-margin {
+  margin: 0;
+  -webkit-flex-grow: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
+  padding: 0;
+  color: inherit;
+  width: 100%;
+}
 .mdl-demo.mdl-demo .mdl-card__supporting-text h4 {
   margin-top: 0;
   margin-bottom: 20px;
