@@ -5,7 +5,7 @@
     var smilesDrawer = null;
     var pointHelper = null;
     var octreeHelper = null;
-    var smiles = null;
+    var smiles_data = null;
     var socketWorker = new Worker('scripts/socketWorkerDetails.js');
     var loader = document.getElementById('loader');
 
@@ -48,8 +48,7 @@
             }
             else if(cmd === 'loaddetailsresponse') {
                 var coords = Faerun.getCoords(message.data.coords, 250);
-                smiles = coords.smiles;
-
+                smiles_data = message.data.smiles;
                 updateCoordinatesHelper(coords.scale);
 
                 pointHelper = new Lore.PointHelper(lore, 'TestGeometry', 'default', { pointScale: 10 });
@@ -57,16 +56,35 @@
                 console.log(coords.x, coords.y, coords.z);
                 pointHelper.setPositionsXYZColor(coords.x, coords.y, coords.z, new Lore.Color.fromHex('#8BC34A'));
                 octreeHelper = new Lore.OctreeHelper(lore, 'OctreeGeometry', 'default', pointHelper);
-                octreeHelper.addEventListener('singlehoveredchanged', function(e) {
-                    var s = smiles[e.e.index];
-                    var data = smiles.parse(message.trim());
-                    smilesDrawer.draw(data, 'structure-view', false)
-                });
+
+                initMoleculeList();
             }
         }; 
     });
 
     // Helpers
+    function initMoleculeList() {
+        var container = document.getElementById('molecules');
+        for(var i = 0; i < smiles_data.length; i++) {
+            var smile = smiles_data[i].trim();
+            var molecule = document.createElement('div');
+            var structure = document.createElement('div');
+            molecule.classList.add('molecule');
+            structure.classList.add('structure-view');
+            
+            structure.id = 'structure-view' + i;
+            var p = document.createElement('p');
+            p.innerHTML = smile;
+
+            molecule.appendChild(structure);
+            molecule.appendChild(p);
+
+            container.appendChild(molecule);
+            var data = smiles.parse(smile);
+            smilesDrawer.draw(data, structure.id, false);
+        }
+    }
+
     function updateCoordinatesHelper(size) {
         var coordinatesHelper = new Lore.CoordinatesHelper(lore, 'Coordinates', 'coordinates', {
             position: new Lore.Vector3f(0, 0, 0),

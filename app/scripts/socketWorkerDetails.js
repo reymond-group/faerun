@@ -1,7 +1,7 @@
 importScripts('/libs/socketio/socket.io-1.4.5.js');
 importScripts('/scripts/faerun-common.js');
 
-var socket = io.connect('http://localhost:8080/underdark');
+var socket = io.connect('http://130.92.75.77:8080/underdark');
 
 socket.on('initresponse', function (msg) {
   postMessage({

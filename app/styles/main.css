@@ -167,6 +167,19 @@ html, body {
           align-items: center;
 }
 
+#overlay {
+  position: absolute;
+  z-index: 9999999;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  -webkit-box-shadow: inset 0px 0px 250px 55px rgba(0,0,0,0.75);
+  -moz-box-shadow: inset 0px 0px 250px 55px rgba(0,0,0,0.75);
+  box-shadow: inset 0px 0px 250px 55px rgba(0,0,0,0.75);
+  pointer-events: none;
+}
+
 #loader {
   position: absolute;
   z-index: 999999;
