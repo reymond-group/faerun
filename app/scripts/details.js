@@ -52,7 +52,7 @@
                 updateCoordinatesHelper(coords.scale);
 
                 pointHelper = new Lore.PointHelper(lore, 'TestGeometry', 'default', { pointScale: 10 });
-                pointHelper.setFogDistance(coords.scale * 2 + 200);
+                pointHelper.setFogDistance(coords.scale * Math.sqrt(3) * 2 + 200);
                 console.log(coords.x, coords.y, coords.z);
                 pointHelper.setPositionsXYZColor(coords.x, coords.y, coords.z, new Lore.Color.fromHex('#8BC34A'));
                 octreeHelper = new Lore.OctreeHelper(lore, 'OctreeGeometry', 'default', pointHelper);

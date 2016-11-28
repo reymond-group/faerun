@@ -93,7 +93,7 @@
                 updateCoordinatesHelper(message.size);
 
                 pointHelper = new Lore.PointHelper(lore, 'TestGeometry', 'default');
-                pointHelper.setFogDistance(message.size * 2 + 200);
+                pointHelper.setFogDistance(message.size * Math.sqrt(3) * 2 + 200);
                 pointHelper.setPositionsXYZColor(message.data[0], message.data[1], message.data[2], new Lore.Color(0.1, 0.2, 0.8));
                 octreeHelper = new Lore.OctreeHelper(lore, 'OctreeGeometry', 'default', pointHelper);
                 octreeHelper.addEventListener('singlehoveredchanged', function(e) {
