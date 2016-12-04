@@ -12,12 +12,24 @@
         "sourceType": "module"
     },
     "rules": {
-        "no-const-assign": "warn",
+        /*"no-const-assign": "warn",
         "no-this-before-super": "warn",
         "no-undef": "warn",
         "no-unreachable": "warn",
         "no-unused-vars": "warn",
         "constructor-super": "warn",
-        "valid-typeof": "warn"
+        "valid-typeof": "warn"*/
+        "no-const-assign": 1,
+        "no-this-before-super": 1,
+        "no-undef": 1,
+        "no-unreachable": 1,
+        "no-unused-vars": 1,
+        "constructor-super": 1,
+        "valid-typeof": 1,
+        "linebreak-style": 0,
+        "space-before-function-paren": 0,
+        "curly": 0,
+        "block-scoped-var": 0,
+        "max-len": 0
     }
 }

@@ -1,5 +1,16 @@
-function Faerun() {};
+/**
+ * The Faerun class contains static helper functions used in the app.
+ */
+function Faerun() {}
 
+/**
+ * Initializes a TypedArray based on the type and length. This allows the dynamic creation of
+ * differently typed TypedArrays. Returns a Float32Array if no valid type is provided.
+ *
+ * @param {String} type - The type of the TypedArray. Can be 'uint8clamped', 'uint8', 'int8', 'uint16', 'int16', 'uint32', 'int32', 'float32' or 'float64'.
+ * @param {Number} length - The size of the TypedArray.
+ * @return {any} A TypedArray of size 'length' and type 'type'.
+ */
 Faerun.initArray = function (type, length) {
   if (type === 'uint8clamped') return new Uint8ClampedArray(length);
   if (type === 'uint8') return new Uint8Array(length);
@@ -13,8 +24,16 @@ Faerun.initArray = function (type, length) {
 
   // If nothing matches return float32
   return new Float32Array(length);
-}
+};
 
+/**
+ * Initializes a TypedArray based on the type and and an existing buffer. Allows buffers to be accessed as the given type. 
+ * Returns a Float32Array if no valid type is provided.
+ *
+ * @param {String} type - The type of the TypedArray. Can be 'uint8clamped', 'uint8', 'int8', 'uint16', 'int16', 'uint32', 'int32', 'float32' or 'float64'.
+ * @param {ArrayBuffer} buffer - The size of the TypedArray.
+ * @return {any} A TypedArray with the content of the buffer 'buffer' and type 'type'.
+ */
 Faerun.initArrayFromBuffer = function (type, buffer) {
   if (type === 'uint8clamped') return new Uint8ClampedArray(buffer);
   if (type === 'uint8') return new Uint8Array(buffer);
@@ -28,83 +47,192 @@ Faerun.initArrayFromBuffer = function (type, buffer) {
 
   // If nothing matches return float32
   return new Float32Array(buffer);
-}
+};
 
 Faerun.isTypeFloat = function (type) {
   if (type === 'float32' || type === 'float64') return true;
 
   return false;
-}
+};
 
 Faerun.csvToArray = function (str, dataTypes) {
   var lines = str.split('\n');
   var arrays = [];
 
-  for (var i = 0; i < lines[0].split(',').length; i++)
+  var i;
+  for (i = 0; i < lines[0].split(',').length; i++)
     arrays.push(Faerun.initArray(dataTypes[i], lines.length));
 
-  for (var i = 0; i < lines.length; i++) {
+  for (i = 0; i < lines.length; i++) {
     var values = lines[i].split(',');
     for (var j = 0; j < values.length; j++) {
-      if(Faerun.isTypeFloat(dataTypes[j]))
+      if (Faerun.isTypeFloat(dataTypes[j]))
         arrays[j][i] = parseFloat(values[j]);
       else
-        arrays[j][i] = parseInt(values[j]);
+        arrays[j][i] = parseInt(values[j], 10);
     }
   }
   console.log(arrays);
   return arrays;
-}
+};
 
-Faerun.parseUrlParams = function() {
+Faerun.parseUrlParams = function () {
   var search = location.search.substring(1);
-   return JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
-}
+  return JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/\=/g, '":"') + '"}');
+};
 
-Faerun.getCoords = function(arr, scale) {
+Faerun.getCoords = function (arr, scale) {
   scale = scale || 500;
 
   // Avoid points on the lines
   var fraction = Math.round(scale / 20);
 
-  var x_arr = new Uint16Array(arr.length);
-  var y_arr = new Uint16Array(arr.length);
-  var z_arr = new Uint16Array(arr.length);
+  var xArr = new Uint16Array(arr.length);
+  var yArr = new Uint16Array(arr.length);
+  var zArr = new Uint16Array(arr.length);
 
-  var x_arr_tmp = new Float32Array(arr.length);
-  var y_arr_tmp = new Float32Array(arr.length);
-  var z_arr_tmp = new Float32Array(arr.length);
+  var xArrTmp = new Float32Array(arr.length);
+  var yArrTmp = new Float32Array(arr.length);
+  var zArrTmp = new Float32Array(arr.length);
 
-  var max = { x: -Number.MAX_VALUE, y: -Number.MAX_VALUE, z: -Number.MAX_VALUE };
-  var min = { x: Number.MAX_VALUE, y: Number.MAX_VALUE, z: Number.MAX_VALUE };
+  var max = {
+    x: -Number.MAX_VALUE,
+    y: -Number.MAX_VALUE,
+    z: -Number.MAX_VALUE
+  };
+  var min = {
+    x: Number.MAX_VALUE,
+    y: Number.MAX_VALUE,
+    z: Number.MAX_VALUE
+  };
 
-  for(var i = 0; i < arr.length; i++) {
+  var i;
+  for (i = 0; i < arr.length; i++) {
     var values = arr[i].split(',');
     var x = parseFloat(values[0].trim());
     var y = parseFloat(values[1].trim());
     var z = parseFloat(values[2].trim());
 
-    if(max.x < x) max.x = x;
-    if(max.y < y) max.y = y;
-    if(max.z < z) max.z = z;
+    if (max.x < x) max.x = x;
+    if (max.y < y) max.y = y;
+    if (max.z < z) max.z = z;
 
-    if(min.x > x) min.x = x;
-    if(min.y > y) min.y = y;
-    if(min.z > z) min.z = z;
+    if (min.x > x) min.x = x;
+    if (min.y > y) min.y = y;
+    if (min.z > z) min.z = z;
 
-    x_arr_tmp[i] = x;
-    y_arr_tmp[i] = y;
-    z_arr_tmp[i] = z;
+    xArrTmp[i] = x;
+    yArrTmp[i] = y;
+    zArrTmp[i] = z;
   }
 
   // Normalize the values
-  for(var i = 0; i < arr.length; i++) {
-    x_arr[i] = Math.round((x_arr_tmp[i] - min.x) / (max.x - min.x) * scale) + fraction;
-    y_arr[i] = Math.round((y_arr_tmp[i] - min.y) / (max.y - min.y) * scale) + fraction;
-    z_arr[i] = Math.round((z_arr_tmp[i] - min.z) / (max.z - min.z) * scale) + fraction;
+  for (i = 0; i < arr.length; i++) {
+    xArr[i] = Math.round((xArrTmp[i] - min.x) / (max.x - min.x) * scale) + fraction;
+    yArr[i] = Math.round((yArrTmp[i] - min.y) / (max.y - min.y) * scale) + fraction;
+    zArr[i] = Math.round((zArrTmp[i] - min.z) / (max.z - min.z) * scale) + fraction;
   }
 
-  return { x: x_arr, y: y_arr, z: z_arr, scale: scale + 2 * fraction };
-}
+  return {
+    x: xArr,
+    y: yArr,
+    z: zArr,
+    scale: scale + 2 * fraction
+  };
+};
 
 Faerun.schemblUrl = 'https://www.surechembl.org/chemical/';
+
+
+// HTML helpers
+/**
+ * Lunch fullscreen mode.
+ *
+ * @param {HTMLElement} element - The HTML element to be shown in fullscreen.
+ */
+Faerun.launchIntoFullscreen = function (element) {
+  if (element.requestFullscreen) {
+    element.requestFullscreen();
+  } else if (element.mozRequestFullScreen) {
+    element.mozRequestFullScreen();
+  } else if (element.webkitRequestFullscreen) {
+    element.webkitRequestFullscreen();
+  } else if (element.msRequestFullscreen) {
+    element.msRequestFullscreen();
+  }
+};
+
+/**
+ * Exits the fullscreen mode.
+ */
+Faerun.exitFullscreen = function () {
+  if (document.exitFullscreen) {
+    document.exitFullscreen();
+  } else if (document.mozCancelFullScreen) {
+    document.mozCancelFullScreen();
+  } else if (document.webkitExitFullscreen) {
+    document.webkitExitFullscreen();
+  }
+};
+
+/**
+ * Removes all the children from a given HTMLElement.
+ *
+ * @param {HTMLElement} element - The element from which to remove all children.
+ */
+Faerun.removeChildren = function (element) {
+  while (element.firstChild) {
+    element.removeChild(element.firstChild);
+  }
+};
+
+/**
+ * Sets the title of the Faerun app.
+ *
+ * @param {String} title - The new title.
+ */
+Faerun.setTitle = function (title) {
+  document.getElementById('datatitle').innerHTML = title;
+};
+
+/**
+ * Attaches an HTMLOptionElement to a HTMLSelectElement.
+ *
+ * @param {HTMLSelectElement} element - A HTMLSelectElement to which the option is attached.
+ * @param {any} value - The value of the HTMLOptionElement.
+ * @param {any} text - The innerHTML of the HTMLOptionElement.
+ */
+Faerun.appendOption = function (element, value, text) {
+  var option = document.createElement('option');
+  option.value = value;
+  option.innerHTML = text;
+  element.appendChild(option);
+};
+
+/**
+ * Attaches an empty HTMLOptionElement to an HTMLSelectElement.
+ *
+ * @param {HTMLSelectElement} element - A HTMLSelectElement to which an empty HTMLOptionElement is added.
+ */
+Faerun.appendEmptyOption = function (element) {
+  var option = document.createElement('option');
+  element.appendChild(option);
+};
+
+/**
+ * Hides an HTMLElement by adding the class 'hidden' to the classList of the element.
+ *
+ * @param {HTMLElement} element - The HTMLElement to be hidden.
+ */
+Faerun.hide = function (element) {
+  element.classList.add('hidden');
+};
+
+/**
+ * Shows an HTMLElement by removing the class 'hidden' from the classList of the element.
+ *
+ * @param {HTMLElement} element - The HTMLElement to be hidden.
+ */
+Faerun.show = function (element) {
+  element.classList.remove('hidden');
+};

@@ -80,6 +80,8 @@ html, body {
           flex-grow: 1;
   
   padding: 0px 16px 16px 16px;
+
+  overflow-x: hidden;
 }
 
 .faerun-controls-header {
@@ -191,6 +193,21 @@ html, body {
   background-size: 20px 20px;
   background-image: linear-gradient(to right, rgba(255, 255, 255, 0.005) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.005) 1px, transparent 1px);
   pointer-events: none;
+}
+
+#hud-container {
+  position: absolute;
+  margin: auto;
+  z-index: 9999999;
+  width: 360px;
+  bottom: 0;
+  left: calc(50% - 180px);
+  /* background-color: #fff; */
+  padding: 5px 0;
+}
+
+#hud-container label {
+  margin-left: 20px;
 }
 
 #loader {
