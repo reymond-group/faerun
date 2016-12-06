@@ -36,7 +36,7 @@
       lore.setClearColor(Lore.Color.fromHex('#DADFE1'));
     } else {
       labelSwitchColor.innerHTML = 'Dark Background';
-      lore.setClearColor(Lore.Color.fromHex('#212121'));
+      lore.setClearColor(Lore.Color.fromHex('#1E1E1E'));
     }
   }, false);
 

@@ -26,7 +26,7 @@
       lore.setClearColor(Lore.Color.fromHex('#DADFE1'));
     } else {
       labelSwitchColor.innerHTML = 'Dark Background';
-      lore.setClearColor(Lore.Color.fromHex('#212121'));
+      lore.setClearColor(Lore.Color.fromHex('#1E1E1E'));
     }
   }, false);
 
@@ -55,10 +55,10 @@
         smilesData = message.data.smiles;
         updateCoordinatesHelper(coords.scale);
 
-        pointHelper = new Lore.PointHelper(lore, 'TestGeometry', 'default', {
+        pointHelper = new Lore.PointHelper(lore, 'TestGeometry', 'sphere', {
           pointScale: 10
         });
-        pointHelper.setFogDistance(coords.scale * Math.sqrt(3) * 2 + 200);
+        pointHelper.setFogDistance(coords.scale * Math.sqrt(3) * 2 + 400);
         console.log(coords.x, coords.y, coords.z);
         pointHelper.setPositionsXYZColor(coords.x, coords.y, coords.z, new Lore.Color.fromHex('#8BC34A'));
         octreeHelper = new Lore.OctreeHelper(lore, 'OctreeGeometry', 'default', pointHelper);
@@ -79,16 +79,23 @@
       var smile = smilesData[i].trim();
       var molecule = document.createElement('div');
       var structure = document.createElement('div');
+      var image = document.createElement('div');
+
       molecule.classList.add('molecule');
       structure.classList.add('structure-view');
+      
+      image.classList.add('structure-view');
+      image.id = 'structure-view-image' + i;
 
       structure.id = 'structure-view' + i;
       var p = document.createElement('p');
       p.innerHTML = smile;
 
       molecule.appendChild(structure);
+      molecule.appendChild(image);
       molecule.appendChild(p);
 
+      image.style.backgroundImage = 'url(\'' + Faerun.getSchemblStructure(smile) + '\')';
       container.appendChild(molecule);
       var data = smiles.parse(smile);
       smilesDrawer.draw(data, structure.id, false);

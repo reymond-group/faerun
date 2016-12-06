@@ -142,7 +142,11 @@ Faerun.getCoords = function (arr, scale) {
 };
 
 Faerun.schemblUrl = 'https://www.surechembl.org/chemical/';
-
+Faerun.getSchemblStructure = function(smiles) {
+  return 'https://api.surechembl.org/service/chemical/image?structure=' +
+    encodeURIComponent(smiles).replace(/%5B/g, '[').replace(/%5D/g, ']') +
+    '&structure_hightlight&height=250&width=250';
+};
 
 // HTML helpers
 /**
