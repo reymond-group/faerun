@@ -78,11 +78,13 @@
     for (var i = 0; i < smilesData.length; i++) {
       var smile = smilesData[i].trim();
       var molecule = document.createElement('div');
-      var structure = document.createElement('div');
+      var structure = document.createElement('canvas');
       var image = document.createElement('div');
 
       molecule.classList.add('molecule');
       structure.classList.add('structure-view');
+      structure.width = 250;
+      structure.height = 250;
       
       image.classList.add('structure-view');
       image.id = 'structure-view-image' + i;
