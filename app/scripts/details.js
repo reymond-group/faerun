@@ -85,7 +85,7 @@
       structure.classList.add('structure-view');
       structure.width = 250;
       structure.height = 250;
-      
+
       image.classList.add('structure-view');
       image.id = 'structure-view-image' + i;
 

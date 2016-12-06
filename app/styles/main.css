@@ -225,3 +225,41 @@ html, body {
   top: 10px;
   right: 40px;
 }
+
+#hover-indicator {
+  position: absolute; 
+  left: 10px;
+  top : 10px;
+  width: 10px;
+  height: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  pointer-events: none;
+  -webkit-box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.75);
+  -moz-box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.75);
+  box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.75);
+}
+
+#hover-structure, #select-structure {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: #000;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  pointer-events: none;
+  -webkit-box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.75);
+  -moz-box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.75);
+  box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.75);
+}
+
+#select-indicator {
+  position: absolute; 
+  left: 10px;
+  top : 10px;
+  width: 10px;
+  height: 10px;
+  border: 1px solid rgba(255, 255, 255, 1.0);
+  pointer-events: none;
+  -webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+  -moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+  box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+}

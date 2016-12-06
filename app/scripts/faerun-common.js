@@ -142,7 +142,7 @@ Faerun.getCoords = function (arr, scale) {
 };
 
 Faerun.schemblUrl = 'https://www.surechembl.org/chemical/';
-Faerun.getSchemblStructure = function(smiles) {
+Faerun.getSchemblStructure = function (smiles) {
   return 'https://api.surechembl.org/service/chemical/image?structure=' +
     encodeURIComponent(smiles).replace(/%5B/g, '[').replace(/%5D/g, ']') +
     '&structure_hightlight&height=250&width=250';
@@ -239,4 +239,46 @@ Faerun.hide = function (element) {
  */
 Faerun.show = function (element) {
   element.classList.remove('hidden');
+};
+
+
+/**
+ * Moves the absolute positioned element to the position x, y.
+ *
+ * @param {HTMLElement} element - HtmlElement to translate.
+ * @param {Number} x - The x position to translate the element to.
+ * @param {Number} y - The y position to translate the element to.
+ * @param {Boolean} center - If true, centers the object given its width and height.
+ */
+Faerun.translateAbsolute = function (element, x, y, center) {
+  if (center) {
+    x -= element.offsetWidth / 2.0;
+    y -= element.offsetHeight / 2.0;
+  }
+  element.style.left = x + 'px';
+  element.style.top = y + 'px';
+};
+
+
+/**
+ * Resize the element to a new width and height.
+ *
+ * @param {HTMLElement} element - HtmlElement to resize.
+ * @param {Number} width - The width to resize the element to.
+ * @param {Number} height - The height to resize the element to.
+ */
+Faerun.resize = function (element, width, height) {
+  element.style.width = width + 'px';
+  element.style.height = height + 'px';
+};
+
+/**
+ * Set the background color of an element from an array containing r, g and b values.
+ *
+ * @param {HTMLElement} element - HtmlElement to set the background color on.
+ * @param {Array} arr - The array containing the r, g and b values.
+ */
+Faerun.setColorFromArray = function (element, arr) {
+  element.style.backgroundColor = 'rgb(' + Math.round(arr[0] * 255) + ', ' + Math.round(arr[1] * 255) +
+                                  ', ' + Math.round(arr[2] * 255) + ')';
 };

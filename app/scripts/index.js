@@ -20,6 +20,8 @@
   var sliderCutoff = document.getElementById('slider-cutoff');
   var hudContainer = document.getElementById('hud-container');
   var buttonRecenter = document.getElementById('button-recenter');
+  var hoverIndicator = document.getElementById('hover-indicator');
+  var selectIndicator = document.getElementById('select-indicator');
 
   // Events
   switchFullscreen.addEventListener('change', function () {
@@ -136,8 +138,15 @@
         pointHelper.setFogDistance(message.size * Math.sqrt(3) + 500);
         pointHelper.setPositionsXYZColor(message.data[0], message.data[1], message.data[2], new Lore.Color(0.1, 0.2, 0.8));
         octreeHelper = new Lore.OctreeHelper(lore, 'OctreeGeometry', 'default', pointHelper);
+        
         octreeHelper.addEventListener('hoveredchanged', function (e) {
-          if (!e.e) return;
+          if (!e.e) {
+            Faerun.hide(hoverIndicator);
+            return;
+          }
+
+          updateHovered();
+
           socketWorker.postMessage({
             cmd: 'loadsmiles',
             message: {
@@ -145,6 +154,29 @@
               index: e.e.index
             }
           });
+        });
+
+        octreeHelper.addEventListener('selectedchanged', function (e) {
+          console.log(e);
+          if (!e.e) {
+            Faerun.hide(selectIndicator);
+            return;
+          }
+
+          updateSelected();
+
+          socketWorker.postMessage({
+            cmd: 'loadsmiles',
+            message: {
+              set_id: currentSet.id,
+              index: e.e.index
+            }
+          });
+        });
+
+        octreeHelper.addEventListener('updated', function() {
+          if (octreeHelper.hovered) updateHovered();
+          if (octreeHelper.selected) updateSelected();
         });
 
         document.getElementById('datatitle').innerHTML = currentSet.name;
@@ -158,13 +190,31 @@
         Faerun.hide(loader);
       } else if (cmd === 'loadsmilesresponse') {
         var data = smiles.parse(message.trim());
-
-        smilesDrawer.draw(data, 'structure-view', false);
+        smilesDrawer.draw(data, 'hover-structure-drawing', false);
       }
     };
   });
 
   // Helpers
+
+
+  function updateHovered() {
+    Faerun.show(hoverIndicator);
+    Faerun.translateAbsolute(hoverIndicator, octreeHelper.hovered.screenPosition[0], octreeHelper.hovered.screenPosition[1], true);
+    var pointSize = pointHelper.getPointSize();
+    Faerun.resize(hoverIndicator, pointSize, pointSize);
+    console.log(octreeHelper.hovered);
+    console.log(octreeHelper.hovered.color);
+    Faerun.setColorFromArray(hoverIndicator, octreeHelper.hovered.color);
+  }
+
+  function updateSelected() {
+    Faerun.show(selectIndicator);
+    Faerun.translateAbsolute(selectIndicator, octreeHelper.selected.screenPosition[0], octreeHelper.selected.screenPosition[1], true);
+    var pointSize = pointHelper.getPointSize();
+    Faerun.resize(selectIndicator, pointSize, pointSize);
+    Faerun.setColorFromArray(selectIndicator, octreeHelper.selected.color);
+  }
 
   /**
    * Update the coordinates according to the current data set.

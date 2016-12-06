@@ -91,9 +91,7 @@
         <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-color">
             <input type="checkbox" id="switch-color" class="mdl-switch__input">
             <span id="label-switch-color" class="mdl-switch__label">Dark Background</span>
-          </label>
-        <canvas id="structure-view" width="150" height="150" style="background-color: #141414">
-        </canvas>
+        </label>
       </div>
     </div>
     <main id="main" class="mdl-layout__content mdl-color--grey-900">
@@ -107,10 +105,12 @@
       </div>
       <div id="overlay">
       </div>
+      <div id="hover-indicator" class="hidden"></div>
+      <div id="hover-structure"><canvas id="hover-structure-drawing" width="200" height="200"></div></div>
+      <div id="select-indicator" class="hidden"></div>
       <div id="hud-container" class="hidden-n mdl-color--grey-100">
         <label>Depth Cutoff</label>
-        <input id="slider-cutoff" class="mdl-slider mdl-js-slider" type="range"
-               min="0" max="100" value="0" tabindex="0">
+        <input id="slider-cutoff" class="mdl-slider mdl-js-slider" type="range" min="0" max="100" value="0" tabindex="0">
         <div style="text-align:center">
           <button id="button-recenter" class="mdl-button mdl-js-button mdl-button--icon">
             <i class="material-icons">all_out</i>
