@@ -241,6 +241,41 @@ Faerun.show = function (element) {
   element.classList.remove('hidden');
 };
 
+/**
+ * Shows or hides an HTMLElement by adding or removing the class 'hidden' from the classList of the element.
+ *
+ * @param {HTMLElement} element - The HTMLElement to be shown or hidden.
+ */
+Faerun.toggle = function (element) {
+  if (Faerun.hasClass(element, 'hidden'))
+    Faerun.show(element);
+  else
+    Faerun.hide(element);
+};
+
+/**
+ * Checks whether an element has a class.
+ *
+ * @param {HTMLElement} element - The HTMLElement to check.
+ * @param {String} name - The name of the class.
+ * @return {Boolean} Whether or not the HTMLElement has the class name.
+ */
+Faerun.hasClass = function (element, name) {
+  return new RegExp('(\\s|^)' + name + '(\\s|$)').test(element.className);
+};
+
+/**
+ * Removes or adds the class to the HTMLElement.
+ *
+ * @param {HTMLElement} element - The HTMLElement to add or remove the class to / from.
+ * @param {String} name - The name of the class.
+ */
+Faerun.toggleClass = function (element, name) {
+  if (Faerun.hasClass(element, name))
+    element.classList.remove(name);
+  else
+    element.classList.add(name);
+};
 
 /**
  * Moves the absolute positioned element to the position x, y.

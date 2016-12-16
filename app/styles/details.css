@@ -1,6 +1,12 @@
 
 html, body {
   font-family: 'Roboto', 'Helvetica', sans-serif;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 .hidden {
   display: none;
@@ -206,7 +212,11 @@ main .mdl-grid {
 }
 
 #molecules {
-  overflow-y: scroll;
+  overflow-y: scroll;-webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
   overflow-x: hidden;
   max-height: 100%;
 }

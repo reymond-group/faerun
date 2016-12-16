@@ -19,11 +19,18 @@
   var selectColorMap = document.getElementById('select-color-map');
   var sliderCutoff = document.getElementById('slider-cutoff');
   var hudContainer = document.getElementById('hud-container');
+  var hudHeader = document.getElementById('hud-header');
+  var hudHeaderIcon = document.getElementById('hud-header-icon');
   var buttonRecenter = document.getElementById('button-recenter');
   var hoverIndicator = document.getElementById('hover-indicator');
   var selectIndicator = document.getElementById('select-indicator');
 
   // Events
+  hudHeader.addEventListener('click', function () {
+    Faerun.toggle(hudContainer);
+    Faerun.toggleClass(hudHeaderIcon, 'rotate');
+  }, false);
+
   switchFullscreen.addEventListener('change', function () {
     if (switchFullscreen.checked) {
       Faerun.launchIntoFullscreen(document.documentElement);

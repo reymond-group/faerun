@@ -1,50 +1,48 @@
 .vertex {
-	stroke: transparent;
-	fill: transparent;
+    stroke: transparent;
+    fill: transparent;
 }
 
 .helper {
-	stroke: #f00;
-	fill: #f00;
+    stroke: #f00;
+    fill: #f00;
 }
 
 .benzene {
-	stroke: #fff;
-	stroke-width: 1.0px;
-	fill: transparent;
+    stroke: #fff;
+    stroke-width: 1.0px;
+    fill: transparent;
 }
 
 .edge {
     stroke: #fff;
     /* stroke: #000; */
-	stroke-width: 1.5px;
-	stroke-linecap: round;
+    stroke-width: 1.5px;
+    stroke-linecap: round;
 }
 
-.edge.double-bond {
-
-}
+.edge.double-bond {}
 
 .id {
-	font-size: 8px;
-	fill: #f00;
+    font-size: 8px;
+    fill: #f00;
 }
 
 .element {
-  fill: #fff;
-  /* fill: #000 */
-	font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
-	font-weight: normal;
-	font-size: 10px;
+    fill: #fff;
+    /* fill: #000 */
+    font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+    font-weight: normal;
+    font-size: 10px;
     /* filter: url(#dropShadowFilter); */
 }
 
 .number {
-	fill: #fff;
-  /* fill: #000 */
-	font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
-	font-weight: normal;
-	font-size: 6px;
+    fill: #fff;
+    /* fill: #000 */
+    font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+    font-weight: normal;
+    font-size: 6px;
 }
 
 .element.o {
@@ -59,16 +57,16 @@
     fill: #f39c12;
 }
 
-.element.f {
-
-}
+.element.f {}
 
 .background {
     fill: rgba(20, 20, 20, 1.0);
     /* fill: #fff; */
 }
 
+
 /* C */
+
 .gradientCO {
     stroke: url(#gradientCO);
 }
@@ -105,7 +103,9 @@
     stop-color: #f39c12;
 }
 
+
 /* O */
+
 .gradientOO {
     stroke: url(#gradientOO);
 }
@@ -156,6 +156,7 @@
 
 
 /* N */
+
 .gradientNN {
     stroke: url(#gradientNN);
 }
@@ -206,6 +207,7 @@
 
 
 /* F */
+
 .gradientSS {
     stroke: url(#gradientSS);
 }

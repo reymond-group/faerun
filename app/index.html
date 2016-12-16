@@ -101,14 +101,13 @@
           <div class="mdl-spinner mdl-js-spinner is-active"></div>
         </div>
       </div>
-      <div id="overlay-grid">
-      </div>
-      <div id="overlay">
-      </div>
       <div id="hover-indicator" class="hidden"></div>
       <div id="hover-structure"><canvas id="hover-structure-drawing" width="200" height="200"></div></div>
       <div id="select-indicator" class="hidden"></div>
-      <div id="hud-container" class="hidden-n mdl-color--grey-100">
+      <div id="hud-container" class="hidden-n mdl-color--grey-300">
+        <div id="hud-header" class="mdl-color--blue-grey-600">
+          <i id="hud-header-icon" class="material-icons">keyboard_arrow_down</i>
+        </div>
         <label>Depth Cutoff</label>
         <input id="slider-cutoff" class="mdl-slider mdl-js-slider" type="range" min="0" max="100" value="0" tabindex="0">
         <div style="text-align:center">
@@ -116,6 +115,10 @@
             <i class="material-icons">all_out</i>
           </button>
         </div>
+      </div>
+      <div id="overlay-grid">
+      </div>
+      <div id="overlay">
       </div>
     </main>
   </div>

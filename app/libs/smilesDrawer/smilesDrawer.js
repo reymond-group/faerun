@@ -22,7 +22,8 @@ function SmilesDrawer() {
         P: '#d35400',
         S: '#f1c40f',
         B: '#e67e22',
-        SI: '#e67e22'
+        SI: '#e67e22',
+        BACKGROUND: '#141414'
     }
 }
 
@@ -178,10 +179,12 @@ SmilesDrawer.prototype.printRingInfo = function (id) {
 
 SmilesDrawer.prototype.createVertices = function (node, parentId, branch) {
     // Create a new vertex object
+    // console.log(node);
     var atom = new Atom(node.atom.element ? node.atom.element : node.atom);
     atom.bond = node.bond;
     atom.branchBond = node.branchBond;
     atom.ringbonds = node.ringbonds;
+    atom.bracket = node.atom.element ? node.atom : null;
 
 
     var vertex = new Vertex(atom);
@@ -341,15 +344,15 @@ SmilesDrawer.prototype.discoverRings = function () {
         ring.neighbours = RingConnection.getNeighbours(this.ringConnections, ring.id);
     }
 
-    // Replace rings contained by a larger bridged ring by a bridged ring
+    // Replace rings contained by a larger bridged ring with a bridged ring
     while (this.rings.length > 0) {
         // Gets stuck with this: C1C2CC3CCCC4C1C2C34 and C1C2C3CC123
-        // somethings wrong with isPartOfBirdgedRing
+        // somethings wrong with isPartOfBridgedRing
         var id = -1;
         for (var i = 0; i < this.rings.length; i++) {
             var ring = this.rings[i];
 
-            if (this.isPartOfBirdgedRing(ring.id)) {
+            if (this.isPartOfBridgedRing(ring.id)) {
                 id = ring.id;
             }
         }
@@ -393,7 +396,7 @@ SmilesDrawer.prototype.getBridgedRingRings = function (id) {
     return ArrayHelper.unique(involvedRings);
 }
 
-SmilesDrawer.prototype.isPartOfBirdgedRing = function (ring) {
+SmilesDrawer.prototype.isPartOfBridgedRing = function (ring) {
     for (var i = 0; i < this.ringConnections.length; i++) {
         if (this.ringConnections[i].rings.contains(ring) &&
             this.ringConnections[i].isBridge()) {
@@ -514,6 +517,7 @@ SmilesDrawer.prototype.createBridgedRing = function (rings, start) {
             this.getRingConnection(connections[j]).updateOther(ring.id, neighbours[i]);
         }
     }
+    
     return ring;
 }
 
@@ -887,7 +891,12 @@ SmilesDrawer.prototype.getOverlapScore = function () {
     };
 }
 
-SmilesDrawer.prototype.circle = function (radius, x, y, classes, fill) {
+SmilesDrawer.prototype.getColor = function(key) {
+    if(key in this.colors) return this.colors[key];
+    return this.colors['C'];
+}
+
+SmilesDrawer.prototype.circle = function (radius, x, y, classes, fill, debug) {
     // Return empty line element for debugging, remove this check later, values should not be NaN
     if (isNaN(x) || isNaN(y))
         return;
@@ -897,15 +906,29 @@ SmilesDrawer.prototype.circle = function (radius, x, y, classes, fill) {
     this.ctx.beginPath();
     this.ctx.arc(x + this.offsetX, y + this.offsetY, radius, 0, Math.PI * 2, true); 
     this.ctx.closePath();
-    
-    if(fill) {
-        this.ctx.fillStyle = this.colors['C'];
-        this.ctx.fill();
+
+    if(debug) {
+        if(fill) {
+            this.ctx.fillStyle = '#ff0000';
+            this.ctx.fill();
+        }
+        else {
+            this.ctx.strokeStyle = '#ff0000';
+            this.ctx.stroke();
+        }
     }
     else {
-        this.ctx.strokeStyle = this.colors['C'];
-        this.ctx.stroke();
+        if(fill) {
+        this.ctx.fillStyle = this.colors['C'];
+        this.ctx.fill();
+        }
+        else {
+            this.ctx.strokeStyle = this.colors['C'];
+            this.ctx.stroke();
+        }
     }
+    
+    
     this.ctx.restore();
 }
 
@@ -914,9 +937,34 @@ SmilesDrawer.prototype.line = function (x1, y1, x2, y2, elementA, elementB, clas
         return;
 
     var line = new Line(new Vector2(x1, y1), new Vector2(x2, y2), elementA, elementB);
+    // Add a shadow behind the line
+    var shortLine = line.clone().shorten(6.0);
 
-    var l = line.getLeftVector().clone();
-    var r = line.getRightVector().clone();
+    var l = shortLine.getLeftVector().clone();
+    var r = shortLine.getRightVector().clone();
+
+    l.x += this.offsetX;
+    l.y += this.offsetY;
+
+    r.x += this.offsetX;
+    r.y += this.offsetY;
+
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.moveTo(l.x, l.y);
+    this.ctx.lineTo(r.x, r.y);
+    this.ctx.lineCap = 'round';
+    this.ctx.lineWidth = 1.5;
+    this.ctx.shadowColor = this.colors['BACKGROUND'];
+    this.ctx.shadowBlur = 6.0;
+    this.ctx.shadowOffsetX = 0;
+    this.ctx.shadowOffsetY = 0;
+    this.ctx.strokeStyle = this.colors['BACKGROUND'];
+    this.ctx.stroke();
+    this.ctx.restore();
+
+    l = line.getLeftVector().clone();
+    r = line.getRightVector().clone();
 
     l.x += this.offsetX;
     l.y += this.offsetY;
@@ -938,67 +986,111 @@ SmilesDrawer.prototype.line = function (x1, y1, x2, y2, elementA, elementB, clas
     this.ctx.restore();
 }
 
-SmilesDrawer.prototype.text = function (x, y, element, classes, background, hydrogen, position, terminal) {
+SmilesDrawer.prototype.debugText = function(x, y, text) {
+    this.ctx.save();
+    var font = '5px Arial';
+    this.ctx.font = font;
+    this.ctx.textAlign = 'start';
+    this.ctx.textBaseline = 'top';
+    this.ctx.fillStyle = '#ff0000';
+    this.ctx.fillText(text, x + this.offsetX, y + this.offsetY);
+    this.ctx.restore();
+}
+
+SmilesDrawer.prototype.text = function (x, y, element, classes, background, hydrogen, position, terminal, charge) {
     // Return empty line element for debugging, remove this check later, values should not be NaN
     if (isNaN(x) || isNaN(y))
         return;
     
     this.ctx.save();
-    var font = '10px Arial';
-    this.ctx.font = font;
+    var fontLarge = '10px Arial';
+    var fontSmall = '6px Arial';
+
     this.ctx.textAlign = 'start';
     this.ctx.textBaseline = 'top';
-    this.ctx.fillStyle = '#141414';
+
+    // Charge
+    var chargeWidth = 0;
+    if(charge) {
+        var chargeText = '+';
+        if(charge === 2) chargeText = '2+';
+        if(charge === -1) chargeText = '-';
+        if(charge === -2) chargeText = '2-';
+
+        this.ctx.font = fontSmall;
+        chargeWidth = this.ctx.measureText(chargeText).width;
+    }
+
+    this.ctx.font = fontLarge;
+    
+    this.ctx.fillStyle = this.colors['BACKGROUND'];
     var dim = this.ctx.measureText(element);
-    dim.height = parseInt(font, 10);
-    var r = (dim.width > dim.height) ? dim.width : dim.height;
+    dim.totalWidth = dim.width + chargeWidth;
+    dim.height = parseInt(fontLarge, 10);
+    var r = (dim.totalWidth > dim.height) ? dim.totalWidth : dim.height;
     r /= 2.0;
+    
     this.ctx.beginPath();
-    this.ctx.arc(x + this.offsetX, y + this.offsetY, r + 1, 0, Math.PI*2, true); 
+    this.ctx.arc(x + this.offsetX, y + this.offsetY + dim.height / 20.0, r + 1.0, 0, Math.PI*2, true); 
     this.ctx.closePath();
     this.ctx.fill();
     
-    this.ctx.fillStyle = this.colors[element.toUpperCase() || 'C'];
-    this.ctx.fillText(element, x - dim.width / 2.0 + this.offsetX, y - dim.height / 2.0 + this.offsetY);
+    this.ctx.fillStyle = this.getColor(element.toUpperCase());
+    this.ctx.fillText(element, x - dim.totalWidth / 2.0 + this.offsetX, y - dim.height / 2.0 + this.offsetY);
+
+    if(charge) {
+        this.ctx.font = fontSmall;
+        this.ctx.fillText(chargeText, x - dim.totalWidth / 2.0 + dim.width + this.offsetX, y - dim.height / 2.0 + this.offsetY);
+    }
+
+
+    this.ctx.font = fontLarge;
+    
+    var hDim = this.ctx.measureText('H');
+    hDim.height = parseInt(fontLarge, 10);
 
 
     if (hydrogen === 1) {
-        var hx = x - dim.width / 2.0 + this.offsetX,
+        var hx = x - dim.totalWidth / 2.0 + this.offsetX,
             hy = y - dim.height / 2.0 + this.offsetY;
-        if (position === 'left') hx -= dim.width;
-        if (position === 'right') hx += dim.width;
-        if (position === 'up' && terminal) hx += dim.width + 1.0;
-        if (position === 'down' && terminal) hx += dim.width + 1.0;
-        if (position === 'up' && !terminal) hy -= dim.height - dim.height / 4  + 1.0;
-        if (position === 'down' && !terminal) hy += dim.height - dim.height / 4  + 1.0;
+        if (position === 'left') hx -= dim.totalWidth;
+        if (position === 'right') hx += dim.totalWidth;
+        if (position === 'up' && terminal) hx += dim.totalWidth;
+        if (position === 'down' && terminal) hx += dim.totalWidth;
+        if (position === 'up' && !terminal) hy -= dim.height;
+        if (position === 'down' && !terminal) hy += dim.height;
 
         this.ctx.fillText('H', hx, hy);
     } else if (hydrogen > 1) {
-        var hx = x - dim.width / 2.0 + this.offsetX,
+        var hx = x - dim.totalWidth / 2.0 + this.offsetX,
             hy = y - dim.height / 2.0 + this.offsetY;
 
-        if (position === 'left') hx -= dim.width + dim.width / 1.75;
-        if (position === 'right') hx += dim.width;
-        if (position === 'up' && terminal) hx += dim.width + 1.0;
-        if (position === 'down' && terminal) hx += dim.width + 1.0;
-        if (position === 'up' && !terminal) hy -= bdimb.height + 1.0;
-        if (position === 'down' && !terminal) hy += dim.height + 1.0;
+        this.ctx.font = fontSmall;
+        var cDim = this.ctx.measureText(hydrogen);
+        cDim.height = parseInt(fontSmall, 10);
 
+        if (position === 'left') hx -= hDim.width + cDim.width;
+        if (position === 'right') hx += dim.totalWidth;
+        if (position === 'up' && terminal) hx += dim.totalWidth;
+        if (position === 'down' && terminal) hx += dim.totalWidth;
+        if (position === 'up' && !terminal) hy -= dim.height;
+        if (position === 'down' && !terminal) hy += dim.height;
+
+        this.ctx.font = fontLarge;
         this.ctx.fillText('H', hx, hy)
 
-        var font = '6px Arial';
-        this.ctx.font = font;
-        this.ctx.fillText(hydrogen, hx + dim.width / 0.9, hy + dim.height / 1.5);
+        this.ctx.font = fontSmall;
+        this.ctx.fillText(hydrogen, hx + hDim.width, hy + hDim.height / 2.0);
     }
 
     this.ctx.restore();
 }
 
 SmilesDrawer.prototype.drawPoint = function (v, text) {
-    this.circle(2, v.x, v.y, 'helper', true);
+    this.circle(2, v.x, v.y, 'helper', true, true);
 
     if (text) {
-        this.text(v.x + 7, v.y + 7, text, 'id');
+        this.debugText(v.x, v.y, text, 'id', true);
     }
 }
 
@@ -1273,7 +1365,10 @@ SmilesDrawer.prototype.forceLayout = function (vertices, center, start) {
         var vertex = this.vertices[vertices[u]];
         var neighbours = vertex.getNeighbours();
         for (var i = 0; i < neighbours.length; i++) {
-            this.createBonds(this.vertices[neighbours[i]], vertex, MathHelper.Geom.toRad(60));
+            if(vertex.value.isBridge)
+                this.createBonds(this.vertices[neighbours[i]], vertex, MathHelper.Geom.toRad(60));
+            else
+                this.createBonds(this.vertices[neighbours[i]], vertex, center);
         }
     }
 }
@@ -1402,7 +1497,7 @@ SmilesDrawer.prototype.drawEdges = function (label) {
 
         if (label) {
             var midpoint = Vector2.midpoint(a, b);
-            this.text(midpoint.x, midpoint.y, i, 'id');
+            this.debugText(midpoint.x, midpoint.y, 'id: ' + i);
         }
     }
 }
@@ -1426,17 +1521,21 @@ SmilesDrawer.prototype.drawVertices = function (label) {
 
         if (label) {
             var value = vertex.id + ' ' + ArrayHelper.print(atom.ringbonds);
-            this.text(vertex.position.x + 7, vertex.position.y + 7, value, 'id');
+            this.debugText(vertex.position.x, vertex.position.y, 'id: ' + value);
         }
+
+        var hydrogens = SmilesDrawer.maxBonds[element] - bondCount;
+        if(atom.bracket) hydrogens = atom.bracket.hcount;
+
+        var charge = 0;
+        if(atom.bracket) charge = atom.bracket.charge;
 
         if (atom.isTerminal && !label) {
             var dir = vertex.getTextDirection(this.vertices);
-            this.text(vertex.position.x, vertex.position.y, element, 'element ' + atom.element.toLowerCase(), true, SmilesDrawer.maxBonds[element] - bondCount, dir, true);
+            this.text(vertex.position.x, vertex.position.y, element, 'element ' + atom.element.toLowerCase(), true, hydrogens, dir, true, charge);
         } else if (atom.element.toLowerCase() !== 'c' && !label) {
             var dir = vertex.getTextDirection(this.vertices);
-            this.text(vertex.position.x, vertex.position.y, element, 'element ' + atom.element.toLowerCase(), true, SmilesDrawer.maxBonds[element] - bondCount, dir, false);
-        } else if (atom.element.toLowerCase() != 'c' && !label) {
-            this.text(vertex.position.x, vertex.position.y, element, 'element ' + atom.element.toLowerCase(), true);
+            this.text(vertex.position.x, vertex.position.y, element, 'element ' + atom.element.toLowerCase(), true, hydrogens, dir, false, charge);
         }
     }
 
@@ -1627,7 +1726,7 @@ SmilesDrawer.prototype.createRing = function (ring, center, start, previous) {
         for (var j = 0; j < ringMemberNeighbours.length; j++) {
             if (ring.thisOrNeighboursContain(this.rings, ringMemberNeighbours[j])) continue;
             var v = this.vertices[ringMemberNeighbours[j]];
-            this.createBonds(v, ringMember, ring);
+            this.createBonds(v, ringMember, ring.center);
         }
     }
 }
@@ -1805,7 +1904,7 @@ SmilesDrawer.prototype.createBonds = function (vertex, previous, ringOrAngle, di
         // If the previous atom is in a bridged ring and this one is inside the ring
         var targets = this.getTargets(vertex.id, previous.id, vertex.value.bridgedRing);
 
-        var pos = Vector2.subtract(ringOrAngle.center, previous.position);
+        var pos = Vector2.subtract(ringOrAngle, previous.position);
         pos.normalize();
 
         // Unlike with the ring, do not multiply with radius but with bond length
@@ -1827,10 +1926,10 @@ SmilesDrawer.prototype.createBonds = function (vertex, previous, ringOrAngle, di
         vertex.previousPosition = previous.position;
         vertex.positioned = true;
     } else if (previous.value.rings.length == 1) {
-        // Here, ringOrAngle is always a ring
+        // Here, ringOrAngle is always a ring (THIS IS CURRENTLY NOT TRUE - WHY?)
         // Use the same approach es with rings that are connected at one vertex
         // and draw the atom in the opposite direction of the center.
-        var pos = Vector2.subtract(ringOrAngle.center, previous.position);
+        var pos = Vector2.subtract(ringOrAngle, previous.position);
 
         pos.invert();
         pos.normalize();
@@ -1880,7 +1979,7 @@ SmilesDrawer.prototype.createBonds = function (vertex, previous, ringOrAngle, di
 
         this.createRing(nextRing, nextCenter, vertex);
     } else {
-        // Draw the non-ring vertices connected to this one
+        // Draw the non-ring vertices connected to this one        
         var neighbours = vertex.getNeighbours();
         if (previous) neighbours = ArrayHelper.remove(neighbours, previous.id);
 
@@ -2356,6 +2455,7 @@ function Atom(element, bond) {
     this.isBridgeNode = false;
     this.bridgedRing = null;
     this.anchoredRings = new Array();
+    this.bracket = null;
 }
 
 Atom.prototype.addAnchoredRing = function (ring) {
@@ -2855,6 +2955,10 @@ function Line(a, b, elementA, elementB) {
     this.elementB = elementB;
 }
 
+Line.prototype.clone = function() {
+    return new Line(this.a.clone(), this.b.clone(), this.elementA, this.elementB);
+}
+
 Line.prototype.getLength = function () {
     return Math.sqrt(Math.pow(this.b.x - this.a.x, 2) + Math.pow(this.b.y - this.a.y, 2));
 }
@@ -2914,6 +3018,8 @@ Line.prototype.rotate = function (theta) {
     var x = Math.cos(theta) * (r.x - l.x) - Math.sin(theta) * (r.y - l.y) + l.x;
     var y = Math.sin(theta) * (r.x - l.x) - Math.cos(theta) * (r.y - l.y) + l.y;
     this.setRightVector(x, y);
+
+    return this;
 }
 
 Line.prototype.shortenA = function (by) {
@@ -2921,6 +3027,8 @@ Line.prototype.shortenA = function (by) {
     f.normalize();
     f.multiply(by);
     this.a.add(f);
+
+    return this;
 }
 
 Line.prototype.shortenB = function (by) {
@@ -2928,6 +3036,8 @@ Line.prototype.shortenB = function (by) {
     f.normalize();
     f.multiply(by);
     this.b.add(f);
+
+    return this;
 }
 
 Line.prototype.shorten = function (by) {
@@ -2936,6 +3046,8 @@ Line.prototype.shorten = function (by) {
     f.multiply(by / 2.0);
     this.b.add(f);
     this.a.subtract(f);
+
+    return this;
 }
 
 function ArrayHelper() {
