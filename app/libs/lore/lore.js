@@ -163,6 +163,36 @@ Lore.Color.hslToRgb = function(h, s, l) {
 
     return [r, g, b];
 }
+
+Lore.Color.rgbToHsl = function(r, g, b){
+    r /= 255, g /= 255, b /= 255;
+    var max = Math.max(r, g, b), min = Math.min(r, g, b);
+    var h, s, l = (max + min) / 2;
+
+    if(max == min){
+        h = s = 0; // achromatic
+    }else{
+        var d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch(max){
+            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+            case g: h = (b - r) / d + 2; break;
+            case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+    }
+
+    return [h, s, l];
+}
+
+Lore.Color.gdbHueShift = function(hue) {
+    var hue = 0.85 * hue + 0.66;
+    if (hue > 1.0) hue = hue - 1.0
+    hue = (1 - hue) + 0.33
+    if (hue > 1.0) hue = hue - 1.0
+
+    return hue;
+}
 Lore.Renderer = function(targetId, options) {
     this.canvas = document.getElementById(targetId);
     this.parent = this.canvas.parentElement;
@@ -654,7 +684,9 @@ Lore.Geometry.prototype = Object.assign(Object.create(Lore.Node.prototype), {
     },
 
     updateAttribute: function(name, data) {
-        this.attributes[name].update(this.gl, data);
+        if(data) this.attributes[name].data = data;
+        this.attributes[name].update(this.gl);
+        return this;
     },
 
     getAttribute: function(name) {
@@ -690,6 +722,8 @@ Lore.Geometry.prototype = Object.assign(Object.create(Lore.Node.prototype), {
                 this.drawMode = this.gl.TRIANGLE_FAN;
                 break;
         }
+
+        return this;
     },
 
     size: function() {
@@ -1150,11 +1184,12 @@ Lore.OrbitalControls = function(renderer, radius, lookAt) {
     this.lookAt = lookAt || new Lore.Vector3f();
 
     this.scale = 0.95;
-    this.zoomed = false;
 
     this.camera.position = new Lore.Vector3f(radius, radius, radius);
     this.camera.updateProjectionMatrix();
     this.camera.updateViewMatrix();
+
+    this.rotationLocked = false;
 
     var that = this;
 
@@ -1186,12 +1221,12 @@ Lore.OrbitalControls.prototype = Object.assign(Object.create(Lore.ControlsBase.p
         this.update();
     },
     update: function(e, source) {
-        if(source == 'left') {
+        if(source == 'left' && !this.rotationLocked) {
 	        // Rotate
             this.dTheta = -2 * Math.PI * e.x / (this.canvas.clientWidth * this.camera.zoom);
             this.dPhi   = -2 * Math.PI * e.y / (this.canvas.clientHeight * this.camera.zoom);
         }
-        else if(source == 'right') {
+        else if(source == 'right' || source == 'left' && this.rotationLocked) {
             // Translate
             var x = e.x * (this.camera.right - this.camera.left) / this.camera.zoom / this.canvas.clientWidth;
             var y = e.y * (this.camera.top - this.camera.bottom) / this.camera.zoom / this.canvas.clientHeight;
@@ -1208,14 +1243,12 @@ Lore.OrbitalControls.prototype = Object.assign(Object.create(Lore.ControlsBase.p
                 // Zoom Out
                 this.camera.zoom = Math.max(0, this.camera.zoom * this.scale);
                 this.camera.updateProjectionMatrix();
-                this.zoomed = true;
                 this.raiseEvent('zoomchanged', this.camera.zoom);
             }
             else if(e.y < 0) {
                 // Zoom In
                 this.camera.zoom = Math.max(0, this.camera.zoom / this.scale);
                 this.camera.updateProjectionMatrix();
-                this.zoomed = true;
                 this.raiseEvent('zoomchanged', this.camera.zoom);
             }
         }
@@ -1223,24 +1256,16 @@ Lore.OrbitalControls.prototype = Object.assign(Object.create(Lore.ControlsBase.p
         // Update the camera
         var offset = this.camera.position.clone().subtract(this.lookAt);
 
-        //var q = new Lore.Quaternion();
-        //q.setFromUnitVectors(this.up, this.up);
-        //var qInverse = q.clone().inverse();
-        //offset.applyQuaternion(q);
-
         this.spherical.setFromVector(offset);
         this.spherical.components[1] += this.dPhi;
         this.spherical.components[2] += this.dTheta;
         this.spherical.limit(0.0, 0.5 * Math.PI, -Infinity, Infinity);
         this.spherical.secure();
 
-
         // Limit radius here
 
         this.lookAt.add(this.dPan);
         offset.setFromSphericalCoords(this.spherical);
-
-        //offset.applyQuaternion(qInverse);
 
         this.camera.position.copyFrom(this.lookAt).add(offset);
 
@@ -1252,12 +1277,60 @@ Lore.OrbitalControls.prototype = Object.assign(Object.create(Lore.ControlsBase.p
         this.dTheta = 0.0;
         this.dPan.set(0, 0, 0);
 
-        // Handle zoom, this is copied from THREE.js OrbitCamera
-        if(this.zoomed) {
-            this.zoomed = false;
-        }
+        this.raiseEvent('updated');
+    },
+
+    setView: function(phi, theta) {
+        var offset = this.camera.position.clone().subtract(this.lookAt);
+
+        this.spherical.setFromVector(offset);
+        this.spherical.components[1] = phi;
+        this.spherical.components[2] = theta;
+        this.spherical.secure();
+
+        offset.setFromSphericalCoords(this.spherical);
+
+        this.camera.position.copyFrom(this.lookAt).add(offset);
+
+        this.camera.setLookAt(this.lookAt);
+
+        this.camera.updateViewMatrix();
 
         this.raiseEvent('updated');
+    },
+
+    setTopView: function() {
+        this.setView(0.0, 2.0 * Math.PI);
+        this.rotationLocked = true;
+    },
+
+    setBottomView: function() {
+        this.rotationLocked = true;
+    },
+
+    setRightView: function() {
+        this.setView(0.5 * Math.PI, 0.5 * Math.PI);
+        this.rotationLocked = true;
+    },
+
+    setLeftView: function() {
+        this.setView(0.5 * Math.PI, -0.5 * Math.PI);
+        this.rotationLocked = true;
+    },
+
+    setFrontView: function() {
+        this.setView(0.5 * Math.PI, 2.0 * Math.PI);
+        this.rotationLocked = true;
+    },
+
+    setBackView: function() {
+        this.setView(0.5 * Math.PI, Math.PI);
+        this.rotationLocked = true;
+    },
+
+    setFreeView: function() {
+        this.setView(0.25 * Math.PI, 0.25 * Math.PI);
+        this.rotationLocked = false
     }
 });
 Lore.CameraBase = function() {
@@ -3302,6 +3375,7 @@ Lore.PointHelper = function (renderer, geometryName, shaderName, options) {
     this.octree = null;
     this.geometry.setMode(Lore.DrawModes.points);
     this.initPointSize();
+    this.filters = {};
 }
 
 Lore.PointHelper.prototype = Object.assign(Object.create(Lore.HelperBase.prototype), {
@@ -3352,6 +3426,7 @@ Lore.PointHelper.prototype = Object.assign(Object.create(Lore.HelperBase.prototy
         this.setRGB(r, g, b, length, normalize);
     },
 
+    /*
     setPositionsXYZHues: function (x, y, z, hues) {
         var length = this.getMaxLength(x, y, z);
         this.setPositionsXYZ(x, y, z, length);
@@ -3363,6 +3438,7 @@ Lore.PointHelper.prototype = Object.assign(Object.create(Lore.HelperBase.prototy
         this.setPositionsXYZ(x, y, z, length);
         this.setHSL(h, s, l, length);
     },
+   
 
     setHues: function (hues, length) {
         var colors = new Float32Array(length * 3);
@@ -3409,6 +3485,7 @@ Lore.PointHelper.prototype = Object.assign(Object.create(Lore.HelperBase.prototy
 
         return hue;
     },
+    */
 
     setColors: function (colors) {
         this.setAttribute('color', colors);
@@ -3465,6 +3542,17 @@ Lore.PointHelper.prototype = Object.assign(Object.create(Lore.HelperBase.prototy
             }
         }
 
+        // Convert to HOS (Hue, Opacity, Size)
+        for(var i = 0; i < c.length; i += 3) {
+            var r = c[i];
+            var g = c[i + 1];
+            var b = c[i + 2];
+
+            c[i] = Lore.Color.rgbToHsl(r, g, b)[0];
+            c[i + 1] = 1.0;
+            c[i + 2] = 1.0;
+        }
+
         this.setColors(c);
     },
 
@@ -3476,6 +3564,17 @@ Lore.PointHelper.prototype = Object.assign(Object.create(Lore.HelperBase.prototy
             c[j] = r[i];
             c[j + 1] = g[i];
             c[j + 2] = b[i];
+        }
+
+        // Convert to HOS (Hue, Opacity, Size)
+        for(var i = 0; i < c.length; i += 3) {
+            var r = c[i];
+            var g = c[i + 1];
+            var b = c[i + 2];
+
+            c[i] = Lore.Color.rgbToHsl(r, g, b)[0];
+            c[i + 1] = 1.0;
+            c[i + 2] = 1.0;
         }
 
         this.updateColors(c);
@@ -3491,6 +3590,19 @@ Lore.PointHelper.prototype = Object.assign(Object.create(Lore.HelperBase.prototy
         }
 
         this.setColors(c);
+    },
+
+    addFilter: function (name, filter) {
+        filter.setGeometry(this.geometry);
+        this.filters[name] = filter;
+    },
+
+    removeFilter: function (name) {
+        delete this.filters[name];
+    },
+
+    getFilter: function (name) {
+        return this.filters[name];
     }
 });
 
@@ -3905,7 +4017,8 @@ Lore.OctreeHelper.prototype = Object.assign(Object.create(Lore.HelperBase.protot
                 var intersectedPoint = ray.closestPointToPoint(v);
                 intersectedPoint.applyProjection(this.target.modelMatrix);
                 var dist = this.raycaster.ray.source.distanceTo(intersectedPoint);
-                if(dist < this.raycaster.near || dist > this.raycaster.far || dist < cutoff) continue;
+                var isVisible = Lore.FilterBase.isVisible(this.target.geometry, index);
+                if(dist < this.raycaster.near || dist > this.raycaster.far || dist < cutoff || !isVisible) continue;
 
                 result.push({
                     distance: dist,
@@ -3925,6 +4038,83 @@ Lore.OctreeHelper.prototype = Object.assign(Object.create(Lore.HelperBase.protot
 Lore.OctreeHelper.defaults = {
     visualize: false
 }
+Lore.FilterBase = function(attribute, attributeIndex) {
+    this.type = 'Lore.FilterBase';
+    this.geometry = null;
+    this.attribute = attribute;
+    this.attributeIndex = attributeIndex;
+    this.active = false;
+}
+
+Lore.FilterBase.prototype = {
+    constructor: Lore.FilterBase,
+
+    filter: function() {
+
+    }
+}
+
+
+Lore.FilterBase.isVisible = function(geometry, index) {
+    return geometry.attributes['color'].data[index * 3 + 2] > 0.0;
+}
+
+Lore.InRangeFilter = function(attribute, attributeIndex, min, max) {
+    Lore.FilterBase.call(this, attribute, attributeIndex);
+    this.min = min;
+    this.max = max;
+}
+
+Lore.InRangeFilter.prototype = Object.assign(Object.create(Lore.FilterBase.prototype), {
+    constructor: Lore.InRangeFilter,
+
+    getMin: function() {
+        return this.min;
+    },
+
+    setMin: function(value) {
+        this.min = value;
+    },
+
+    getMax: function() {
+        return this.max;
+    },
+
+    setMax: function(value) {
+        this.max = value;
+    },
+
+    getGeometry: function() {
+        return this.geometry;
+    },
+
+    setGeometry: function(value) {
+        this.geometry = value;
+    },
+
+    filter: function() {
+        var attribute = this.geometry.attributes[this.attribute];
+
+        for(var i = 0; i < attribute.data.length; i += attribute.attributeLength) {
+            var value = attribute.data[i + this.attributeIndex];
+            var size = this.geometry.attributes['color'].data[i + 2];
+            if(value > this.max || value < this.min)
+                this.geometry.attributes['color'].data[i + 2] = -Math.abs(size);
+            else
+                this.geometry.attributes['color'].data[i + 2] = Math.abs(size);
+        }
+
+        this.geometry.updateAttribute('color');
+    },
+
+    reset: function(geometry) {
+        for(var i = 0; i < attribute.data.length; i += attribute.attributeLength) {
+            this.geometry.attributes['color'][i + 2] = -this.geometry.attributes['color'][i + 2];
+        }
+
+        this.geometry.updateAttribute('color');
+    } 
+});
 Lore.FileReaderBase = function(elementId) {
     this.elementId = elementId;
     this.element = document.getElementById(this.elementId);
@@ -4113,10 +4303,13 @@ Lore.Shaders['default'] = new Lore.Shader('Default', { size: new Lore.Uniform('s
         'return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);',
     '}',
     'void main() {',
+        'vec3 hsv = vec3(color.r, color.g, 0.75);',
+        'float saturation = color.g;',
+        'float point_size = color.b;',
         'gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);',
         'vec4 mv_pos = modelViewMatrix * vec4(position, 1.0);',
         'vDiscard = 0.0;',
-        'if(-mv_pos.z < cutoff) {',
+        'if(-mv_pos.z < cutoff || point_size <= 0.0) {',
             'vDiscard = 1.0;',
             'return;',
         '}',
@@ -4125,19 +4318,15 @@ Lore.Shaders['default'] = new Lore.Shader('Default', { size: new Lore.Uniform('s
         'float dist = abs(mv_pos.z - fog_start);',
         'gl_PointSize = size;',
         'if(fogDistance > 0.0) {',
-            'vec3 hsv = rgb2hsv(color);',
             'hsv.b = clamp((fog_end - dist) / (fog_end - fog_start), 0.0, 1.0);',
-            'vColor = hsv2rgb(hsv);',
         '}',
-        'else {',
-            'vColor = color;',
-        '}',
+        'vColor = hsv2rgb(hsv);',
     '}'
 ], [
     'varying vec3 vColor;',
     'varying float vDiscard;',
     'void main() {',
-        'if(vDiscard == 1.0) discard;',
+        'if(vDiscard > 0.5) discard;',
         'gl_FragColor = vec4(vColor, 1.0);',
     '}'
 ]);
@@ -4205,10 +4394,13 @@ Lore.Shaders['sphere'] = new Lore.Shader('Sphere', { size: new Lore.Uniform('siz
         'return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);',
     '}',
     'void main() {',
+        'vec3 hsv = vec3(color.r, color.g, 0.75);',
+        'float saturation = color.g;',
+        'float point_size = color.b;',
         'gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);',
         'vec4 mv_pos = modelViewMatrix * vec4(position, 1.0);',
         'vDiscard = 0.0;',
-        'if(-mv_pos.z < cutoff) {',
+        'if(-mv_pos.z < cutoff || point_size <= 0.0) {',
             'vDiscard = 1.0;',
             'return;',
         '}',
@@ -4217,23 +4409,19 @@ Lore.Shaders['sphere'] = new Lore.Shader('Sphere', { size: new Lore.Uniform('siz
         'float dist = abs(mv_pos.z - fog_start);',
         'gl_PointSize = size;',
         'if(fogDistance > 0.0) {',
-            'vec3 hsv = rgb2hsv(color);',
             'hsv.b = clamp((fog_end - dist) / (fog_end - fog_start), 0.0, 1.0);',
-            'vColor = hsv2rgb(hsv);',
         '}',
-        'else {',
-            'vColor = color;',
-        '}',
+        'vColor = hsv2rgb(hsv);',
     '}'
 ], [
     'varying vec3 vColor;',
     'varying float vDiscard;',
     'void main() {',
-        'if(vDiscard == 1.0) discard;',
+        'if(vDiscard > 0.5) discard;',
         'vec3 N;',
         'N.xy = gl_PointCoord * 2.0 - vec2(1.0);',
         'float mag = dot(N.xy, N.xy);',
-        'if (mag > 1.0) discard;   // kill pixels outside circle',
+        'if (mag > 1.0) discard;   // discard fragments outside circle',
         'N.z = sqrt(1.0 - mag);',
         'float diffuse = max(0.5, dot(vec3(0.25, -0.25, 1.0), N));',
         'gl_FragColor = vec4(vColor * diffuse, 1.0);',

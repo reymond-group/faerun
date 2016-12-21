@@ -17,6 +17,7 @@
   var switchColor = document.getElementById('switch-color');
   var selectSet = document.getElementById('select-set');
   var selectColorMap = document.getElementById('select-color-map');
+  var selectView = document.getElementById('select-view');
   var sliderCutoff = document.getElementById('slider-cutoff');
   var hudContainer = document.getElementById('hud-container');
   var hudHeader = document.getElementById('hud-header');
@@ -45,7 +46,7 @@
       lore.setClearColor(Lore.Color.fromHex('#DADFE1'));
     } else {
       labelSwitchColor.innerHTML = 'Dark Background';
-      lore.setClearColor(Lore.Color.fromHex('#1E1E1E'));
+      lore.setClearColor(Lore.Color.fromHex('#121212'));
     }
   }, false);
 
@@ -71,6 +72,17 @@
     selectColorMap.parentElement.style.pointerEvents = 'none';
     Faerun.show(loader);
   }, false);
+
+  selectView.addEventListener('change', function() {
+    var val = selectView.value;
+
+    if (val === 'free') lore.controls.setFreeView();
+    if (val === 'top') lore.controls.setTopView();
+    if (val === 'left') lore.controls.setLeftView();
+    if (val === 'right') lore.controls.setRightView();
+    if (val === 'front') lore.controls.setFrontView();
+    if (val === 'back') lore.controls.setBackView();
+  });
 
   sliderCutoff.addEventListener('input', function () {
     pointHelper.setCutoff(sliderCutoff.value);
@@ -119,7 +131,7 @@
   // Socket.IO communication
   document.addEventListener('DOMContentLoaded', function (event) {
     lore = Lore.init('lore', {
-      clearColor: '#212121'
+      clearColor: '#121212'
     });
     smilesDrawer = new SmilesDrawer();
 
