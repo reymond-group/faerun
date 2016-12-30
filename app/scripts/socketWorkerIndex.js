@@ -41,7 +41,10 @@ socket.on('loadmapresponse', function (msg) {
 socket.on('loadsmilesresponse', function (msg) {
   postMessage({
     cmd: 'loadsmilesresponse',
-    message: msg.data
+    message: {
+      smiles: msg.data,
+      index: msg.index
+    }
   });
 });
 

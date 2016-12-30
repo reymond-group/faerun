@@ -9,6 +9,9 @@
   var currentSet = null;
   var currentMap = null;
   var center = null;
+  var selectIndicators = [];
+  var selectCanvas = {};
+  var selectSmiles = {};
   var socketWorker = new Worker('scripts/socketWorkerIndex.js');
   var loader = document.getElementById('loader');
 
@@ -19,12 +22,18 @@
   var selectColorMap = document.getElementById('select-color-map');
   var selectView = document.getElementById('select-view');
   var sliderCutoff = document.getElementById('slider-cutoff');
+  var sliderColor = document.getElementById('slider-color');
   var hudContainer = document.getElementById('hud-container');
   var hudHeader = document.getElementById('hud-header');
   var hudHeaderIcon = document.getElementById('hud-header-icon');
   var buttonRecenter = document.getElementById('button-recenter');
+  var buttonZoomIn = document.getElementById('button-zoomin');
+  var buttonZoomOut = document.getElementById('button-zoomout');
+  var buttonToggleSelect = document.getElementById('button-toggle-select');
+  var buttonSelectHovered = document.getElementById('button-select-hovered');
   var hoverIndicator = document.getElementById('hover-indicator');
-  var selectIndicator = document.getElementById('select-indicator');
+  var hoverStructure = document.getElementById('hover-structure');
+  var selectContainer = document.getElementById('select-container');
 
   // Events
   hudHeader.addEventListener('click', function () {
@@ -88,8 +97,46 @@
     pointHelper.setCutoff(sliderCutoff.value);
   });
 
+  sliderColor.addEventListener('input', function() {
+    var val = parseFloat(sliderColor.value);
+    var filter = pointHelper.getFilter('hueRange');
+
+    if (val < 0.02) {
+      filter.reset();
+      return;
+    }
+
+    val = Lore.Color.gdbHueShift(val);
+    filter.setMin(val - 0.002);
+    filter.setMax(val + 0.002);
+    filter.filter();
+  });
+
   buttonRecenter.addEventListener('click', function () {
     lore.controls.setLookAt(center);
+  });
+
+  buttonZoomIn.addEventListener('click', function () {
+    lore.controls.zoomIn();
+  });
+
+  buttonZoomOut.addEventListener('click', function () {
+    lore.controls.zoomOut();
+  });
+
+  buttonToggleSelect.addEventListener('click', function () {
+    Faerun.toggleClass(buttonToggleSelect, 'mdl-button--colored');
+    if (lore.controls.touchMode === 'drag') {
+      Faerun.showMobile(hoverStructure);
+      lore.controls.touchMode = 'select';
+    } else {
+      Faerun.hideMobile(hoverStructure);
+      lore.controls.touchMode = 'drag';
+    }
+  });
+
+  buttonSelectHovered.addEventListener('click', function () {
+    octreeHelper.selectHovered();
   });
 
   // UI - data
@@ -115,6 +162,73 @@
     for (var key in availableMaps)
       if ({}.hasOwnProperty.call(availableMaps, key))
         Faerun.appendOption(selectColorMap, key, availableMaps[key].name);
+  }
+
+  function createSelected(index, id) {
+    var selected = octreeHelper.selected[index];
+    var hue = pointHelper.getHue(id);
+    var rgb = Lore.Color.hslToRgb(hue, 1.0, 0.75);
+    rgb[0] = Math.round(rgb[0] * 255); rgb[1] = Math.round(rgb[1] * 255); rgb[2] = Math.round(rgb[2] * 255);
+
+    var structure = document.createElement('div');
+    structure.classList.add('mdl-badge', 'mdl-badge--overlap');
+    structure.setAttribute('id', 'selected-' + index);
+    structure.setAttribute('data-badge', index);
+    structure.style.borderColor = 'rgba(' + rgb[0] + ', ' + rgb[1] + ', ' + rgb[2] + ', 1.0)';
+
+    Faerun.hover(structure, function() {
+      var data = smiles.parse(selectSmiles[id]);
+      smilesDrawer.draw(data, 'hover-structure-drawing', false);
+    }, function() {
+      Faerun.clearCanvas('hover-structure-drawing');
+    });
+
+    structure.addEventListener('click', function() {
+
+    });
+
+    var canvas = document.createElement('canvas');
+    canvas.setAttribute('id', 'select-structure-drawing-' + id);
+    canvas.setAttribute('width', '50');
+    canvas.setAttribute('height', '50');
+    structure.appendChild(canvas);
+
+    var indicator = document.createElement('span');
+    indicator.classList.add('mdl-badge', 'mdl-badge--overlap', 'select-indicator');
+    indicator.setAttribute('id', 'selected-indicator-' + index);
+    indicator.setAttribute('data-badge', index);
+    Faerun.translateAbsolute(indicator, selected.screenPosition[0], selected.screenPosition[1], true);
+    var pointSize = pointHelper.getPointSize();
+    Faerun.resize(indicator, pointSize, pointSize);
+
+    selectCanvas[id] = canvas;
+
+    selectIndicators.push(indicator);
+
+    selectContainer.appendChild(structure);
+    selectContainer.parentElement.appendChild(indicator);
+  }
+
+  function clearSelected() {
+    selectCanvas = {};
+    selectSmiles = {};
+    Faerun.removeChildren(selectContainer);
+
+    selectIndicators = [];
+    var indicators = document.getElementsByClassName('select-indicator');
+    for (var i = indicators.length - 1; i >= 0; i--) {
+      indicators[i].parentNode.removeChild(indicators[i]);
+    }
+  }
+
+  function updateSelected() {
+    var pointSize = pointHelper.getPointSize();
+    for (var i = 0; i < selectIndicators.length; i++) {
+      var selected = octreeHelper.selected[i];
+      var indicator = selectIndicators[i];
+      Faerun.translateAbsolute(indicator, selected.screenPosition[0], selected.screenPosition[1], true);
+      Faerun.resize(indicator, pointSize, pointSize);
+    }
   }
 
   /**
@@ -156,8 +270,10 @@
         pointHelper = new Lore.PointHelper(lore, 'TestGeometry', 'default');
         pointHelper.setFogDistance(message.size * Math.sqrt(3) + 500);
         pointHelper.setPositionsXYZColor(message.data[0], message.data[1], message.data[2], new Lore.Color(0.1, 0.2, 0.8));
+        pointHelper.addFilter('hueRange', new Lore.InRangeFilter('color', 0, 0.22, 0.25));
+
         octreeHelper = new Lore.OctreeHelper(lore, 'OctreeGeometry', 'default', pointHelper);
-        
+
         octreeHelper.addEventListener('hoveredchanged', function (e) {
           if (!e.e) {
             Faerun.hide(hoverIndicator);
@@ -176,21 +292,19 @@
         });
 
         octreeHelper.addEventListener('selectedchanged', function (e) {
-          console.log(e);
-          if (!e.e) {
-            Faerun.hide(selectIndicator);
-            return;
+          clearSelected();
+          for (var i = 0; i < octreeHelper.selected.length; i++) {
+            var selected = octreeHelper.selected[i];
+            createSelected(i, selected.index);
+
+            socketWorker.postMessage({
+              cmd: 'loadsmiles',
+              message: {
+                set_id: currentSet.id,
+                index: e.e[i].index
+              }
+            });
           }
-
-          updateSelected();
-
-          socketWorker.postMessage({
-            cmd: 'loadsmiles',
-            message: {
-              set_id: currentSet.id,
-              index: e.e.index
-            }
-          });
         });
 
         octreeHelper.addEventListener('updated', function() {
@@ -208,31 +322,26 @@
         selectColorMap.parentElement.style.pointerEvents = 'auto';
         Faerun.hide(loader);
       } else if (cmd === 'loadsmilesresponse') {
-        var data = smiles.parse(message.trim());
-        smilesDrawer.draw(data, 'hover-structure-drawing', false);
+        var target = 'hover-structure-drawing';
+
+        if (selectCanvas.hasOwnProperty(message.index)) {
+          target = 'select-structure-drawing-' + message.index;
+          selectSmiles[message.index] = message.smiles.trim();
+        }
+
+        var data = smiles.parse(message.smiles.trim());
+        smilesDrawer.draw(data, target, false);
       }
     };
   });
 
   // Helpers
 
-
   function updateHovered() {
     Faerun.show(hoverIndicator);
     Faerun.translateAbsolute(hoverIndicator, octreeHelper.hovered.screenPosition[0], octreeHelper.hovered.screenPosition[1], true);
     var pointSize = pointHelper.getPointSize();
     Faerun.resize(hoverIndicator, pointSize, pointSize);
-    console.log(octreeHelper.hovered);
-    console.log(octreeHelper.hovered.color);
-    Faerun.setColorFromArray(hoverIndicator, octreeHelper.hovered.color);
-  }
-
-  function updateSelected() {
-    Faerun.show(selectIndicator);
-    Faerun.translateAbsolute(selectIndicator, octreeHelper.selected.screenPosition[0], octreeHelper.selected.screenPosition[1], true);
-    var pointSize = pointHelper.getPointSize();
-    Faerun.resize(selectIndicator, pointSize, pointSize);
-    Faerun.setColorFromArray(selectIndicator, octreeHelper.selected.color);
   }
 
   /**

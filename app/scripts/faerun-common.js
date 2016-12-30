@@ -242,6 +242,25 @@ Faerun.show = function (element) {
 };
 
 /**
+ * Hides an HTMLElement by adding the class 'hidden' to the classList of the element.
+ *
+ * @param {HTMLElement} element - The HTMLElement to be hidden.
+ */
+Faerun.hideMobile = function (element) {
+  element.classList.add('hidden-mobile');
+};
+
+/**
+ * Shows an HTMLElement by removing the class 'hidden' from the classList of the element.
+ *
+ * @param {HTMLElement} element - The HTMLElement to be hidden.
+ */
+Faerun.showMobile = function (element) {
+  element.classList.remove('hidden-mobile');
+};
+
+
+/**
  * Shows or hides an HTMLElement by adding or removing the class 'hidden' from the classList of the element.
  *
  * @param {HTMLElement} element - The HTMLElement to be shown or hidden.
@@ -316,4 +335,15 @@ Faerun.resize = function (element, width, height) {
 Faerun.setColorFromArray = function (element, arr) {
   element.style.backgroundColor = 'rgb(' + Math.round(arr[0] * 255) + ', ' + Math.round(arr[1] * 255) +
                                   ', ' + Math.round(arr[2] * 255) + ')';
+};
+
+Faerun.hover = function (element, enter, leave) {
+  element.addEventListener('mouseenter', enter, false);
+  element.addEventListener('mouseleave', leave, false);
+};
+
+Faerun.clearCanvas = function (id) {
+  var canvas = document.getElementById(id);
+  var ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 };
