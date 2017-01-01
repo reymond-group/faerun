@@ -170,10 +170,11 @@
     var rgb = Lore.Color.hslToRgb(hue, 1.0, 0.75);
     rgb[0] = Math.round(rgb[0] * 255); rgb[1] = Math.round(rgb[1] * 255); rgb[2] = Math.round(rgb[2] * 255);
 
-    var structure = document.createElement('div');
+    var structure = document.createElement('a');
     structure.classList.add('mdl-badge', 'mdl-badge--overlap');
     structure.setAttribute('id', 'selected-' + index);
     structure.setAttribute('data-badge', index);
+    structure.setAttribute('href', '/details.html?index=' + id + '&set_id=' + currentSet.id);
     structure.style.borderColor = 'rgba(' + rgb[0] + ', ' + rgb[1] + ', ' + rgb[2] + ', 1.0)';
 
     Faerun.hover(structure, function() {
@@ -181,10 +182,6 @@
       smilesDrawer.draw(data, 'hover-structure-drawing', false);
     }, function() {
       Faerun.clearCanvas('hover-structure-drawing');
-    });
-
-    structure.addEventListener('click', function() {
-
     });
 
     var canvas = document.createElement('canvas');
