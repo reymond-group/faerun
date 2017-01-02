@@ -375,6 +375,7 @@ html, body {
 
 #select-container a {
   z-index: 9999;
+  position: relative;
   display: inline-block;
   padding: 15px;
   margin: 10px;
@@ -384,8 +385,26 @@ html, body {
   border-radius: 100px;
   pointer-events: all;
 
-  transition: background .2s linear;
+  transition: background .1s linear;
   box-shadow: 0px 0px 10px 2px rgba(0,0,0,0.5);
+}
+
+#select-container a span {
+  position: absolute;
+  top: 15px;
+  right: -10px;
+  width: 20px;
+  height: 20px;
+  background-color: #f00;
+  color: #fff;
+  border-radius: 50px;
+  text-align: center;
+  transition: background .1s linear;
+}
+
+#select-container a span:hover {
+  background-color: #fff;
+  color: #f00;
 }
 
 #select-container a:hover {
@@ -399,7 +418,8 @@ html, body {
 
 /* Badge overrides */
 .mdl-badge[data-badge]:after {
-  background-color: #000 !important;
+  background-color: #fff !important;
+  color: #000 !important;
 }
 
 @media screen and (max-width: 1024px) {

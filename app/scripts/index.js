@@ -175,7 +175,17 @@
     structure.setAttribute('id', 'selected-' + index);
     structure.setAttribute('data-badge', index);
     structure.setAttribute('href', '/details.html?index=' + id + '&set_id=' + currentSet.id);
+    structure.setAttribute('target', '_blank');
     structure.style.borderColor = 'rgba(' + rgb[0] + ', ' + rgb[1] + ', ' + rgb[2] + ', 1.0)';
+
+    var closer = document.createElement('span');
+    closer.innerHTML = '&times;';
+    closer.addEventListener('click', function(e) {
+      octreeHelper.removeSelected(index);
+      e.stopPropagation();
+      e.preventDefault();
+    });
+    structure.appendChild(closer);
 
     Faerun.hover(structure, function() {
       var data = smiles.parse(selectSmiles[id]);

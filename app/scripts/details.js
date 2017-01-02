@@ -26,14 +26,14 @@
       lore.setClearColor(Lore.Color.fromHex('#DADFE1'));
     } else {
       labelSwitchColor.innerHTML = 'Dark Background';
-      lore.setClearColor(Lore.Color.fromHex('#1E1E1E'));
+      lore.setClearColor(Lore.Color.fromHex('#121212'));
     }
   }, false);
 
   // Socket.IO communication
   document.addEventListener('DOMContentLoaded', function (event) {
     lore = Lore.init('lore', {
-      clearColor: '#212121'
+      clearColor: '#121212'
     });
     smilesDrawer = new SmilesDrawer();
 
@@ -79,28 +79,22 @@
       var smile = smilesData[i].trim();
       var molecule = document.createElement('div');
       var structure = document.createElement('canvas');
-      var image = document.createElement('div');
 
-      molecule.classList.add('molecule');
+      molecule.classList.add('molecule', 'demo-card-wide', 'mdl-card', 'mdl-shadow--6dp');
       structure.classList.add('structure-view');
-      structure.width = 250;
-      structure.height = 250;
-
-      image.classList.add('structure-view');
-      image.id = 'structure-view-image' + i;
+      structure.width = 300;
+      structure.height = 300;
 
       structure.id = 'structure-view' + i;
       var p = document.createElement('p');
       p.innerHTML = smile;
 
       molecule.appendChild(structure);
-      molecule.appendChild(image);
-      molecule.appendChild(p);
+      // molecule.appendChild(p);
 
-      image.style.backgroundImage = 'url(\'' + Faerun.getSchemblStructure(smile) + '\')';
       container.appendChild(molecule);
       var data = smiles.parse(smile);
-      smilesDrawer.draw(data, structure.id, false);
+      smilesDrawer.draw(data, structure.id, false, true);
     }
   }
 
