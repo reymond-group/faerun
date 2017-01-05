@@ -174,7 +174,7 @@
     structure.classList.add('mdl-badge', 'mdl-badge--overlap');
     structure.setAttribute('id', 'selected-' + index);
     structure.setAttribute('data-badge', index);
-    structure.setAttribute('href', '/details.html?index=' + id + '&set_id=' + currentSet.id);
+    structure.setAttribute('href', 'details.html?index=' + id + '&set_id=' + currentSet.id);
     structure.setAttribute('target', '_blank');
     structure.style.borderColor = 'rgba(' + rgb[0] + ', ' + rgb[1] + ', ' + rgb[2] + ', 1.0)';
 
