@@ -68,6 +68,21 @@ gulp.task('copy', () =>
     .pipe($.size({title: 'copy'}))
 );
 
+// Copy the libs
+gulp.task('copylibs', () =>
+  gulp.src([
+    'app/libs/**/*'
+  ]).pipe(gulp.dest('dist/libs'))
+);
+
+// Copy the scripts, I do not want to concat them
+gulp.task('copyscripts', () =>
+  gulp.src([
+    'app/scripts/*.js'
+  ]).pipe(gulp.dest('dist/scripts'))
+);
+
+
 // Compile and automatically prefix stylesheets
 gulp.task('styles', () => {
   const AUTOPREFIXER_BROWSERS = [
@@ -109,7 +124,17 @@ gulp.task('scripts', () =>
       // Note: Since we are not using useref in the scripts build pipeline,
       //       you need to explicitly list your scripts here in the right order
       //       to be correctly concatenated
-      './app/scripts/main.js'
+      // './app/libs/lore/lore.min.js',
+      // './app/libs/mdl-selectified/mdl-slectified.min.js',
+      // './app/libs/smilesDrawer/smiles.js',
+      // './app/libs/smilesDrawer/smilesDrawer.js',
+      // './app/libs/socketio/socket.io-1.4.5.js',
+      // './app/scripts/main.js',
+      // './app/scripts/faerun-common.js',
+      // './app/scripts/index.js',
+      // './app/scripts/details.js',
+      // './app/scripts/socketWorkerDetails.js',
+      // './app/scripts/socketWorkerIndex.js'
       // Other scripts
     ])
       .pipe($.newer('.tmp/scripts'))
@@ -191,11 +216,37 @@ gulp.task('serve:dist', ['default'], () =>
   })
 );
 
+// Build and serve the output from the dist build
+gulp.task('serve:distnolint', ['nolint'], () =>
+  browserSync({
+    notify: false,
+    logPrefix: 'WSK',
+    // Allow scroll syncing across breakpoints
+    scrollElementMapping: ['main', '.mdl-layout'],
+    // Run as an https by uncommenting 'https: true'
+    // Note: this uses an unsigned certificate which on first access
+    //       will present a certificate warning in the browser.
+    // https: true,
+    server: 'dist',
+    port: 3001
+  })
+);
+
+
 // Build production files, the default task
 gulp.task('default', ['clean'], cb =>
   runSequence(
     'styles',
     ['lint', 'html', 'scripts', 'images', 'copy'],
+    'generate-service-worker',
+    cb
+  )
+);
+
+gulp.task('nolint', ['clean'], cb =>
+  runSequence(
+    'styles',
+    ['html', 'scripts', 'images', 'copy', 'copylibs', 'copyscripts'],
     'generate-service-worker',
     cb
   )
