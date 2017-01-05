@@ -296,6 +296,12 @@ Faerun.toggleClass = function (element, name) {
     element.classList.add(name);
 };
 
+Faerun.removeClasses = function (element, classNames) {
+  for (var i = 0; i < classNames.length; i++) {
+    element.classList.remove(classNames[i]);
+  }
+};
+
 /**
  * Moves the absolute positioned element to the position x, y.
  *
@@ -346,4 +352,9 @@ Faerun.clearCanvas = function (id) {
   var canvas = document.getElementById(id);
   var ctx = canvas.getContext('2d');
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+};
+
+Faerun.removeElement = function(id) {
+  var element = document.getElementById(id);
+  return element.parentNode.removeChild(element);
 };

@@ -53,15 +53,19 @@
       } else if (cmd === 'loaddetailsresponse') {
         var coords = Faerun.getCoords(message.data.coords, 250);
         smilesData = message.data.smiles;
-        updateCoordinatesHelper(coords.scale);
-
-        pointHelper = new Lore.PointHelper(lore, 'TestGeometry', 'sphere', {
-          pointScale: 10
-        });
-        pointHelper.setFogDistance(coords.scale * Math.sqrt(3) * 2 + 400);
-        console.log(coords.x, coords.y, coords.z);
-        pointHelper.setPositionsXYZColor(coords.x, coords.y, coords.z, new Lore.Color.fromHex('#8BC34A'));
-        octreeHelper = new Lore.OctreeHelper(lore, 'OctreeGeometry', 'default', pointHelper);
+        console.log(message);
+        if (message.data.size > 1) {
+          updateCoordinatesHelper(coords.scale);
+          pointHelper = new Lore.PointHelper(lore, 'TestGeometry', 'sphere', {
+            pointScale: 10
+          });
+          pointHelper.setFogDistance(coords.scale * Math.sqrt(3) * 2 + 400);
+          pointHelper.setPositionsXYZColor(coords.x, coords.y, coords.z, new Lore.Color.fromHex('#8BC34A'));
+          octreeHelper = new Lore.OctreeHelper(lore, 'OctreeGeometry', 'default', pointHelper);
+        } else {
+          Faerun.removeElement('loreCell');
+          
+        }
 
         initMoleculeList();
       }
