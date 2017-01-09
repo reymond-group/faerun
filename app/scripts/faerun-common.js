@@ -196,7 +196,7 @@ Faerun.removeChildren = function (element) {
  * @param {String} title - The new title.
  */
 Faerun.setTitle = function (title) {
-  document.getElementById('datatitle').innerHTML = title;
+  document.getElementById('dataTitle').innerHTML = title;
 };
 
 /**
@@ -302,6 +302,12 @@ Faerun.removeClasses = function (element, classNames) {
   }
 };
 
+Faerun.addClasses = function (element, classNames) {
+  for (var i = 0; i < classNames.length; i++) {
+    element.classList.add(classNames[i]);
+  }
+};
+
 /**
  * Moves the absolute positioned element to the position x, y.
  *
@@ -354,7 +360,78 @@ Faerun.clearCanvas = function (id) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 };
 
-Faerun.removeElement = function(id) {
-  var element = document.getElementById(id);
+Faerun.removeElement = function(element) {
   return element.parentNode.removeChild(element);
+};
+
+Faerun.getBindings = function() {
+  var bindings = {};
+  var elements = document.querySelectorAll('[data-binding-id]');
+
+  for (var i = 0; i < elements.length; i++) {
+    var element = elements[i];
+    bindings[element.getAttribute('data-binding-id')] = element;
+  }
+
+  return bindings;
+};
+
+/**
+ * Update the coordinates according to the current data set.
+ *
+ * @param {Lore} lore - A Lore visualizer context
+ * @param {Number} size - The size of the x, y and z coordinate axis
+ * @return {any} Retruns an object containing the center (.center) of the CoordinatesHelper and the CoordiantesHelper itself (.helper)
+ */
+Faerun.updateCoordinatesHelper = function(lore, size) {
+  var coordinatesHelper = new Lore.CoordinatesHelper(lore, 'Coordinates', 'coordinates', {
+    position: new Lore.Vector3f(0, 0, 0),
+    axis: {
+      x: {
+        length: size,
+        color: Lore.Color.fromHex('#123273')
+      },
+      y: {
+        length: size,
+        color: Lore.Color.fromHex('#123273')
+      },
+      z: {
+        length: size,
+        color: Lore.Color.fromHex('#123273')
+      }
+    },
+    ticks: {
+      x: {
+        length: 10,
+        color: Lore.Color.fromHex('#123273')
+      },
+      y: {
+        length: 10,
+        color: Lore.Color.fromHex('#123273')
+      },
+      z: {
+        length: 10,
+        color: Lore.Color.fromHex('#123273')
+      }
+    },
+    box: {
+      enabled: false,
+      x: {
+        color: Lore.Color.fromHex('#123273')
+      },
+      y: {
+        color: Lore.Color.fromHex('#123273')
+      },
+      z: {
+        color: Lore.Color.fromHex('#123273')
+      }
+    }
+  });
+
+  var halfSize = size / 2.0;
+  var center = new Lore.Vector3f(halfSize, halfSize, halfSize);
+  lore.controls.setRadius((size * Math.sqrt(3)) / 2.0 + 100);
+  lore.controls.setLookAt(center);
+
+  return {center: center, helper: coordinatesHelper};
 };

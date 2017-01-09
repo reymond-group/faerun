@@ -3,39 +3,61 @@
   var lore = null;
   var smilesDrawer = null;
   var pointHelper = null;
+  var treeHelper = null;
   var octreeHelper = null;
+  var coordinatesHelper = null;
   var smilesData = null;
+  var coords = null;
   var socketWorker = new Worker('scripts/socketWorkerDetails.js');
-  var loader = document.getElementById('loader');
+  var treeWorker = new Worker('libs/kmst/kmst-worker.js');
+
+  var bindings = Faerun.getBindings();
 
   // Events
-  var switchFullscreen = document.getElementById('switch-fullscreen');
-  switchFullscreen.addEventListener('change', function () {
-    if (switchFullscreen.checked) {
+  bindings.switchFullscreen.addEventListener('change', function () {
+    if (bindings.switchFullscreen.checked) {
       Faerun.launchIntoFullscreen(document.documentElement);
     } else {
       Faerun.exitFullscreen();
     }
   }, false);
 
-  var labelSwitchColor = document.getElementById('label-switch-color');
-  var switchColor = document.getElementById('switch-color');
-  switchColor.addEventListener('change', function () {
-    if (switchColor.checked) {
-      labelSwitchColor.innerHTML = 'Light Background';
+  bindings.switchColor.addEventListener('change', function () {
+    if (bindings.switchColor.checked) {
+      bindings.labelSwitchColor.innerHTML = 'Light Background';
       lore.setClearColor(Lore.Color.fromHex('#DADFE1'));
     } else {
-      labelSwitchColor.innerHTML = 'Dark Background';
+      bindings.labelSwitchColor.innerHTML = 'Dark Background';
       lore.setClearColor(Lore.Color.fromHex('#121212'));
     }
   }, false);
 
   // Socket.IO communication
   document.addEventListener('DOMContentLoaded', function (event) {
-    lore = Lore.init('lore', {
-      clearColor: '#121212'
-    });
     smilesDrawer = new SmilesDrawer();
+
+    treeWorker.onmessage = function (e) {
+      treeHelper = new Lore.TreeHelper(lore, 'TreeGeometry', 'tree');
+      treeHelper.setFogDistance(coords.scale * Math.sqrt(3) * 1.5);
+      var x = new Array(e.data.length * 2);
+      var y = new Array(e.data.length * 2);
+      var z = new Array(e.data.length * 2);
+
+      for (var i = 0; i < e.data.length; i++) {
+        var a = e.data[i][0];
+        var b = e.data[i][1];
+
+        x.push(coords.x[a]);
+        y.push(coords.y[a]);
+        z.push(coords.z[a]);
+
+        x.push(coords.x[b]);
+        y.push(coords.y[b]);
+        z.push(coords.z[b]);
+      }
+
+      treeHelper.setPositionsXYZHSS(x, y, z, 0.8, 0.5, 1.0);
+    };
 
     socketWorker.onmessage = function (e) {
       var cmd = e.data.cmd;
@@ -51,20 +73,53 @@
           }
         });
       } else if (cmd === 'loaddetailsresponse') {
-        var coords = Faerun.getCoords(message.data.coords, 250);
+        coords = Faerun.getCoords(message.data.coords, 250);
         smilesData = message.data.smiles;
         console.log(message);
-        if (message.data.size > 1) {
-          updateCoordinatesHelper(coords.scale);
-          pointHelper = new Lore.PointHelper(lore, 'TestGeometry', 'sphere', {
-            pointScale: 10
+
+        if (message.data.size > 2) {
+          lore = Lore.init('lore', {
+            clearColor: '#121212'
           });
-          pointHelper.setFogDistance(coords.scale * Math.sqrt(3) * 2 + 400);
-          pointHelper.setPositionsXYZColor(coords.x, coords.y, coords.z, new Lore.Color.fromHex('#8BC34A'));
+
+          // Setup the coordinate system
+          var cs = Faerun.updateCoordinatesHelper(lore, coords.scale);
+          coordinatesHelper = cs.helper;
+
+          // The tree
+          var tmpArr = [];
+          for (var i = 0; i < coords.x.length; i++) {
+            tmpArr.push([coords.x[i], coords.y[i], coords.z[i]]);
+          }
+
+          treeWorker.postMessage(tmpArr);
+
+          pointHelper = new Lore.PointHelper(lore, 'TestGeometry', 'sphere', {
+            pointScale: 10,
+            octreeThreshold: 5
+          });
+
+          pointHelper.setFogDistance(coords.scale * Math.sqrt(3) * 1.5);
+          pointHelper.setPositionsXYZHSS(coords.x, coords.y, coords.z, 0.9, 1.0, 1.0);
+
           octreeHelper = new Lore.OctreeHelper(lore, 'OctreeGeometry', 'default', pointHelper);
+          octreeHelper.addEventListener('hoveredchanged', function (e) {
+            if (!e.e) {
+              Faerun.hide(bindings.hoverIndicator);
+              return;
+            }
+
+            updateHovered();
+          });
+
+          octreeHelper.addEventListener('updated', function() {
+            if (octreeHelper.hovered) updateHovered();
+            // if (octreeHelper.selected) updateSelected();
+          });
         } else {
-          Faerun.removeElement('loreCell');
-          
+          Faerun.removeElement(bindings.loreCell);
+          Faerun.removeClasses(bindings.moleculeCell, ['mdl-cell--6-col-desktop', 'mdl-cell--4-col-tablet', 'mdl-cell--4-col-phone']);
+          Faerun.addClasses(bindings.moleculeCell, ['mdl-cell--12-col-desktop', 'mdl-cell--8-col-tablet', 'mdl-cell--8-col-phone']);
         }
 
         initMoleculeList();
@@ -73,17 +128,26 @@
   });
 
   // Helpers
+  function updateHovered() {
+    Faerun.show(bindings.hoverIndicator);
+    Faerun.translateAbsolute(bindings.hoverIndicator, octreeHelper.hovered.screenPosition[0], octreeHelper.hovered.screenPosition[1], true);
+    var pointSize = pointHelper.getPointSize();
+    Faerun.resize(bindings.hoverIndicator, pointSize, pointSize);
 
-  /**
+    var molecule = document.getElementById('mol' + octreeHelper.hovered.index);
+    bindings.molecules.scrollTop = molecule.offsetTop;
+  }
+
+  /**  // Helpers
    * Initializes the list of molecules.
    */
   function initMoleculeList() {
-    var container = document.getElementById('molecules');
     for (var i = 0; i < smilesData.length; i++) {
       var smile = smilesData[i].trim();
       var molecule = document.createElement('div');
       var structure = document.createElement('canvas');
 
+      molecule.id = 'mol' + i;
       molecule.classList.add('molecule', 'demo-card-wide', 'mdl-card', 'mdl-shadow--6dp');
       structure.classList.add('structure-view');
       structure.width = 300;
@@ -96,64 +160,9 @@
       molecule.appendChild(structure);
       // molecule.appendChild(p);
 
-      container.appendChild(molecule);
+      bindings.molecules.appendChild(molecule);
       var data = smiles.parse(smile);
       smilesDrawer.draw(data, structure.id, false, true);
     }
-  }
-
-  /**
-   * Update the coordinates according to the data.
-   *
-   * @param {Number} size - The size of the x, y and z coordinate axis
-   */
-  function updateCoordinatesHelper(size) {
-    var coordinatesHelper = new Lore.CoordinatesHelper(lore, 'Coordinates', 'coordinates', {
-      position: new Lore.Vector3f(0, 0, 0),
-      axis: {
-        x: {
-          length: size,
-          color: Lore.Color.fromHex('#097692')
-        },
-        y: {
-          length: size,
-          color: Lore.Color.fromHex('#097692')
-        },
-        z: {
-          length: size,
-          color: Lore.Color.fromHex('#097692')
-        }
-      },
-      ticks: {
-        x: {
-          length: 10,
-          color: Lore.Color.fromHex('#097692')
-        },
-        y: {
-          length: 10,
-          color: Lore.Color.fromHex('#097692')
-        },
-        z: {
-          length: 10,
-          color: Lore.Color.fromHex('#097692')
-        }
-      },
-      box: {
-        enabled: false,
-        x: {
-          color: Lore.Color.fromHex('#004F6E')
-        },
-        y: {
-          color: Lore.Color.fromHex('#004F6E')
-        },
-        z: {
-          color: Lore.Color.fromHex('#004F6E')
-        }
-      }
-    });
-
-    var halfSize = size / 2.0;
-    lore.controls.setRadius(size * Math.sqrt(3) + 100);
-    lore.controls.setLookAt(new Lore.Vector3f(halfSize, halfSize, halfSize));
   }
 })();

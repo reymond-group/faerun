@@ -28,6 +28,7 @@
   <script src="libs/smilesDrawer/smiles.js"></script>
   <script src="libs/smilesDrawer/smilesDrawer.js"></script>
   <script defer src="libs/mdl-selectified/mdl-selectified.min.js"></script>
+  
   <link rel="stylesheet" href="libs/mdl-selectified/mdl-selectified.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
@@ -40,7 +41,7 @@
   <div class="faerun-layout mdl-layout mdl-js-layout mdl-layout--fixed-header">
     <header class="faerun-header mdl-layout__header mdl-layout__header--seamed mdl-color--black mdl-color-text--grey-300">
       <div class="mdl-layout__header-row">
-        <span id="datatitle" class="mdl-layout-title">Details</span>
+        <span id="dataTitle" data-binding-id="dataTitle" class="mdl-layout-title">Details</span>
         <div class="mdl-layout-spacer"></div>
         <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="hdrbtn">
             <i class="material-icons">more_vert</i>
@@ -59,7 +60,7 @@
       <div class="faerun-controls mdl-color--grey-300 mdl-color-text--grey-900">
         <p class="faerun-controls-header">3D Map Settings</p>
         <div class="mdl-selectfield mdl-js-selectfield mdl-selectfield--floating-label">
-          <select id="select-view" name="select-view" class="mdl-selectfield__select">
+          <select id="select-view" data-binding-id="selectView" name="select-view" class="mdl-selectfield__select">
               <option value="option0_value">Free View</option>
               <option value="option1_value">Top View</option>
               <option value="option2_value">Bottom View</option>
@@ -71,31 +72,28 @@
           <label class="mdl-selectfield__label" for="select-view">View</label>
         </div>
         <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-fullscreen">
-            <input type="checkbox" id="switch-fullscreen" class="mdl-switch__input">
+            <input type="checkbox" id="switch-fullscreen" data-binding-id="switchFullscreen" class="mdl-switch__input">
             <span class="mdl-switch__label">Fullscreen</span>
           </label>
         <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-color">
-            <input type="checkbox" id="switch-color" class="mdl-switch__input">
+            <input type="checkbox" id="switch-color" data-binding-id="switchColor" class="mdl-switch__input">
             <span id="label-switch-color" class="mdl-switch__label">Dark Background</span>
           </label>
       </div>
     </div>
-    <main id="main" class="mdl-layout__content mdl-color--grey-900">
+    <main id="main" data-binding-id="main" class="mdl-layout__content mdl-color--grey-900">
       <div class="mdl-grid mdl-grid--no-spacing">
-        <div id="loreCell" class="mdl-cell mdl-cell--6-col-desktop mdl-cell--4-col-tablet mdl-cell--4-col-phone mdl-color--grey-900" style="position:relative">
-          <canvas id="lore"></canvas>
-          <div id="loader" class="hidden">
-            <div id="loader-inner">
+        <div id="loreCell" data-binding-id="loreCell" class="mdl-cell mdl-cell--6-col-desktop mdl-cell--4-col-tablet mdl-cell--4-col-phone mdl-color--grey-900" style="position:relative">
+          <canvas id="lore" data-binding-id="lore"></canvas>
+          <div id="loader" data-binding-id="loader" class="hidden">
+            <div id="loader-inner" data-binding-id="loaderInner">
               <div class="mdl-spinner mdl-js-spinner is-active"></div>
             </div>
           </div>
-          <div id="overlay-grid">
-          </div>
-          <div id="overlay">
-          </div>
+          <span id="hover-indicator" data-binding-id="hoverIndicator" class="hidden"></span>
         </div>
-        <div id="moleculeCell" class="mdl-cell mdl-cell--6-col-desktop mdl-cell--4-col-tablet mdl-cell--4-col-phone mdl-color--white">
-          <div id="molecules">
+        <div id="moleculeCell" data-binding-id="moleculeCell" class="mdl-cell mdl-cell--6-col-desktop mdl-cell--4-col-tablet mdl-cell--4-col-phone mdl-color--white">
+          <div id="molecules" data-binding-id="molecules">
           </div>
         </div>
       </div>

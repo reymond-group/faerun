@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+    <h1>Hello World</h1>
+    <script>
+      var arr = new Float32Array(3000);
+      for(var i = 0; i < 1500; i++) {
+        arr[i] = Math.random();
+      }
+
+      // The array has to be changed into 2d form
+      var arr2 = [];
+      for(var i = 0; i < 1500; i += 3) {
+        arr2.push([ arr[i], arr[i + 1], arr[i + 2] ]);
+      }
+
+      var worker = new Worker('kmst-worker.js');
+
+      worker.addEventListener('message', function(e) {
+        console.log(e.data);
+      }, false);
+
+      console.log('Starting mst calculation ...')
+      worker.postMessage(arr2);
+    </script>
+  </body>
+</html>

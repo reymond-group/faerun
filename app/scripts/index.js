@@ -4,6 +4,7 @@
   var smilesDrawer = null;
   var pointHelper = null;
   var octreeHelper = null;
+  var coordinatesHelper = null;
   var availableSets = null;
   var availableMaps = null;
   var currentSet = null;
@@ -13,64 +14,45 @@
   var selectCanvas = {};
   var selectSmiles = {};
   var socketWorker = new Worker('scripts/socketWorkerIndex.js');
-  var loader = document.getElementById('loader');
 
-  var switchFullscreen = document.getElementById('switch-fullscreen');
-  var labelSwitchColor = document.getElementById('label-switch-color');
-  var switchColor = document.getElementById('switch-color');
-  var selectSet = document.getElementById('select-set');
-  var selectColorMap = document.getElementById('select-color-map');
-  var selectView = document.getElementById('select-view');
-  var sliderCutoff = document.getElementById('slider-cutoff');
-  var sliderColor = document.getElementById('slider-color');
-  var hudContainer = document.getElementById('hud-container');
-  var hudHeader = document.getElementById('hud-header');
-  var hudHeaderIcon = document.getElementById('hud-header-icon');
-  var buttonRecenter = document.getElementById('button-recenter');
-  var buttonZoomIn = document.getElementById('button-zoomin');
-  var buttonZoomOut = document.getElementById('button-zoomout');
-  var buttonToggleSelect = document.getElementById('button-toggle-select');
-  var buttonSelectHovered = document.getElementById('button-select-hovered');
-  var hoverIndicator = document.getElementById('hover-indicator');
-  var hoverStructure = document.getElementById('hover-structure');
-  var selectContainer = document.getElementById('select-container');
+  var bindings = Faerun.getBindings();
 
   // Events
-  hudHeader.addEventListener('click', function () {
-    Faerun.toggle(hudContainer);
-    Faerun.toggleClass(hudHeaderIcon, 'rotate');
+  bindings.hudHeader.addEventListener('click', function () {
+    Faerun.toggle(bindings.hudContainer);
+    Faerun.toggleClass(bindings.hudHeaderIcon, 'rotate');
   }, false);
 
-  switchFullscreen.addEventListener('change', function () {
-    if (switchFullscreen.checked) {
+  bindings.switchFullscreen.addEventListener('change', function () {
+    if (bindings.switchFullscreen.checked) {
       Faerun.launchIntoFullscreen(document.documentElement);
     } else {
       Faerun.exitFullscreen();
     }
   }, false);
 
-  switchColor.addEventListener('change', function () {
-    if (switchColor.checked) {
-      labelSwitchColor.innerHTML = 'Light Background';
+  bindings.switchColor.addEventListener('change', function () {
+    if (bindings.switchColor.checked) {
+      bindings.labelSwitchColor.innerHTML = 'Light Background';
       lore.setClearColor(Lore.Color.fromHex('#DADFE1'));
     } else {
-      labelSwitchColor.innerHTML = 'Dark Background';
+      bindings.labelSwitchColor.innerHTML = 'Dark Background';
       lore.setClearColor(Lore.Color.fromHex('#121212'));
     }
   }, false);
 
-  selectSet.addEventListener('change', function () {
-    currentSet = availableSets[selectSet.value];
+  bindings.selectSet.addEventListener('change', function () {
+    currentSet = availableSets[bindings.selectSet.value];
     socketWorker.postMessage({
       cmd: 'load',
-      message: selectSet.value
+      message: bindings.selectSet.value
     });
-    selectSet.parentElement.style.pointerEvents = 'none';
-    Faerun.show(loader);
+    bindings.selectSet.parentElement.style.pointerEvents = 'none';
+    Faerun.show(bindings.loader);
   }, false);
 
-  selectColorMap.addEventListener('change', function () {
-    currentMap = availableMaps[selectColorMap.value];
+  bindings.selectColorMap.addEventListener('change', function () {
+    currentMap = availableMaps[bindings.selectColorMap.value];
     socketWorker.postMessage({
       cmd: 'loadmap',
       message: JSON.stringify({
@@ -78,12 +60,12 @@
         map_id: currentMap.id
       })
     });
-    selectColorMap.parentElement.style.pointerEvents = 'none';
-    Faerun.show(loader);
+    bindings.selectColorMap.parentElement.style.pointerEvents = 'none';
+    Faerun.show(bindings.loader);
   }, false);
 
-  selectView.addEventListener('change', function() {
-    var val = selectView.value;
+  bindings.selectView.addEventListener('change', function() {
+    var val = bindings.selectView.value;
 
     if (val === 'free') lore.controls.setFreeView();
     if (val === 'top') lore.controls.setTopView();
@@ -93,12 +75,12 @@
     if (val === 'back') lore.controls.setBackView();
   });
 
-  sliderCutoff.addEventListener('input', function () {
-    pointHelper.setCutoff(sliderCutoff.value);
+  bindings.sliderCutoff.addEventListener('input', function () {
+    pointHelper.setCutoff(bindings.sliderCutoff.value);
   });
 
-  sliderColor.addEventListener('input', function() {
-    var val = parseFloat(sliderColor.value);
+  bindings.sliderColor.addEventListener('input', function() {
+    var val = parseFloat(bindings.sliderColor.value);
     var filter = pointHelper.getFilter('hueRange');
 
     if (val < 0.02) {
@@ -112,30 +94,30 @@
     filter.filter();
   });
 
-  buttonRecenter.addEventListener('click', function () {
+  bindings.buttonRecenter.addEventListener('click', function () {
     lore.controls.setLookAt(center);
   });
 
-  buttonZoomIn.addEventListener('click', function () {
+  bindings.buttonZoomIn.addEventListener('click', function () {
     lore.controls.zoomIn();
   });
 
-  buttonZoomOut.addEventListener('click', function () {
+  bindings.buttonZoomOut.addEventListener('click', function () {
     lore.controls.zoomOut();
   });
 
-  buttonToggleSelect.addEventListener('click', function () {
-    Faerun.toggleClass(buttonToggleSelect, 'mdl-button--colored');
+  bindings.buttonToggleSelect.addEventListener('click', function () {
+    Faerun.toggleClass(bindings.buttonToggleSelect, 'mdl-button--colored');
     if (lore.controls.touchMode === 'drag') {
-      Faerun.showMobile(hoverStructure);
+      Faerun.showMobile(bindings.hoverStructure);
       lore.controls.touchMode = 'select';
     } else {
-      Faerun.hideMobile(hoverStructure);
+      Faerun.hideMobile(bindings.hoverStructure);
       lore.controls.touchMode = 'drag';
     }
   });
 
-  buttonSelectHovered.addEventListener('click', function () {
+  bindings.buttonSelectHovered.addEventListener('click', function () {
     octreeHelper.selectHovered();
   });
 
@@ -146,22 +128,26 @@
    * Populates the HTMLSelectElement containing the sets available on the server.
    */
   function populateServerSets() {
-    Faerun.removeChildren(selectSet);
-    Faerun.appendEmptyOption(selectSet);
-    for (var key in availableSets)
-      if ({}.hasOwnProperty.call(availableSets, key))
-        Faerun.appendOption(selectSet, key, availableSets[key].name);
+    Faerun.removeChildren(bindings.selectSet);
+    Faerun.appendEmptyOption(bindings.selectSet);
+    for (var key in availableSets) {
+      if ({}.hasOwnProperty.call(availableSets, key)) {
+        Faerun.appendOption(bindings.selectSet, key, availableSets[key].name);
+      }
+    }
   }
 
   /**
    * Populates the HTMLSelectElement containing the color maps available for the selected set.
    */
   function populateColorMaps() {
-    Faerun.removeChildren(selectColorMap);
-    Faerun.appendEmptyOption(selectColorMap);
-    for (var key in availableMaps)
-      if ({}.hasOwnProperty.call(availableMaps, key))
-        Faerun.appendOption(selectColorMap, key, availableMaps[key].name);
+    Faerun.removeChildren(bindings.selectColorMap);
+    Faerun.appendEmptyOption(bindings.selectColorMap);
+    for (var key in availableMaps) {
+      if ({}.hasOwnProperty.call(availableMaps, key)) {
+        Faerun.appendOption(bindings.selectColorMap, key, availableMaps[key].name);
+      }
+    }
   }
 
   function createSelected(index, id) {
@@ -212,14 +198,14 @@
 
     selectIndicators.push(indicator);
 
-    selectContainer.appendChild(structure);
-    selectContainer.parentElement.appendChild(indicator);
+    bindings.selectContainer.appendChild(structure);
+    bindings.selectContainer.parentElement.appendChild(indicator);
   }
 
   function clearSelected() {
     selectCanvas = {};
     selectSmiles = {};
-    Faerun.removeChildren(selectContainer);
+    Faerun.removeChildren(bindings.selectContainer);
 
     selectIndicators = [];
     var indicators = document.getElementsByClassName('select-indicator');
@@ -245,8 +231,8 @@
    */
   function setCutoffRange(diameter) {
     // 100.0 is also added to radius when setting the camera.
-    sliderCutoff.min = 100.0;
-    sliderCutoff.max = diameter + 100.0;
+    bindings.sliderCutoff.min = 100.0;
+    bindings.sliderCutoff.max = diameter + 100.0;
   }
 
   // Socket.IO communication
@@ -271,19 +257,24 @@
         for (i = 0; i < message.data.length; i++) message.data[i] = Faerun.initArrayFromBuffer(message.data_types[i], message.data[i]);
         populateColorMaps();
         setCutoffRange(message.size * Math.sqrt(3));
-        Faerun.show(hudContainer);
-        updateCoordinatesHelper(message.size);
+        Faerun.show(bindings.hudContainer);
+        
+        // Setup the coordinate system
+        var cs = Faerun.updateCoordinatesHelper(lore, message.size);
+        center = cs.center;
+        coordinatesHelper = cs.helper;
+
 
         pointHelper = new Lore.PointHelper(lore, 'TestGeometry', 'default');
         pointHelper.setFogDistance(message.size * Math.sqrt(3) + 500);
-        pointHelper.setPositionsXYZColor(message.data[0], message.data[1], message.data[2], new Lore.Color(0.1, 0.2, 0.8));
+        pointHelper.setPositionsXYZHSS(message.data[0], message.data[1], message.data[2], 0.6, 1.0, 1.0);
         pointHelper.addFilter('hueRange', new Lore.InRangeFilter('color', 0, 0.22, 0.25));
 
         octreeHelper = new Lore.OctreeHelper(lore, 'OctreeGeometry', 'default', pointHelper);
 
         octreeHelper.addEventListener('hoveredchanged', function (e) {
           if (!e.e) {
-            Faerun.hide(hoverIndicator);
+            Faerun.hide(bindings.hoverIndicator);
             return;
           }
 
@@ -319,15 +310,15 @@
           if (octreeHelper.selected) updateSelected();
         });
 
-        document.getElementById('datatitle').innerHTML = currentSet.name;
-        selectSet.parentElement.style.pointerEvents = 'auto';
-        Faerun.hide(loader);
+        bindings.dataTitle.innerHTML = currentSet.name;
+        bindings.selectSet.parentElement.style.pointerEvents = 'auto';
+        Faerun.hide(bindings.loader);
       } else if (cmd === 'loadmapresponse') {
         for (i = 0; i < message.data.length; i++) message.data[i] = Faerun.initArrayFromBuffer(message.data_types[i], message.data[i]);
-        pointHelper.updateRGB(message.data[0], message.data[1], message.data[2]);
+        pointHelper.setRGB(message.data[0], message.data[1], message.data[2]);
         Faerun.setTitle(currentSet.name + ' &middot; ' + currentMap.name);
-        selectColorMap.parentElement.style.pointerEvents = 'auto';
-        Faerun.hide(loader);
+        bindings.selectColorMap.parentElement.style.pointerEvents = 'auto';
+        Faerun.hide(bindings.loader);
       } else if (cmd === 'loadsmilesresponse') {
         var target = 'hover-structure-drawing';
 
@@ -343,67 +334,10 @@
   });
 
   // Helpers
-
   function updateHovered() {
-    Faerun.show(hoverIndicator);
-    Faerun.translateAbsolute(hoverIndicator, octreeHelper.hovered.screenPosition[0], octreeHelper.hovered.screenPosition[1], true);
+    Faerun.show(bindings.hoverIndicator);
+    Faerun.translateAbsolute(bindings.hoverIndicator, octreeHelper.hovered.screenPosition[0], octreeHelper.hovered.screenPosition[1], true);
     var pointSize = pointHelper.getPointSize();
-    Faerun.resize(hoverIndicator, pointSize, pointSize);
-  }
-
-  /**
-   * Update the coordinates according to the current data set.
-   *
-   * @param {Number} size - The size of the x, y and z coordinate axis
-   */
-  function updateCoordinatesHelper(size) {
-    var coordinatesHelper = new Lore.CoordinatesHelper(lore, 'Coordinates', 'coordinates', {
-      position: new Lore.Vector3f(0, 0, 0),
-      axis: {
-        x: {
-          length: size,
-          color: Lore.Color.fromHex('#B71C1C')
-        },
-        y: {
-          length: size,
-          color: Lore.Color.fromHex('#1B5E20')
-        },
-        z: {
-          length: size,
-          color: Lore.Color.fromHex('#0D47A1')
-        }
-      },
-      ticks: {
-        x: {
-          length: 10,
-          color: Lore.Color.fromHex('#B71C1C')
-        },
-        y: {
-          length: 10,
-          color: Lore.Color.fromHex('#1B5E20')
-        },
-        z: {
-          length: 10,
-          color: Lore.Color.fromHex('#0D47A1')
-        }
-      },
-      box: {
-        enabled: false,
-        x: {
-          color: Lore.Color.fromHex('#EEEEEE')
-        },
-        y: {
-          color: Lore.Color.fromHex('#EEEEEE')
-        },
-        z: {
-          color: Lore.Color.fromHex('#EEEEEE')
-        }
-      }
-    });
-
-    var halfSize = size / 2.0;
-    center = new Lore.Vector3f(halfSize, halfSize, halfSize);
-    lore.controls.setRadius((size * Math.sqrt(3)) / 2.0 + 100);
-    lore.controls.setLookAt(center);
+    Faerun.resize(bindings.hoverIndicator, pointSize, pointSize);
   }
 })();
