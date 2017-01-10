@@ -96,7 +96,7 @@
 
           pointHelper = new Lore.PointHelper(lore, 'TestGeometry', 'sphere', {
             pointScale: 10,
-            octreeThreshold: 5
+            octreeThreshold: 1
           });
 
           pointHelper.setFogDistance(coords.scale * Math.sqrt(3) * 1.5);
