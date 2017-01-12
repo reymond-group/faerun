@@ -27,6 +27,7 @@
   <script src="libs/lore/lore.min.js"></script>
   <script src="libs/smilesDrawer/smiles.js"></script>
   <script src="libs/smilesDrawer/smilesDrawer.js"></script>
+  <script src="libs/handlebars/handlebars-v4.0.5.js"></script>
   <script defer src="libs/mdl-selectified/mdl-selectified.min.js"></script>
   
   <link rel="stylesheet" href="libs/mdl-selectified/mdl-selectified.min.css">
@@ -99,7 +100,19 @@
       </div>
     </main>
   </div>
+
+  <!-- Templates -->
+  <script id="molecule-template" type="text/x-handlebars-template">
+    <div id="mol{{id}}" class="molecule demo-card-wide mdl-card mdl-shadow--6dp dimmed">
+      <p>{{compoundId}}</p>
+      <canvas class="structure-view" width="300" height="300" id="structure-view{{id}}"></canvas>
+      <a href="{{schemblUrl}}">Details</a>
+      <a href="#">More ...</a>
+    </div>
+  </script>
+
   <script src="https://code.getmdl.io/1.2.1/material.min.js"></script>
+  <script src="scripts/jsonp.js"></script>
   <script src="scripts/faerun-common.js"></script>
   <script src="scripts/details.js"></script>
 </body>

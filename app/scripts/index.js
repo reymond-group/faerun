@@ -258,12 +258,11 @@
         populateColorMaps();
         setCutoffRange(message.size * Math.sqrt(3));
         Faerun.show(bindings.hudContainer);
-        
+
         // Setup the coordinate system
         var cs = Faerun.updateCoordinatesHelper(lore, message.size);
         center = cs.center;
         coordinatesHelper = cs.helper;
-
 
         pointHelper = new Lore.PointHelper(lore, 'TestGeometry', 'default');
         pointHelper.setFogDistance(message.size * Math.sqrt(3) + 500);
@@ -326,7 +325,7 @@
           target = 'select-structure-drawing-' + message.index;
           selectSmiles[message.index] = message.smiles.trim();
         }
-
+        console.log(message.smiles.trim());
         var data = smiles.parse(message.smiles.trim());
         smilesDrawer.draw(data, target, false);
       }

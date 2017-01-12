@@ -142,10 +142,15 @@ Faerun.getCoords = function (arr, scale) {
 };
 
 Faerun.schemblUrl = 'https://www.surechembl.org/chemical/';
-Faerun.getSchemblStructure = function (smiles) {
-  return 'https://api.surechembl.org/service/chemical/image?structure=' +
-    encodeURIComponent(smiles).replace(/%5B/g, '[').replace(/%5D/g, ']') +
-    '&structure_hightlight&height=250&width=250';
+
+Faerun.sourceIdsUrl = 'https://www.ebi.ac.uk/unichem/rest/src_ids/';
+
+Faerun.sourceInformationUrl = function (id) {
+  return 'https://www.ebi.ac.uk/unichem/rest/sources/' + id;
+};
+
+Faerun.schemblIdsUrl = function (id) {
+  return 'https://www.ebi.ac.uk/unichem/rest/src_compound_id/' + id + '/15';
 };
 
 // HTML helpers
@@ -297,14 +302,32 @@ Faerun.toggleClass = function (element, name) {
 };
 
 Faerun.removeClasses = function (element, classNames) {
-  for (var i = 0; i < classNames.length; i++) {
-    element.classList.remove(classNames[i]);
+  if (typeof element === 'string') {
+    var elements = document.querySelectorAll(element);
+    for (var i = 0; i < classNames.length; i++) {
+      for (var j = 0; j < elements.length; j++) {
+        elements[j].classList.remove(classNames[i]);
+      }
+    }
+  } else {
+    for (var i = 0; i < classNames.length; i++) {
+      element.classList.remove(classNames[i]);
+    }
   }
 };
 
 Faerun.addClasses = function (element, classNames) {
-  for (var i = 0; i < classNames.length; i++) {
-    element.classList.add(classNames[i]);
+  if (typeof element === 'string') {
+    var elements = document.querySelectorAll(element);
+    for (var i = 0; i < classNames.length; i++) {
+      for (var j = 0; j < elements.length; j++) {
+        elements[j].classList.add(classNames[i]);
+      }
+    }
+  } else {
+    for (var i = 0; i < classNames.length; i++) {
+      element.classList.add(classNames[i]);
+    }
   }
 };
 
@@ -346,7 +369,7 @@ Faerun.resize = function (element, width, height) {
  */
 Faerun.setColorFromArray = function (element, arr) {
   element.style.backgroundColor = 'rgb(' + Math.round(arr[0] * 255) + ', ' + Math.round(arr[1] * 255) +
-                                  ', ' + Math.round(arr[2] * 255) + ')';
+    ', ' + Math.round(arr[2] * 255) + ')';
 };
 
 Faerun.hover = function (element, enter, leave) {
@@ -360,11 +383,11 @@ Faerun.clearCanvas = function (id) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 };
 
-Faerun.removeElement = function(element) {
+Faerun.removeElement = function (element) {
   return element.parentNode.removeChild(element);
 };
 
-Faerun.getBindings = function() {
+Faerun.getBindings = function () {
   var bindings = {};
   var elements = document.querySelectorAll('[data-binding-id]');
 
@@ -383,7 +406,7 @@ Faerun.getBindings = function() {
  * @param {Number} size - The size of the x, y and z coordinate axis
  * @return {any} Retruns an object containing the center (.center) of the CoordinatesHelper and the CoordiantesHelper itself (.helper)
  */
-Faerun.updateCoordinatesHelper = function(lore, size) {
+Faerun.updateCoordinatesHelper = function (lore, size) {
   var coordinatesHelper = new Lore.CoordinatesHelper(lore, 'Coordinates', 'coordinates', {
     position: new Lore.Vector3f(0, 0, 0),
     axis: {
@@ -433,5 +456,21 @@ Faerun.updateCoordinatesHelper = function(lore, size) {
   lore.controls.setRadius((size * Math.sqrt(3)) / 2.0 + 100);
   lore.controls.setLookAt(center);
 
-  return {center: center, helper: coordinatesHelper};
+  return {
+    center: center,
+    helper: coordinatesHelper
+  };
+};
+
+Faerun.appendTemplate = function (element, templateId, context) {
+  var source = document.getElementById(templateId).innerHTML;
+  var template = Handlebars.compile(source);
+
+  var div = document.createElement('div');
+  div.innerHTML = template(context);
+  var elements = div.childNodes;
+
+  for (var i = 0; i < elements.length; i++) {
+    element.appendChild(elements[i].cloneNode(true));
+  }
 };

@@ -7,7 +7,10 @@
   var octreeHelper = null;
   var coordinatesHelper = null;
   var smilesData = null;
+  var idsData = null;
   var coords = null;
+  var sourceInfos = {};
+  var sources = {};
   var socketWorker = new Worker('scripts/socketWorkerDetails.js');
   var treeWorker = new Worker('libs/kmst/kmst-worker.js');
 
@@ -75,6 +78,7 @@
       } else if (cmd === 'loaddetailsresponse') {
         coords = Faerun.getCoords(message.data.coords, 250);
         smilesData = message.data.smiles;
+        idsData = message.data.ids;
         console.log(message);
 
         if (message.data.size > 2) {
@@ -122,7 +126,19 @@
           Faerun.addClasses(bindings.moleculeCell, ['mdl-cell--12-col-desktop', 'mdl-cell--8-col-tablet', 'mdl-cell--8-col-phone']);
         }
 
-        initMoleculeList();
+
+        JSONP.get(Faerun.sourceIdsUrl, function(srcIds) {
+          var length = srcIds.length;
+
+          for (var i = 0; i < srcIds.length; i++) {
+            JSONP.get(Faerun.sourceInformationUrl(srcIds[i].src_id), function(sourceData) {
+              sourceInfos[sourceData[0].src_id] = sourceData;
+              if (--length === 0) {
+                initMoleculeList();
+              }
+            });
+          }
+        });
       }
     };
   });
@@ -136,33 +152,55 @@
 
     var molecule = document.getElementById('mol' + octreeHelper.hovered.index);
     bindings.molecules.scrollTop = molecule.offsetTop;
+    Faerun.removeClasses('.molecule', ['highlight']);
+    Faerun.addClasses('.molecule', ['dimmed']);
+    Faerun.addClasses(molecule, ['highlight']);
+    Faerun.removeClasses(molecule, ['dimmed']);
+
+    console.log(sources);
   }
 
-  /**  // Helpers
+  /**
    * Initializes the list of molecules.
    */
   function initMoleculeList() {
     for (var i = 0; i < smilesData.length; i++) {
       var smile = smilesData[i].trim();
-      var molecule = document.createElement('div');
-      var structure = document.createElement('canvas');
+      var schemblIds = idsData[i].trim();
+      var schemblUrl = Faerun.schemblUrl + idsData[i].trim();
+      var structureViewId = 'structure-view' + i;
 
-      molecule.id = 'mol' + i;
-      molecule.classList.add('molecule', 'demo-card-wide', 'mdl-card', 'mdl-shadow--6dp');
-      structure.classList.add('structure-view');
-      structure.width = 300;
-      structure.height = 300;
+      var schemblIdsSplit = schemblIds.split(';');
 
-      structure.id = 'structure-view' + i;
-      var p = document.createElement('p');
-      p.innerHTML = smile;
+      for (var j = 0; j < schemblIdsSplit.length; j++) {
+        var schemblId = schemblIdsSplit[j];
+        sources[schemblId] = [];
+        JSONP.get(Faerun.schemblIdsUrl(schemblId), function(data) {
+          // Recover schembl id
+          var id = '';
+          for (var k = 0; k < data.length; k++) {
+            if (parseInt(data[k].src_id, 10) === 15) {
+              id = data[k].src_compound_id;
+              break;
+            }
+          }
 
-      molecule.appendChild(structure);
-      // molecule.appendChild(p);
+          for (var k = 0; k < data.length; k++) {
+            var srcId = data[k].src_id;
+            var srcInfo = sourceInfos[srcId];
+            sources[id].push(srcId);
+          }
+        });
+      }
 
-      bindings.molecules.appendChild(molecule);
+      Faerun.appendTemplate(bindings.molecules, 'molecule-template', {
+        id: i,
+        compoundId: schemblIds,
+        schemblUrl: schemblUrl
+      });
+
       var data = smiles.parse(smile);
-      smilesDrawer.draw(data, structure.id, false, true);
+      smilesDrawer.draw(data, structureViewId, false, true);
     }
   }
 })();
