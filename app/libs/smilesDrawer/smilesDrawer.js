@@ -154,8 +154,16 @@ SmilesDrawer.prototype.settings = {
     bondLength: 25, // 30,
     bondSpacing: 4,
     defaultDir: -1,
-    debug: false
+    debug: true
 };
+
+SmilesDrawer.prototype.edgeRingCount = function(edgeId) {
+    var edge = this.edges[edgeId];
+    var a = this.vertices[edge.source];
+    var b = this.vertices[edge.target];
+
+    return Math.min(a.value.rings.length, b.value.rings.length);
+}
 
 SmilesDrawer.prototype.getBridgedRings = function () {
     var tmp = [];
@@ -246,12 +254,6 @@ SmilesDrawer.prototype.createVertices = function (node, parentId, branch) {
 
     if (node.hasNext) {
         this.createVertices(node.next, vertex.id);
-
-        // Set the frist node to terminal as well
-        if (parentId === null && atom.ringbonds.length == 0)
-            atom.isTerminal = true;
-    } else if (atom.ringbonds.length == 0) {
-        atom.isTerminal = true;
     }
 }
 
@@ -383,6 +385,7 @@ SmilesDrawer.prototype.discoverRings = function () {
 
         var ring = this.getRing(id);
         var involvedRings = this.getBridgedRingRings(ring.id);
+
         this.createBridgedRing(involvedRings, ring.source);
 
         // Remove the rings
@@ -457,7 +460,6 @@ SmilesDrawer.prototype.createBridgedRing = function (rings, start) {
 
         var intersection = ArrayHelper.intersection(rings, vertex.value.rings);
         if (vertex.value.rings.length == 1 || intersection.length == 1) {
-
             bridgedRing.push(vertex.id);
         } else {
             leftovers.push(vertex.id);
@@ -472,10 +474,28 @@ SmilesDrawer.prototype.createBridgedRing = function (rings, start) {
     for (var i = 0; i < leftovers.length; i++) {
         var vertex = this.vertices[leftovers[i]];
 
+        /*
         if (ArrayHelper.intersection(vertex.getNeighbours(), bridgedRing).length > 1) {
             vertex.value.isBridgeNode = true;
             tmp.push(vertex.id);
         } else {
+            vertex.value.isBridge = true;
+            insideRing.push(vertex.id);
+        }
+        */
+
+        var onRing = false;
+        for(var j = 0; j < vertex.edges.length; j++) {
+            if(this.edgeRingCount(vertex.edges[j]) == 1) {
+                onRing = true;
+            }
+        }
+
+        if(onRing) {
+            vertex.value.isBridgeNode = true;
+            tmp.push(vertex.id);
+        }
+        else {
             vertex.value.isBridge = true;
             insideRing.push(vertex.id);
         }
@@ -500,14 +520,14 @@ SmilesDrawer.prototype.createBridgedRing = function (rings, start) {
         if (ringMembers.indexOf(n) !== -1)
             target = n;
     }
-
+    
     // Create the ring
     var ring = new Ring(-1, start, target);
     ring.isBridged = true;
     ring.members = ringMembers;
     ring.neighbours = neighbours;
     ring.insiders = insideRing;
-    ring.rings = rings;
+    for(var i = 0; i < rings.length; i++) ring.rings.push(this.getRing(rings[i]).clone());
     this.addRing(ring);
 
     // Atoms inside the ring are no longer part of a ring but are now
@@ -1173,50 +1193,32 @@ SmilesDrawer.prototype.connected = function(a, b) {
     return false;
 }
 
-SmilesDrawer.prototype.forceLayout = function (vertices, center, start, rings) {
-    /*
-    var str = '';
-    for(var i = 0; i < vertices.length; i++) {
-        for (var j = 0; j < vertices.length; j++) {
-            if(i === j) {
-                str += '0;';
-                continue;
-            }
-
-            if(this.connected(i, j))
-                str += '1;';
-            else
-                str += '0;';
-        }
-        str += '\n';
-    }
-
-    console.log(str);
-    */
+SmilesDrawer.prototype.forceLayout = function (vertices, center, start, ring) {
     // Constants
     var l = this.settings.bondLength;
     var kr = 6000; // repulsive force
-    var ks = 1; // spring
+    var ks = 5; // spring
     var g = 0.5; // gravity (to center)
 
-    if(rings > 2) {
+    if(ring.rings.length > 2) {
         kr = 1000;
-        ks = 0.5;
-        g = 0.0;
+        ks = 1.5;
+        g = 0;
     }
+
+    this.vertices[start].positioned = false;
 
     // Place vertices randomly around center
     for (var i = 0; i < vertices.length; i++) {
         var vertex = this.vertices[vertices[i]];
-        if(rings > 2 && vertex.id !== start)
-            vertex.positioned = false;
         
         if (!vertex.positioned) {
             vertex.position.x = center.x + Math.random();
             vertex.position.y = center.y + Math.random();
-        } else if (vertex.id !== start) {
-            // vertex.positioned = false;
         }
+
+        //if(ring.rings.length > 2 && ring.members.length > 6 && vertex.id !== start)
+          //  vertex.positioned = false;
     }
 
     // Loop
@@ -1255,6 +1257,44 @@ SmilesDrawer.prototype.forceLayout = function (vertices, center, start, rings) {
                 if (!vertexB.positioned) {
                     forces[vertexB.id].x += fx;
                     forces[vertexB.id].y += fy;
+                }
+            }
+        }
+
+        // Repulsive forces ring centers
+        if(ring.rings.length > 2) {
+            var ringCenters = new Array(ring.rings.length);
+            for(var i = 0; i < ring.rings.length; i++) {
+                ringCenters[i] = new Vector2();
+                for(var j = 0; j < ring.rings[i].members.length; j++) {
+                    ringCenters[i].x += this.vertices[ring.rings[i].members[j]].position.x;
+                    ringCenters[i].y += this.vertices[ring.rings[i].members[j]].position.y;
+                }
+
+                ringCenters[i].x /= ring.rings[i].members.length;
+                ringCenters[i].y /= ring.rings[i].members.length;
+
+                for(var u = 0; u < ring.rings[i].members.length; u++) {
+                    var vertexA = this.vertices[ring.rings[i].members[u]];
+                    
+                    var dx = ringCenters[i].x - vertexA.position.x;
+                    var dy = ringCenters[i].y - vertexA.position.y;
+
+                    if (dx === 0 || dy === 0) continue;
+
+                    var dSq = dx * dx + dy * dy;
+                    var d = Math.sqrt(dSq);
+
+                    var force = kr / dSq;
+                    if(ring.rings[i].members.length === 5 || ring.rings[i].members.length === 6)
+                        force *= 10;
+                    var fx = force * dx / d;
+                    var fy = force * dy / d;
+
+                    if (!vertexA.positioned) {
+                        forces[vertexA.id].x -= fx;
+                        forces[vertexA.id].y -= fy;
+                    }
                 }
             }
         }
@@ -1305,7 +1345,7 @@ SmilesDrawer.prototype.forceLayout = function (vertices, center, start, rings) {
 
             var d = Math.sqrt(dx * dx + dy * dy);
 
-            var force = g * d;
+            var force = g * (1 / d);
             var fx = force * dx / d;
             var fy = force * dy / d;
 
@@ -1348,7 +1388,7 @@ SmilesDrawer.prototype.forceLayout = function (vertices, center, start, rings) {
         for (var i = 0; i < neighbours.length; i++) {
             if(vertex.value.isBridge)
                 this.createBonds(this.vertices[neighbours[i]], vertex, MathHelper.Geom.toRad(60));
-            else
+            else if(this.vertices[neighbours[i]].value.rings.length === 0) // If there is a spiro, this will be handeled in create ring
                 this.createBonds(this.vertices[neighbours[i]], vertex, center);
         }
     }
@@ -1510,11 +1550,11 @@ SmilesDrawer.prototype.drawVertices = function (label) {
 
         var charge = 0;
         if(atom.bracket) charge = atom.bracket.charge;
-
-        if (atom.isTerminal && !label) {
+        
+        if (vertex.isTerminal()) {
             var dir = vertex.getTextDirection(this.vertices);
             this.text(vertex.position.x, vertex.position.y, element, 'element ' + atom.element.toLowerCase(), true, hydrogens, dir, true, charge);
-        } else if (atom.element.toLowerCase() !== 'c' && !label) {
+        } else if (atom.element.toLowerCase() !== 'c') {
             var dir = vertex.getTextDirection(this.vertices);
             this.text(vertex.position.x, vertex.position.y, element, 'element ' + atom.element.toLowerCase(), true, hydrogens, dir, false, charge);
         }
@@ -1544,13 +1584,13 @@ SmilesDrawer.prototype.drawVertices = function (label) {
 }
 
 SmilesDrawer.prototype.position = function () {
-    // If there is a ring, always start drawing from the ring
     var startVertex = 0;
 
-    /*
-    if(this.rings.length > 0) {
-        startVertex = this.rings[0].members[0];
-    }*/
+    // If there is a bridged ring, alwas start with the bridged ring
+    for(var i = 0; i < this.rings.length; i++) {
+        if(this.rings[i].isBridged)
+            startVertex = this.rings[i].members[i];
+    }
 
     this.createBonds(this.vertices[startVertex]);
 
@@ -1590,6 +1630,7 @@ SmilesDrawer.prototype.restorePositions = function () {
 // TODO: This needs some cleaning up
 SmilesDrawer.prototype.createRing = function (ring, center, start, previous) {
     if (ring.positioned) return;
+
     var orderedNeighbours = ring.getOrderedNeighbours(this.ringConnections);
 
     center = center ? center : new Vector2(0, 0);
@@ -1600,7 +1641,7 @@ SmilesDrawer.prototype.createRing = function (ring, center, start, previous) {
     ring.radius = radius;
     var angle = MathHelper.Geom.centralAngle(ring.size());
     ring.centralAngle = angle;
-
+    
     var a = startingAngle;
     ring.eachMember(this.vertices, function (v) {
         var vertex = that.vertices[v];
@@ -1610,15 +1651,16 @@ SmilesDrawer.prototype.createRing = function (ring, center, start, previous) {
         }
 
         a += angle;
-        vertex.positioned = true;
+
+        if(!ring.isBridged || ring.rings.length < 3)
+            vertex.positioned = true;
     }, (start) ? start.id : null, (previous) ? previous.id : null);
 
     // If the ring is bridged, then draw the vertices inside the ring
     // using a force based approach
     if (ring.isBridged) {
         var allVertices = ArrayHelper.merge(ring.members, ring.insiders);
-
-        this.forceLayout(allVertices, center, start.id, ring.rings.length);
+        this.forceLayout(allVertices, center, start.id, ring);
     }
 
     // Anchor the ring to one of it's members, so that the ring center will always
@@ -1627,14 +1669,12 @@ SmilesDrawer.prototype.createRing = function (ring, center, start, previous) {
 
     ring.positioned = true;
     ring.center = center;
-
     // Draw neighbours in decreasing order of connectivity
     for (var i = 0; i < orderedNeighbours.length; i++) {
         var neighbour = this.getRing(orderedNeighbours[i].neighbour);
         if (neighbour.positioned) continue;
 
         var vertices = RingConnection.getVertices(this.ringConnections, ring.id, neighbour.id);
-
         if (vertices.length == 2) {
             // This ring is a fused ring
             ring.isFused = true;
@@ -1780,7 +1820,7 @@ SmilesDrawer.prototype.resolvePrimaryOverlaps = function () {
                 for (var j = 0; j < overlap.rings.length; j++) a.flipRings.push(overlap.rings[j]);
             }
         } else if (overlap.vertices.length == 2) {
-            var angle = (2 * Math.PI - this.rings[overlap.rings[0]].getAngle()) / 6.0;
+            var angle = (2 * Math.PI - this.getRing(overlap.rings[0]).getAngle()) / 6.0;
             var a = overlap.vertices[0];
             var b = overlap.vertices[1];
             a.backAngle -= angle;
@@ -1957,7 +1997,6 @@ SmilesDrawer.prototype.createBonds = function (vertex, previous, ringOrAngle, di
         var r = MathHelper.Geom.polyCircumradius(this.settings.bondLength, nextRing.size());
         nextCenter.multiply(r);
         nextCenter.add(vertex.position);
-
         this.createRing(nextRing, nextCenter, vertex);
     } else {
         // Draw the non-ring vertices connected to this one        
@@ -2303,6 +2342,12 @@ function Vertex(value, x, y) {
     this.flipCenter = null;
     this.flipNeighbour = null;
     this.flipRings = new Array();
+}
+
+Vertex.prototype.isTerminal = function() {
+    if(this.parent === null && this.children < 2) return true;
+    if(this.children.length === 0) return true;
+    return false;
 }
 
 Vertex.prototype.clone = function () {
