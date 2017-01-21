@@ -328,6 +328,8 @@ Lore.Renderer.prototype = {
     },
 
     updateViewport: function(x, y, width, height) {
+        width *= this.devicePixelRatio;
+        height *= this.devicePixelRatio;
         this.canvas.width = width;
         this.canvas.height = height;
         this.gl.viewport(x, y, width, height);

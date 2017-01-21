@@ -5,9 +5,12 @@
   var pointHelper = null;
   var octreeHelper = null;
   var coordinatesHelper = null;
+  var config = null;
   var availableSets = null;
   var availableMaps = null;
-  var currentSet = null;
+  var currentDatabase = null;
+  var currentFingerprint = null;
+  var currentVariant = null;
   var currentMap = null;
   var center = null;
   var selectIndicators = [];
@@ -41,26 +44,39 @@
     }
   }, false);
 
-  bindings.selectSet.addEventListener('change', function () {
-    currentSet = availableSets[bindings.selectSet.value];
-    socketWorker.postMessage({
-      cmd: 'load',
-      message: bindings.selectSet.value
-    });
-    bindings.selectSet.parentElement.style.pointerEvents = 'none';
-    Faerun.show(bindings.loader);
+  bindings.selectDatabase.addEventListener('change', function () {
+    currentDatabase = config.databases[bindings.selectDatabase.value];
+    populateFingerprints(currentDatabase);
   }, false);
 
-  bindings.selectColorMap.addEventListener('change', function () {
-    currentMap = availableMaps[bindings.selectColorMap.value];
+  bindings.selectFingerprint.addEventListener('change', function () {
+    currentFingerprint = currentDatabase.fingerprints[bindings.selectFingerprint.value];
+    populateVariants(currentFingerprint);
+  }, false);
+
+  bindings.selectVariant.addEventListener('change', function () {
+    currentVariant = currentFingerprint.variants[bindings.selectVariant.value];
+    socketWorker.postMessage({
+      cmd: 'load:variant',
+      msg: {
+        variantId: currentVariant.id
+      }
+    });
+    populateMaps(currentVariant);
+  }, false);
+
+  bindings.selectMap.addEventListener('change', function () {
+    currentMap = currentVariant.maps[bindings.selectMap.value];
+
     socketWorker.postMessage({
       cmd: 'loadmap',
       message: JSON.stringify({
-        set_id: currentSet.id,
+        set_id: currentDatabase.id,
         map_id: currentMap.id
       })
     });
-    bindings.selectColorMap.parentElement.style.pointerEvents = 'none';
+
+    bindings.selectMap.parentElement.style.pointerEvents = 'none';
     Faerun.show(bindings.loader);
   }, false);
 
@@ -125,15 +141,37 @@
 
 
   /**
-   * Populates the HTMLSelectElement containing the sets available on the server.
+   * Populates the HTMLSelectElement containing the databases available on the server.
    */
-  function populateServerSets() {
-    Faerun.removeChildren(bindings.selectSet);
-    Faerun.appendEmptyOption(bindings.selectSet);
-    for (var key in availableSets) {
-      if ({}.hasOwnProperty.call(availableSets, key)) {
-        Faerun.appendOption(bindings.selectSet, key, availableSets[key].name);
-      }
+  function populateDatabases() {
+    Faerun.removeChildren(bindings.selectDatabase);
+    Faerun.appendEmptyOption(bindings.selectDatabase);
+    for (var i = 0; i < config.databases.length; i++) {
+      Faerun.appendOption(bindings.selectDatabase, i, config.databases[i].name);
+    }
+  }
+
+  function populateFingerprints(database) {
+    Faerun.removeChildren(bindings.selectFingerprint);
+    Faerun.appendEmptyOption(bindings.selectFingerprint);
+    for (var i = 0; i < database.fingerprints.length; i++) {
+      Faerun.appendOption(bindings.selectFingerprint, i, database.fingerprints[i].name);
+    }
+  }
+
+  function populateVariants(fingerprint) {
+    Faerun.removeChildren(bindings.selectVariant);
+    Faerun.appendEmptyOption(bindings.selectVariant);
+    for (var i = 0; i < fingerprint.variants.length; i++) {
+      Faerun.appendOption(bindings.selectVariant, i, fingerprint.variants[i].name);
+    }
+  }
+
+  function populateMaps(variant) {
+    Faerun.removeChildren(bindings.selectMap);
+    Faerun.appendEmptyOption(bindings.selectMap);
+    for (var i = 0; i < variant.maps.length; i++) {
+      Faerun.appendOption(bindings.selectMap, i, variant.maps[i].name);
     }
   }
 
@@ -160,7 +198,7 @@
     structure.classList.add('mdl-badge', 'mdl-badge--overlap');
     structure.setAttribute('id', 'selected-' + index);
     structure.setAttribute('data-badge', index);
-    structure.setAttribute('href', 'details.html?index=' + id + '&set_id=' + currentSet.id);
+    structure.setAttribute('href', 'details.html?index=' + id + '&set_id=' + currentDatabase.id);
     structure.setAttribute('target', '_blank');
     structure.style.borderColor = 'rgba(' + rgb[0] + ', ' + rgb[1] + ', ' + rgb[2] + ', 1.0)';
 
@@ -244,28 +282,27 @@
 
     socketWorker.onmessage = function (e) {
       var cmd = e.data.cmd;
-      var message = e.data.message;
+      var message = e.data.msg;
       var i;
 
-      if (cmd === 'initresponse') {
-        availableSets = {};
-        for (i = 0; i < message.length; i++) availableSets[message[i].id] = message[i];
-        populateServerSets();
-      } else if (cmd === 'loadresponse') {
-        availableMaps = {};
-        for (i = 0; i < message.maps.length; i++) availableMaps[message.maps[i].id] = message.maps[i];
-        for (i = 0; i < message.data.length; i++) message.data[i] = Faerun.initArrayFromBuffer(message.data_types[i], message.data[i]);
-        populateColorMaps();
-        setCutoffRange(message.size * Math.sqrt(3));
+      if (cmd === 'init') {
+        config = message;
+        populateDatabases();
+      } else if (cmd === 'load:variant') {
+        for (i = 0; i < message.data.length; i++) {
+          message.data[i] = Faerun.initArrayFromBuffer(message.dataTypes[i], message.data[i]);
+        }
+
+        setCutoffRange(currentVariant.resolution * Math.sqrt(3));
         Faerun.show(bindings.hudContainer);
 
         // Setup the coordinate system
-        var cs = Faerun.updateCoordinatesHelper(lore, message.size);
+        var cs = Faerun.updateCoordinatesHelper(lore, currentVariant.resolution);
         center = cs.center;
         coordinatesHelper = cs.helper;
 
         pointHelper = new Lore.PointHelper(lore, 'TestGeometry', 'default');
-        pointHelper.setFogDistance(message.size * Math.sqrt(3) + 500);
+        pointHelper.setFogDistance(currentVariant.resolution * Math.sqrt(3) + 500);
         pointHelper.setPositionsXYZHSS(message.data[0], message.data[1], message.data[2], 0.6, 1.0, 1.0);
         pointHelper.addFilter('hueRange', new Lore.InRangeFilter('color', 0, 0.22, 0.25));
 
@@ -280,10 +317,11 @@
           updateHovered();
 
           socketWorker.postMessage({
-            cmd: 'loadsmiles',
-            message: {
-              set_id: currentSet.id,
-              index: e.e.index
+            cmd: 'load:binpreview',
+            msg: {
+              databaseId: currentDatabase.id,
+              variantId: currentVariant.id,
+              binIndex: e.e.index
             }
           });
         });
@@ -295,10 +333,11 @@
             createSelected(i, selected.index);
 
             socketWorker.postMessage({
-              cmd: 'loadsmiles',
-              message: {
-                set_id: currentSet.id,
-                index: e.e[i].index
+              cmd: 'load:binpreview',
+              msg: {
+                databaseId: currentDatabase.id,
+                variantId: currentVariant.id,
+                binIndex: e.e[i].index
               }
             });
           }
@@ -309,24 +348,25 @@
           if (octreeHelper.selected) updateSelected();
         });
 
-        bindings.dataTitle.innerHTML = currentSet.name;
-        bindings.selectSet.parentElement.style.pointerEvents = 'auto';
+        bindings.dataTitle.innerHTML = currentDatabase.name;
+        bindings.selectDatabase.parentElement.style.pointerEvents = 'auto';
         Faerun.hide(bindings.loader);
       } else if (cmd === 'loadmapresponse') {
         for (i = 0; i < message.data.length; i++) message.data[i] = Faerun.initArrayFromBuffer(message.data_types[i], message.data[i]);
         pointHelper.setRGB(message.data[0], message.data[1], message.data[2]);
-        Faerun.setTitle(currentSet.name + ' &middot; ' + currentMap.name);
+        Faerun.setTitle(currentDatabase.name + ' &middot; ' + currentMap.name);
         bindings.selectColorMap.parentElement.style.pointerEvents = 'auto';
         Faerun.hide(bindings.loader);
-      } else if (cmd === 'loadsmilesresponse') {
+      } else if (cmd === 'load:binpreview') {
         var target = 'hover-structure-drawing';
 
         if (selectCanvas.hasOwnProperty(message.index)) {
           target = 'select-structure-drawing-' + message.index;
-          selectSmiles[message.index] = message.smiles.trim();
+          selectSmiles[message.index] = message.smiles;
         }
-        console.log(message.smiles.trim());
-        var data = smiles.parse(message.smiles.trim());
+
+        console.log(message.smiles);
+        var data = smiles.parse(message.smiles);
         smilesDrawer.draw(data, target, false);
       }
     };
