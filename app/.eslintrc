@@ -1,0 +1,8 @@
+{
+    "globals": {
+        "Faerun": true,
+        "smiles": true,
+        "Lore": true,
+        "SmilesDrawer": true
+    }
+}

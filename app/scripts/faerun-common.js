@@ -505,3 +505,44 @@ Faerun.getConfigItemById = function (config, id) {
   }
 };
 
+Faerun.initFullscreenSwitch = function (switchElement) {
+  switchElement.addEventListener('change', function () {
+    if (switchElement.checked) {
+      Faerun.launchIntoFullscreen(document.documentElement);
+    } else {
+      Faerun.exitFullscreen();
+    }
+  }, false);
+
+  Faerun.addEventListeners('fullscreenchange webkitfullscreenchange mozfullscreenchange MSFullscreenChange', document, function(event) {
+    var isFullscreen = (window.fullScreen) || (window.innerWidth === screen.width && window.innerHeight === screen.height);
+
+    if (isFullscreen)
+      switchElement.parentElement.MaterialSwitch.on();
+    else
+      switchElement.parentElement.MaterialSwitch.off();
+  });
+};
+
+Faerun.addEventListeners = function (eventNames, element, callback) {
+  var names = eventNames.split(' ');
+  for (var i = 0; i < names.length; i++) {
+    element.addEventListener(names[i], function(e) {
+      callback(e);
+    });
+  }
+};
+
+Faerun.blockElements = function() {
+  for (var i = 0; i < arguments.length; i++) {
+    arguments[i].style.pointerEvents = 'none';
+    arguments[i].style.opacity = 0.25;
+  }
+};
+
+Faerun.unblockElements = function() {
+  for (var i = 0; i < arguments.length; i++) {
+    arguments[i].style.pointerEvents = 'auto';
+    arguments[i].style.opacity = 1.0;
+  }
+};
