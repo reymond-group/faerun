@@ -8,10 +8,12 @@
   var coordinatesHelper = null;
   var smilesData = null;
   var idsData = null;
+  var config = null;
+  var params = Faerun.parseUrlParams();
   var coords = null;
   var sourceInfos = {};
   var sources = {};
-  var socketWorker = new Worker('scripts/socketWorkerDetails.js');
+  var socketWorker = new Worker('scripts/socketWorkerIndex.js');
   var treeWorker = new Worker('libs/kmst/kmst-worker.js');
 
   var bindings = Faerun.getBindings();
@@ -64,24 +66,26 @@
 
     socketWorker.onmessage = function (e) {
       var cmd = e.data.cmd;
-      var message = e.data.message;
+      var message = e.data.msg;
 
-      if (cmd === 'initresponse') {
-        var params = Faerun.parseUrlParams();
+      if (cmd === 'init') {
+        config = message;
         socketWorker.postMessage({
-          cmd: 'loaddetails',
-          message: {
-            set_id: params.set_id,
-            index: params.index
+          cmd: 'load:bin',
+          msg: {
+            databaseId: params.databaseId,
+            fingerprintId: params.fingerprintId,
+            variantId: params.variantId,
+            binIndex: params.binIndex
           }
         });
-      } else if (cmd === 'loaddetailsresponse') {
-        coords = Faerun.getCoords(message.data.coords, 250);
-        smilesData = message.data.smiles;
-        idsData = message.data.ids;
-        console.log(message);
+      } else if (cmd === 'load:bin') {
+        var resolution = Faerun.getConfigItemById(config, params.variantId).resolution;
+        coords = Faerun.getCoords(message.coordinates, 250);
+        smilesData = message.smiles;
+        idsData = message.ids;
 
-        if (message.data.size > 2) {
+        if (message.binSize > 2) {
           lore = Lore.init('lore', {
             clearColor: '#121212'
           });

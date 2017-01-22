@@ -111,7 +111,7 @@ function onInit(data) {
 }
 
 function onLoadVariant(data) {
-  var variant = getConfigItemById(data.id);
+  var variant = Faerun.getConfigItemById(config, data.id);
 
   var arr = Faerun.csvToArray(data.msg, variant.dataTypes);
   for (var i = 0; i < arr.length; i++) arr[i] = arr[i].buffer;
@@ -126,7 +126,7 @@ function onLoadVariant(data) {
 }
 
 function onLoadMap(data) {
-  var map = getConfigItemById(data.id);
+  var map = Faerun.getConfigItemById(config, data.id);
 
   var arr = Faerun.csvToArray(data.msg, map.dataTypes);
   for (var i = 0; i < arr.length; i++) arr[i] = arr[i].buffer;
@@ -152,27 +152,15 @@ function onLoadBinPreview(data) {
 }
 
 function onLoadBin(data) {
-  postMessage(data);
-}
-
-function getConfigItemById(id) {
-  for (var i = 0; i < config.databases.length; i++) {
-    var database = config.databases[i];
-    if (id === database.id) return database;
-
-    for (var j = 0; j < database.fingerprints.length; j++) {
-      var fingerprint = database.fingerprints[j];
-      if (id === fingerprint.id === id) return fingerprint;
-
-      for (var k = 0; k < fingerprint.variants.length; k++) {
-        var variant = fingerprint.variants[k];
-        if (id === variant.id) return variant;
-
-        for (var l = 0; l < variant.maps.length; l++) {
-          var map = variant.maps[l];
-          if (id === map.id) return map;
-        }
-      }
+  postMessage({
+    cmd: data.cmd,
+    msg: {
+      smiles: data.smiles,
+      ids: data.ids,
+      coordinates: data.coordinates,
+      index: parseInt(data.index, 10),
+      binSize: parseInt(data.binSize, 10)
     }
-  }
+  });
 }
+
