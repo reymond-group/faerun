@@ -482,3 +482,26 @@ Faerun.clickClass = function (className, callback) {
     }
   }, false);
 };
+
+Faerun.getConfigItemById = function (config, id) {
+  for (var i = 0; i < config.databases.length; i++) {
+    var database = config.databases[i];
+    if (id === database.id) return database;
+
+    for (var j = 0; j < database.fingerprints.length; j++) {
+      var fingerprint = database.fingerprints[j];
+      if (id === fingerprint.id === id) return fingerprint;
+
+      for (var k = 0; k < fingerprint.variants.length; k++) {
+        var variant = fingerprint.variants[k];
+        if (id === variant.id) return variant;
+
+        for (var l = 0; l < variant.maps.length; l++) {
+          var map = variant.maps[l];
+          if (id === map.id) return map;
+        }
+      }
+    }
+  }
+};
+

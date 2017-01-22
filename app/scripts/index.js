@@ -69,11 +69,10 @@
     currentMap = currentVariant.maps[bindings.selectMap.value];
 
     socketWorker.postMessage({
-      cmd: 'loadmap',
-      message: JSON.stringify({
-        set_id: currentDatabase.id,
-        map_id: currentMap.id
-      })
+      cmd: 'load:map',
+      msg: {
+        mapId: currentMap.id
+      }
     });
 
     bindings.selectMap.parentElement.style.pointerEvents = 'none';
@@ -175,19 +174,6 @@
     }
   }
 
-  /**
-   * Populates the HTMLSelectElement containing the color maps available for the selected set.
-   */
-  function populateColorMaps() {
-    Faerun.removeChildren(bindings.selectColorMap);
-    Faerun.appendEmptyOption(bindings.selectColorMap);
-    for (var key in availableMaps) {
-      if ({}.hasOwnProperty.call(availableMaps, key)) {
-        Faerun.appendOption(bindings.selectColorMap, key, availableMaps[key].name);
-      }
-    }
-  }
-
   function createSelected(index, id) {
     var selected = octreeHelper.selected[index];
     var hue = pointHelper.getHue(id);
@@ -198,7 +184,7 @@
     structure.classList.add('mdl-badge', 'mdl-badge--overlap');
     structure.setAttribute('id', 'selected-' + index);
     structure.setAttribute('data-badge', index);
-    structure.setAttribute('href', 'details.html?index=' + id + '&set_id=' + currentDatabase.id);
+    structure.setAttribute('href', 'details.html?binIndex=' + id + '&databaseId=' + currentDatabase.id + '&fingerprintId=' + currentFingerprint.id + '&variantId=' + currentVariant.id);
     structure.setAttribute('target', '_blank');
     structure.style.borderColor = 'rgba(' + rgb[0] + ', ' + rgb[1] + ', ' + rgb[2] + ', 1.0)';
 
@@ -351,11 +337,13 @@
         bindings.dataTitle.innerHTML = currentDatabase.name;
         bindings.selectDatabase.parentElement.style.pointerEvents = 'auto';
         Faerun.hide(bindings.loader);
-      } else if (cmd === 'loadmapresponse') {
-        for (i = 0; i < message.data.length; i++) message.data[i] = Faerun.initArrayFromBuffer(message.data_types[i], message.data[i]);
+      } else if (cmd === 'load:map') {
+        for (i = 0; i < message.data.length; i++) 
+          message.data[i] = Faerun.initArrayFromBuffer(message.dataTypes[i], message.data[i]);
+        
         pointHelper.setRGB(message.data[0], message.data[1], message.data[2]);
         Faerun.setTitle(currentDatabase.name + ' &middot; ' + currentMap.name);
-        bindings.selectColorMap.parentElement.style.pointerEvents = 'auto';
+        bindings.selectMap.parentElement.style.pointerEvents = 'auto';
         Faerun.hide(bindings.loader);
       } else if (cmd === 'load:binpreview') {
         var target = 'hover-structure-drawing';
