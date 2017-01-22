@@ -474,3 +474,11 @@ Faerun.appendTemplate = function (element, templateId, context) {
     element.appendChild(elements[i].cloneNode(true));
   }
 };
+
+Faerun.clickClass = function (className, callback) {
+  document.addEventListener('click', function (e) {
+    if (Faerun.hasClass(e.target, className)) {
+      callback(e);
+    }
+  }, false);
+};

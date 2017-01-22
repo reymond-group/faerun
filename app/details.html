@@ -105,9 +105,19 @@
   <script id="molecule-template" type="text/x-handlebars-template">
     <div id="mol{{id}}" class="molecule demo-card-wide mdl-card mdl-shadow--6dp dimmed">
       <p>{{compoundId}}</p>
+      <div id="structure-more{{id}}" class="structure-more hidden">
+        <p>More information on this compound can be found in the following databases:</p>
+      </div>
+      <div id="structure-compounds{{id}}" class="structure-compounds"></div>
       <canvas class="structure-view" width="300" height="300" id="structure-view{{id}}"></canvas>
-      <a href="{{schemblUrl}}" class="details">Details</a><a id="menu{{id}}" href="#" class="more">More ...</a>
+      <a href="{{schemblUrl}}" class="details">Details</a><a id="menu{{id}}" href="#" class="more" data-target="structure-more{{id}}">More ...</a>
     </div>
+  </script>
+
+  <script id="more-template" type="text/x-handlebars-template">
+    {{#each items}}
+    <a href="{{url}}">{{name}}</a><br />
+    {{/each}}
   </script>
 
   <script src="https://code.getmdl.io/1.2.1/material.min.js"></script>

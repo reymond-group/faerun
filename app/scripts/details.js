@@ -11,6 +11,7 @@
   var coords = null;
   var sourceInfos = {};
   var sources = {};
+  var schemblIdToId = {};
   var socketWorker = new Worker('scripts/socketWorkerDetails.js');
   var treeWorker = new Worker('libs/kmst/kmst-worker.js');
 
@@ -34,6 +35,11 @@
       lore.setClearColor(Lore.Color.fromHex('#121212'));
     }
   }, false);
+
+  Faerun.clickClass('more', function(e) {
+    var moreContainer = document.getElementById(e.target.getAttribute('data-target'));
+    Faerun.toggle(moreContainer);
+  });
 
   // Socket.IO communication
   document.addEventListener('DOMContentLoaded', function (event) {
@@ -132,7 +138,7 @@
 
           for (var i = 0; i < srcIds.length; i++) {
             JSONP.get(Faerun.sourceInformationUrl(srcIds[i].src_id), function(sourceData) {
-              sourceInfos[sourceData[0].src_id] = sourceData;
+              sourceInfos[sourceData[0].src_id] = sourceData[0];
               if (--length === 0) {
                 initMoleculeList();
               }
@@ -156,8 +162,6 @@
     Faerun.addClasses('.molecule', ['dimmed']);
     Faerun.addClasses(molecule, ['highlight']);
     Faerun.removeClasses(molecule, ['dimmed']);
-
-    console.log(sources);
   }
 
   /**
@@ -167,10 +171,26 @@
     for (var i = 0; i < smilesData.length; i++) {
       var smile = smilesData[i].trim();
       var schemblIds = idsData[i].trim();
+
+      // Only take the first one for now
+      schemblIds = schemblIds.split(';')[0];
+
       var schemblUrl = Faerun.schemblUrl + idsData[i].trim();
       var structureViewId = 'structure-view' + i;
 
+      schemblIdToId[schemblIds] = i;
+
       var schemblIdsSplit = schemblIds.split(';');
+
+      Faerun.appendTemplate(bindings.molecules, 'molecule-template', {
+        id: i,
+        compoundId: schemblIds,
+        schemblUrl: schemblUrl,
+        showMap: smilesData.length > 2
+      });
+
+      var data = smiles.parse(smile);
+      smilesDrawer.draw(data, structureViewId, false, true);
 
       for (var j = 0; j < schemblIdsSplit.length; j++) {
         var schemblId = schemblIdsSplit[j];
@@ -185,22 +205,24 @@
             }
           }
 
+          var items = [];
           for (var k = 0; k < data.length; k++) {
             var srcId = data[k].src_id;
             var srcInfo = sourceInfos[srcId];
             sources[id].push(srcId);
+            items.push({
+              id: data[k].src_compound_id,
+              name: srcInfo.name_label,
+              url: srcInfo.base_id_url + data[k].src_compound_id
+            });
           }
+
+          var moreContainer = document.getElementById('structure-more' + schemblIdToId[id]);
+          Faerun.appendTemplate(moreContainer, 'more-template', {
+            items: items
+          });
         });
       }
-
-      Faerun.appendTemplate(bindings.molecules, 'molecule-template', {
-        id: i,
-        compoundId: schemblIds,
-        schemblUrl: schemblUrl
-      });
-
-      var data = smiles.parse(smile);
-      smilesDrawer.draw(data, structureViewId, false, true);
     }
   }
 })();
