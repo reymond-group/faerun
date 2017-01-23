@@ -72,7 +72,7 @@ tree.kruskal = function (nodes, edges) {
   var sortedEdges = _.sortBy(edges, function (edge) {
     return -edge[2];
   });
-  while (forest.length > 1) {
+  while (forest.length > 1 && sortedEdges.length > 0) {
     var edge = sortedEdges.pop();
     var n1 = edge[0];
     var n2 = edge[1];
