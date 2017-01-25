@@ -388,6 +388,16 @@ html, body {
   background-color: rgba(0, 0, 0, 1.0);
 }
 
+#dialog-search, #dialog-project {
+    width: 75%;
+    height: 75%;
+}
+
+#dialog-search textarea {
+    width: 100%;
+    height: 100%;
+}
+
 /* Selectfield overrides */
 .mdl-selectfield__label {
   color: #888 !important;

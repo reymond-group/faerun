@@ -135,6 +135,16 @@
     octreeHelper.selectHovered();
   });
 
+  if (!bindings.dialogSearch.showModal) {
+    dialogPolyfill.registerDialog(bindings.dialogSearch)
+  }
+  bindings.buttonSearch.addEventListener('click', function() {
+    bindings.dialogSearch.showModal();
+  });
+  bindings.dialogSearch.querySelector('.close').addEventListener('click', function() {
+    bindings.dialogSearch.close();
+  });
+
   /**
    * Populates the HTMLSelectElement containing the databases available on the server.
    */

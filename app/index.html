@@ -101,10 +101,10 @@
         <br />
         <br />
         <p class="faerun-controls-header"><i class="material-icons">build</i>TOOLS</p>
-        <button class="mdl-button mdl-js-button mdl-js-ripple-effect">
+        <button id="button-search" data-binding-id="buttonSearch" class="mdl-button mdl-js-button mdl-js-ripple-effect">
             Search
         </button>
-        <button class="mdl-button mdl-js-button mdl-js-ripple-effect">
+        <button id="button-project" data-binding-id="buttonProject" class="mdl-button mdl-js-button mdl-js-ripple-effect">
             Project
         </button>
 
@@ -155,6 +155,21 @@
           </div>
       </div>
     </main>
+
+    <!-- Modals -->
+    <dialog id="dialog-search" data-binding-id="dialogSearch" class="mdl-dialog">
+        <h4 class="mdl-dialog__title">Allow data collection?</h4>
+        <div class="mdl-dialog__content">
+        <div class="mdl-textfield mdl-js-textfield">
+            <textarea class="mdl-textfield__input" type="text" rows= "3" id="sample5" ></textarea>
+            <label class="mdl-textfield__label" for="sample5">Search Queries (line separated) ...</label>
+        </div>
+        </div>
+        <div class="mdl-dialog__actions">
+            <button type="button" class="mdl-button">Agree</button>
+            <button type="button" class="mdl-button close">Disagree</button>
+        </div>
+    </dialog>
   </div>
   <script src="https://code.getmdl.io/1.2.1/material.min.js"></script>
   <script src="scripts/faerun-common.js"></script>
