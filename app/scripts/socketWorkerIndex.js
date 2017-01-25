@@ -1,11 +1,12 @@
 importScripts('../libs/socketio/socket.io-1.4.5.js');
 importScripts('../scripts/faerun-common.js');
+importScripts('../config.js');
 
 // var socket = socket = io.connect('http://130.92.75.77:8080/underdark');
 // var socket = socket = io.connect('http://192.168.1.3:8080/underdark');
 // var socket = socket = io.connect('http://46.101.234.147:8080/underdark');
 
-var ws = new WebSocket('ws://localhost:8080/underdark');
+var ws = new WebSocket(FaerunConfig.server.url);
 var config = null;
 
 ws.onopen = function(e) {
