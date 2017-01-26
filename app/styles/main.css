@@ -388,14 +388,119 @@ html, body {
   background-color: rgba(0, 0, 0, 1.0);
 }
 
+/* Dialogs */
+.flex-box {
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-flex-wrap: nowrap;
+    -ms-flex-wrap: nowrap;
+    flex-wrap: nowrap;
+    -webkit-justify-content: flex-start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+    -webkit-align-content: stretch;
+    -ms-flex-line-pack: stretch;
+    align-content: stretch;
+    -webkit-align-items: stretch;
+    -ms-flex-align: stretch;
+    align-items: stretch;
+
+    height: 100%;
+}
+
+.flex-item:nth-child(1) {
+    position: relative;
+    box-sizing: border-box;
+    -webkit-order: 0;
+    -ms-flex-order: 0;
+    order: 0;
+    -webkit-flex: 0 1 auto;
+    -ms-flex: 0 1 auto;
+    flex: 0 1 auto;
+    -webkit-align-self: auto;
+    -ms-flex-item-align: auto;
+    align-self: auto;
+}
+
+.flex-item:nth-child(2) {
+    position: relative;
+    box-sizing: border-box;
+    -webkit-order: 0;
+    -ms-flex-order: 0;
+    order: 0;
+    -webkit-flex: 0 1 auto;
+    -ms-flex: 0 1 auto;
+    flex: 0 1 auto;
+    -webkit-align-self: auto;
+    -ms-flex-item-align: auto;
+    align-self: auto;
+}
+
+.flex-item:nth-child(3) {
+    position: relative;
+    box-sizing: border-box;
+    -webkit-order: 0;
+    -ms-flex-order: 0;
+    order: 0;
+    -webkit-flex: 1 1 auto;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    -webkit-align-self: auto;
+    -ms-flex-item-align: auto;
+    align-self: auto;
+}
+
+.flex-item:nth-child(4) {
+    position: relative;
+    box-sizing: border-box;
+    -webkit-order: 0;
+    -ms-flex-order: 0;
+    order: 0;
+    -webkit-flex: 0 1 auto;
+    -ms-flex: 0 1 auto;
+    flex: 0 1 auto;
+    -webkit-align-self: auto;
+    -ms-flex-item-align: auto;
+    align-self: auto;
+}
+
+.mdl-dialog__title {
+    text-align: center;
+}
+
+.mdl-dialog__subtitle {
+    padding-left: 24px;
+    padding-right: 24px;
+    padding-top: 24px;
+
+    text-align: center;
+}
+
 #dialog-search, #dialog-project {
-    width: 75%;
-    height: 75%;
+    width: 90%;
+    height: 90%;
+}
+
+#dialog-search #options-search label {
+    margin-left: 5px;
+    margin-right: 5px;
 }
 
 #dialog-search textarea {
-    width: 100%;
-    height: 100%;
+    position: absolute;
+    display: block;
+    width: calc(100% - 48px);
+    height: calc(100% - 15px);
+    box-sizing: border-box;
+    padding: 5px;
+    resize: none;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    color: #222;
 }
 
 /* Selectfield overrides */

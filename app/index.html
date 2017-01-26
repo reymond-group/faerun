@@ -28,10 +28,12 @@
   <script src="libs/smilesDrawer/smiles.js"></script>
   <script src="libs/smilesDrawer/smilesDrawer.js"></script>
   <script defer src="libs/mdl-selectified/mdl-selectified.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.4.6/dialog-polyfill.js"></script>
   <link rel="stylesheet" href="libs/mdl-selectified/mdl-selectified.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.grey-red.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.4.6/dialog-polyfill.min.css" />
   <link rel="stylesheet" href="styles/main.css">
   <link rel="stylesheet" href="libs/smilesDrawer/smilesDrawer.css">
 </head>
@@ -158,16 +160,29 @@
 
     <!-- Modals -->
     <dialog id="dialog-search" data-binding-id="dialogSearch" class="mdl-dialog">
-        <h4 class="mdl-dialog__title">Allow data collection?</h4>
-        <div class="mdl-dialog__content">
-        <div class="mdl-textfield mdl-js-textfield">
-            <textarea class="mdl-textfield__input" type="text" rows= "3" id="sample5" ></textarea>
-            <label class="mdl-textfield__label" for="sample5">Search Queries (line separated) ...</label>
-        </div>
-        </div>
-        <div class="mdl-dialog__actions">
-            <button type="button" class="mdl-button">Agree</button>
-            <button type="button" class="mdl-button close">Disagree</button>
+        <div class="flex-box">
+            <h4 class="mdl-dialog__title flex-item">Search Compound</h4>
+            <div class="mdl-dialog__subtitle flex-item">
+                <div id="options-search">
+                    <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="options-search-smiles">
+                        <input type="radio" id="options-search-smiles" data-binding-id="optionsSearchSmiles" 
+                            class="mdl-radio__button" name="options" value="smiles" checked>
+                        <span class="mdl-radio__label">Smiles</span>
+                    </label>
+                    <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="options-search-id">
+                        <input type="radio" id="options-search-id" data-binding-id="optionsSearchId" 
+                            class="mdl-radio__button" name="options" value="id">
+                        <span class="mdl-radio__label">Id</span>
+                    </label>
+                </div>
+            </div>
+            <div class="mdl-dialog__content flex-item">
+                <textarea type="text" ></textarea>
+            </div>
+            <div class="mdl-dialog__actions flex-item">
+                <button type="button" class="mdl-button">Agree</button>
+                <button type="button" class="mdl-button close">Disagree</button>
+            </div>
         </div>
     </dialog>
   </div>
