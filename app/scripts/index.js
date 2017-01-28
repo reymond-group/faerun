@@ -74,6 +74,18 @@
       }
     });
 
+    socketWorker.postMessage({
+      cmd: 'search:infos',
+      msg: {
+        fingerprintId: currentFingerprint.id,
+        variantId: currentVariant.id,
+        searchTerms: [
+          'SCHEMBL10000006',
+          'SCHEMBL9999999'
+        ]
+      }
+    });
+
     bindings.selectMap.parentElement.style.pointerEvents = 'none';
     Faerun.show(bindings.loader);
   }, false);
@@ -314,7 +326,7 @@
     });
 
     smilesDrawer = new SmilesDrawer();
-
+    
     socketWorker.onmessage = function (e) {
       if (e.data.cmd === 'init')
         onInit(e.data.msg);
@@ -324,6 +336,8 @@
         onMapLoaded(e.data.msg);
       else if (e.data.cmd === 'load:binpreview')
         onBinPreviewLoaded(e.data.msg);
+      else if (e.data.cmd === 'search:infos')
+        onInfosSearched(e.data.msg);
     };
   });
 
@@ -374,6 +388,7 @@
         cmd: 'load:binpreview',
         msg: {
           databaseId: currentDatabase.id,
+          fingerprintId: currentFingerprint.id,
           variantId: currentVariant.id,
           binIndex: e.e.index
         }
@@ -390,6 +405,7 @@
           cmd: 'load:binpreview',
           msg: {
             databaseId: currentDatabase.id,
+            fingerprintId: currentFingerprint.id,
             variantId: currentVariant.id,
             binIndex: e.e[i].index
           }
@@ -447,5 +463,9 @@
     console.log(message.smiles);
     var data = smiles.parse(message.smiles);
     smilesDrawer.draw(data, target, false);
+  }
+
+  function onInfosSearched (message) {
+    console.log(message);
   }
 })();

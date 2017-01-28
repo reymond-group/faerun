@@ -38,7 +38,7 @@ ws.onerror = function(e) {
 
 ws.onmessage = function(e) {
   var data = JSON.parse(e.data);
-
+  
   if (data.cmd === 'init')
     onInit(data);
   else if (data.cmd === 'load:variant')
@@ -49,6 +49,8 @@ ws.onmessage = function(e) {
     onLoadBinPreview(data);
   else if (data.cmd === 'load:bin')
     onLoadBin(data);
+  else if (data.cmd === 'search:infos')
+    onSearchInfos(data);
 };
 
 onmessage = function (e) {
@@ -83,6 +85,7 @@ onmessage = function (e) {
       cmd: 'load:binpreview',
       msg: [
         message.databaseId,
+        message.fingerprintId,
         message.variantId,
         message.binIndex.toString()
       ]
@@ -102,6 +105,20 @@ onmessage = function (e) {
         message.variantId,
         message.binIndex.toString()
       ]
+    }));
+  }
+
+  if (cmd === 'search:infos') {
+    msg = [
+      message.fingerprintId,
+      message.variantId
+    ];
+
+    msg.append
+
+    ws.send(JSON.stringify({
+      cmd: 'search:infos',
+      msg: msg.concat(message.searchTerms)
     }));
   }
 };
@@ -161,6 +178,15 @@ function onLoadBin(data) {
       coordinates: data.coordinates,
       index: parseInt(data.index, 10),
       binSize: parseInt(data.binSize, 10)
+    }
+  });
+}
+
+function onSearchInfos(data) {
+  postMessage({
+    cmd: data.cmd,
+    msg: {
+      data: data
     }
   });
 }

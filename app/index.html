@@ -95,7 +95,7 @@
             <input type="checkbox" id="switch-fullscreen" data-binding-id="switchFullscreen" class="mdl-switch__input">
             <span class="mdl-switch__label">Fullscreen</span>
         </label>
-        <br />
+        <div class="switch-separator"></div>
         <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-color">
             <input type="checkbox" id="switch-color" data-binding-id="switchColor" class="mdl-switch__input">
             <span id="label-switch-color" data-binding-id="labelSwitchColor" class="mdl-switch__label">Dark Background</span>
@@ -103,12 +103,12 @@
         <br />
         <br />
         <p class="faerun-controls-header"><i class="material-icons">build</i>TOOLS</p>
-        <button id="button-search" data-binding-id="buttonSearch" class="mdl-button mdl-js-button mdl-js-ripple-effect">
+        <a href="#" id="button-search" data-binding-id="buttonSearch" class="faerun-controls-button">
             Search
-        </button>
-        <button id="button-project" data-binding-id="buttonProject" class="mdl-button mdl-js-button mdl-js-ripple-effect">
+        </a>
+        <a href="#" id="button-project" data-binding-id="buttonProject" class="faerun-controls-button">
             Project
-        </button>
+        </a>
 
       </div>
     </div>
@@ -117,6 +117,7 @@
       <div id="loader" data-binding-id="loader" class="hidden">
         <div id="loader-inner" data-binding-id="loaderInner">
           <div class="mdl-spinner mdl-js-spinner is-active"></div>
+          <div class="loader-message">Loading ...</div>
         </div>
       </div>
       <span id="hover-indicator" data-binding-id="hoverIndicator" class="hidden"></span>
@@ -126,6 +127,7 @@
       <div id="select-container" data-binding-id="selectContainer"></div>
       <div id="hud-container" data-binding-id="hudContainer" class="hidden-n mdl-color--grey-300">
         <div id="hud-header" data-binding-id="hudHeader" class="mdl-color-text--white">
+            <span id="hud-header-text">Filters & Touch Controls</span>
           <i id="hud-header-icon" data-binding-id="hudHeaderIcon" class="material-icons">keyboard_arrow_down</i>
         </div>
         <label>Depth Cutoff</label>
@@ -164,6 +166,7 @@
             <h4 class="mdl-dialog__title flex-item">Search Compound</h4>
             <div class="mdl-dialog__subtitle flex-item">
                 <div id="options-search">
+                    <label>Search by </label>
                     <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="options-search-smiles">
                         <input type="radio" id="options-search-smiles" data-binding-id="optionsSearchSmiles" 
                             class="mdl-radio__button" name="options" value="smiles" checked>
@@ -180,8 +183,8 @@
                 <textarea type="text" ></textarea>
             </div>
             <div class="mdl-dialog__actions flex-item">
-                <button type="button" class="mdl-button">Agree</button>
-                <button type="button" class="mdl-button close">Disagree</button>
+                <button type="button" class="mdl-button">Search</button>
+                <button type="button" class="mdl-button close">Cancel</button>
             </div>
         </div>
     </dialog>

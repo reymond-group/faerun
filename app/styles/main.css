@@ -115,13 +115,14 @@ html, body {
   margin-top: 12px;
   margin-bottom: 2px;
 
-  padding-left: 25px;
+  /* padding-left: 25px; */
 
   font-size: 14px;
   font-weight: 700;
 }
 
 .faerun-controls-header i {
+  display: none;
   position: absolute;
   left: 12px;
 }
@@ -223,12 +224,15 @@ html, body {
   /*background-color: #FF4C39;*/
 }
 
+#hud-header span {
+  font-size: 0.8em;
+}
+
 #hud-header i {
   float: right;
   transform: rotate(0deg);
   transition: transform .2s linear, opacity .2s linear;
   opacity: 0.5;
-  
 }
 
 .rotate {
@@ -297,12 +301,15 @@ html, body {
   bottom: 0;
   right: 0;
   background-color: rgba(0, 0, 0, 0.8);
+  text-align: center;
 }
 
 #loader #loader-inner {
-  position: absolute;
-  top: 10px;
-  right: 40px;
+  position: relative;
+  display: inline-block;
+  margin-top: 20px;
+  padding: 20px 20px 15px 20px;
+  background-color: #fff;
 }
 
 #hover-indicator {
@@ -468,6 +475,30 @@ html, body {
     align-self: auto;
 }
 
+.switch-separator {
+    height: 8px;
+}
+
+a.faerun-controls-button {
+    display: block;
+    padding: 10px 15px 10px 15px;
+    margin: 0 -15px 0 -15px;
+    text-decoration: none;
+    color: #212121;
+    font-size: 16px;
+    font-weight: normal;
+    transition: background .1s linear, padding .1s linear;
+}
+
+a.faerun-controls-button:hover {
+    padding-left: 20px;
+    background-color: rgba(0, 0, 0, 0.075);
+}
+
+a.faerun-controls-button:active {
+    background-color: rgba(0, 0, 0, 0.15);
+}
+
 .mdl-dialog__title {
     text-align: center;
 }
@@ -481,8 +512,8 @@ html, body {
 }
 
 #dialog-search, #dialog-project {
-    width: 90%;
-    height: 90%;
+    width: 70%;
+    height: 70%;
 }
 
 #dialog-search #options-search label {
@@ -494,7 +525,7 @@ html, body {
     position: absolute;
     display: block;
     width: calc(100% - 48px);
-    height: calc(100% - 15px);
+    height: calc(100% - 35px);
     box-sizing: border-box;
     padding: 5px;
     resize: none;
