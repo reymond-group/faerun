@@ -186,7 +186,8 @@ function onSearchInfos(data) {
   postMessage({
     cmd: data.cmd,
     msg: {
-      data: data
+      binIndices: data.binIndices,
+      searchTerms: data.searchTerms
     }
   });
 }

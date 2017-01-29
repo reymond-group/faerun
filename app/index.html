@@ -24,7 +24,7 @@
     <link rel="canonical" href="http://www.example.com/">
   -->
   <script src="libs/socketio/socket.io-1.4.5.js"></script>
-  <script src="libs/lore/lore.min.js"></script>
+  <script src="libs/lore/lore.js"></script>
   <script src="libs/smilesDrawer/smiles.js"></script>
   <script src="libs/smilesDrawer/smilesDrawer.js"></script>
   <script defer src="libs/mdl-selectified/mdl-selectified.min.js"></script>
@@ -160,30 +160,24 @@
       </div>
     </main>
 
+    <!-- Toasts -->
+    <div id="toast-error" data-binding-id="toastError" class="mdl-js-snackbar mdl-snackbar">
+        <div class="mdl-snackbar__text"></div>
+        <button class="mdl-snackbar__action" type="button"></button>
+    </div>
+
     <!-- Modals -->
     <dialog id="dialog-search" data-binding-id="dialogSearch" class="mdl-dialog">
         <div class="flex-box">
-            <h4 class="mdl-dialog__title flex-item">Search Compound</h4>
+            <h4 class="mdl-dialog__title flex-item">Search Compounds</h4>
             <div class="mdl-dialog__subtitle flex-item">
-                <div id="options-search">
-                    <label>Search by </label>
-                    <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="options-search-smiles">
-                        <input type="radio" id="options-search-smiles" data-binding-id="optionsSearchSmiles" 
-                            class="mdl-radio__button" name="options" value="smiles" checked>
-                        <span class="mdl-radio__label">Smiles</span>
-                    </label>
-                    <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="options-search-id">
-                        <input type="radio" id="options-search-id" data-binding-id="optionsSearchId" 
-                            class="mdl-radio__button" name="options" value="id">
-                        <span class="mdl-radio__label">Id</span>
-                    </label>
-                </div>
+                <p class="faerun-info">You may enter one search query per line. A search query might include the ID, the SMILES or the fingerprint of a compound. Each query can return multiple matches. The search is case-sensitive (ABC is not equal to abc).</p>
             </div>
             <div class="mdl-dialog__content flex-item">
-                <textarea type="text" ></textarea>
+                <textarea id="textarea-search" data-binding-id="textareaSearch" type="text" ></textarea>
             </div>
             <div class="mdl-dialog__actions flex-item">
-                <button type="button" class="mdl-button">Search</button>
+                <button id="button-exec-search" data-binding-id="buttonExecSearch" type="button" class="mdl-button">Search</button>
                 <button type="button" class="mdl-button close">Cancel</button>
             </div>
         </div>

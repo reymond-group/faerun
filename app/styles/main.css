@@ -205,6 +205,11 @@ html, body {
           align-items: center;
 }
 
+.faerun-info {
+    padding: 10px;
+    background-color: #FFDA77;
+}
+
 #hud-header {
   z-index: 99999;
   height: 24px;
@@ -499,21 +504,22 @@ a.faerun-controls-button:active {
     background-color: rgba(0, 0, 0, 0.15);
 }
 
+#toast-error {
+    background-color: #c0392b;
+}
+
 .mdl-dialog__title {
-    text-align: center;
 }
 
 .mdl-dialog__subtitle {
     padding-left: 24px;
     padding-right: 24px;
     padding-top: 24px;
-
-    text-align: center;
 }
 
 #dialog-search, #dialog-project {
-    width: 70%;
-    height: 70%;
+    width: 75%;
+    height: 75%;
 }
 
 #dialog-search #options-search label {
@@ -529,9 +535,15 @@ a.faerun-controls-button:active {
     box-sizing: border-box;
     padding: 5px;
     resize: none;
+    white-space: nowrap;
     border: 1px solid rgba(0, 0, 0, 0.1);
     background-color: #fff;
     color: #222;
+}
+
+#dialog-search textarea:focus {
+    outline: none !important;
+    border: 1px solid rgba(0, 0, 0, 0.25);
 }
 
 /* Selectfield overrides */
@@ -543,6 +555,11 @@ a.faerun-controls-button:active {
 .mdl-badge[data-badge]:after {
   background-color: #fff !important;
   color: #000 !important;
+}
+
+/* Snackbar overrides */
+.mdl-snackbar {
+  z-index: 9999999;
 }
 
 @media screen and (max-width: 1024px) {

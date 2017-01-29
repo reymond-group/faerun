@@ -73,19 +73,7 @@
         mapId: currentMap.id
       }
     });
-
-    socketWorker.postMessage({
-      cmd: 'search:infos',
-      msg: {
-        fingerprintId: currentFingerprint.id,
-        variantId: currentVariant.id,
-        searchTerms: [
-          'SCHEMBL10000006',
-          'SCHEMBL9999999'
-        ]
-      }
-    });
-
+    
     bindings.selectMap.parentElement.style.pointerEvents = 'none';
     Faerun.show(bindings.loader);
   }, false);
@@ -147,14 +135,48 @@
     octreeHelper.selectHovered();
   });
 
+  // Search
+
   if (!bindings.dialogSearch.showModal) {
     dialogPolyfill.registerDialog(bindings.dialogSearch)
   }
+  
   bindings.buttonSearch.addEventListener('click', function() {
     bindings.dialogSearch.showModal();
   });
+
   bindings.dialogSearch.querySelector('.close').addEventListener('click', function() {
     bindings.dialogSearch.close();
+  });
+
+  bindings.buttonExecSearch.addEventListener('click', function() {
+    if (!currentVariant) {
+        bindings.toastError.MaterialSnackbar.showSnackbar({
+            message: 'Please select a variant before searching ...'
+        });
+        return; 
+    }
+    
+    var queries = bindings.textareaSearch.value.split('\n');
+    console.log('Queries:', queries);
+    if (queries.length < 1 || queries[0] === '') {
+        bindings.toastError.MaterialSnackbar.showSnackbar({
+            message: 'Please enter at least one query ...'
+        });
+        return; 
+    }
+
+    socketWorker.postMessage({
+      cmd: 'search:infos',
+      msg: {
+        fingerprintId: currentFingerprint.id,
+        variantId: currentVariant.id,
+        searchTerms: queries
+      }
+    });
+
+    bindings.dialogSearch.close();
+    Faerun.show(bindings.loader);
   });
 
   /**
@@ -321,6 +343,13 @@
   document.addEventListener('DOMContentLoaded', function () {
     Faerun.initFullscreenSwitch(bindings.switchFullscreen);
 
+    // Hide the hud with animation (to show a brief glimpse to the user
+    // so that he knows it's there)
+    setTimeout(function() {
+        Faerun.toggle(bindings.hudContainer);
+        Faerun.toggleClass(bindings.hudHeaderIcon, 'rotate');
+    }, 1000);
+
     lore = Lore.init('lore', {
       clearColor: '#121212'
     });
@@ -460,12 +489,17 @@
       selectSmiles[message.index] = message.smiles;
     }
 
-    console.log(message.smiles);
     var data = smiles.parse(message.smiles);
     smilesDrawer.draw(data, target, false);
   }
 
   function onInfosSearched (message) {
-    console.log(message);
+    for (var i = 0; i < message.binIndices.length; i++) {
+        for (var j = 0; j < message.binIndices[i].length; j++) {
+            octreeHelper.addSelected(message.binIndices[i][j]);
+        }
+    }
+
+    Faerun.hide(bindings.loader);
   }
 })();
