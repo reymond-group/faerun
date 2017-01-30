@@ -488,12 +488,12 @@ Faerun.hoverClass = function (className, enter, leave) {
     if (Faerun.hasClass(e.target, className)) {
       enter(e);
     }
-  }, false);
+  });
   document.addEventListener('mouseout', function (e) {
     if (Faerun.hasClass(e.target, className)) {
       leave(e);
     }
-  }, false);
+  });
 };
 
 Faerun.getConfigItemById = function (config, id) {
