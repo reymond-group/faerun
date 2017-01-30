@@ -35,6 +35,14 @@
     Faerun.toggle(moreContainer);
   });
 
+  Faerun.hoverClass('molecule', function(e) {
+    var index = e.target.getAttribute('data-index');
+    console.log(index);
+    console.log('Hovered!');
+  }, function(e) {
+  
+  });
+
   // Socket.IO communication
   document.addEventListener('DOMContentLoaded', function (event) {
     Faerun.initFullscreenSwitch(bindings.switchFullscreen);
@@ -102,7 +110,8 @@
     coords = Faerun.getCoords(message.coordinates, 250);
     smilesData = message.smiles;
     idsData = message.ids;
-
+    fpsData = message.fps;
+    
     if (message.binSize > 2) {
       lore = Lore.init('lore', {
         clearColor: '#121212'
@@ -112,11 +121,17 @@
       var cs = Faerun.updateCoordinatesHelper(lore, coords.scale);
       coordinatesHelper = cs.helper;
 
+      
+
       // The tree
       var tmpArr = [];
       for (var i = 0; i < coords.x.length; i++) {
         tmpArr.push([coords.x[i], coords.y[i], coords.z[i]]);
       }
+
+      // for (var i = 0; i < fpsData.length; i++) {
+      //   tmpArr.push(fpsData[i].split(";"));
+      // }
 
       treeWorker.postMessage(tmpArr);
 
@@ -164,7 +179,7 @@
   }
 
   /**
-   * Update the hover indicator and the associated comdpund card.
+   * Update the hover indicator and the associated compound card.
    */
   function updateHovered() {
     Faerun.show(bindings.hoverIndicator);

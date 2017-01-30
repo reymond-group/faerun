@@ -175,6 +175,7 @@ function onLoadBin(data) {
     msg: {
       smiles: data.smiles,
       ids: data.ids,
+      fps: data.fps,
       coordinates: data.coordinates,
       index: parseInt(data.index, 10),
       binSize: parseInt(data.binSize, 10)

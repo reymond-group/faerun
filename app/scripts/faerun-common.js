@@ -483,6 +483,19 @@ Faerun.clickClass = function (className, callback) {
   }, false);
 };
 
+Faerun.hoverClass = function (className, enter, leave) {
+  document.addEventListener('mouseover', function (e) {
+    if (Faerun.hasClass(e.target, className)) {
+      enter(e);
+    }
+  }, false);
+  document.addEventListener('mouseout', function (e) {
+    if (Faerun.hasClass(e.target, className)) {
+      leave(e);
+    }
+  }, false);
+};
+
 Faerun.getConfigItemById = function (config, id) {
   for (var i = 0; i < config.databases.length; i++) {
     var database = config.databases[i];
