@@ -122,30 +122,31 @@ html, body {
   -webkit-align-content: flex-start;
       -ms-flex-line-pack: start;
           align-content: flex-start;
-}
-.faerun-cards .faerun-separator {
-  height: 32px;
-}
-.faerun-cards .mdl-card__title.mdl-card__title {
-  color: white;
-  font-size: 24px;
-  font-weight: 400;
-}
-.faerun-cards ul {
-  padding: 0;
-}
-.faerun-cards h3 {
-  font-size: 1em;
-}
-.faerun-updates .mdl-card__title {
-  min-height: 200px;
-  background-image: url('images/dog.png');
-  background-position: 90% 100%;
-  background-repeat: no-repeat;
-}
-.faerun-cards .mdl-card__actions a {
-  color: #00BCD4;
-  text-decoration: none;
+
+  .faerun-separator {
+    height: 32px;
+  }
+
+  .mdl-card__title {
+    color: #fff;
+    font-size: 24px;
+    font-weight: 400;
+  }
+
+  ul {
+    padding: 0;
+  }
+
+  h3 {
+    font-size: 1em;
+  }
+
+  .mdl-cards__actions {
+    a {
+      color: #00BCD4;
+      text-decoration: none;
+    }
+  }
 }
 
 .faerun-options {
