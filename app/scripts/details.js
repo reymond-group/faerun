@@ -18,6 +18,7 @@
   var treeWorker = new Worker('libs/kmst/kmst-worker.js');
 
   var bindings = Faerun.getBindings();
+  console.log(bindings);
 
   // Events
   bindings.switchColor.addEventListener('change', function () {
@@ -46,7 +47,11 @@
   // Socket.IO communication
   document.addEventListener('DOMContentLoaded', function (event) {
     Faerun.initFullscreenSwitch(bindings.switchFullscreen);
+ 
     smilesDrawer = new SmilesDrawer();
+
+    // Show the loader from the beginning until everything is loaded
+    Faerun.show(bindings.loader);
 
     treeWorker.onmessage = function (e) {
       treeHelper = new Lore.TreeHelper(lore, 'TreeGeometry', 'tree');
@@ -117,11 +122,11 @@
         clearColor: '#121212'
       });
 
+      Faerun.initViewSelect(bindings.selectView, lore);
+
       // Setup the coordinate system
       var cs = Faerun.updateCoordinatesHelper(lore, coords.scale);
       coordinatesHelper = cs.helper;
-
-      
 
       // The tree
       var tmpArr = [];
@@ -159,8 +164,7 @@
       });
     } else {
       Faerun.removeElement(bindings.loreCell);
-      Faerun.removeClasses(bindings.moleculeCell, ['mdl-cell--6-col-desktop', 'mdl-cell--4-col-tablet', 'mdl-cell--4-col-phone']);
-      Faerun.addClasses(bindings.moleculeCell, ['mdl-cell--12-col-desktop', 'mdl-cell--8-col-tablet', 'mdl-cell--8-col-phone']);
+      Faerun.addClasses(bindings.moleculeCell, ['full-width']);
     }
 
 
@@ -172,6 +176,10 @@
           sourceInfos[sourceData[0].src_id] = sourceData[0];
           if (--length === 0) {
             initMoleculeList();
+            
+            // Hide loader here, since this is the closest to fully
+            // loaded we get :-)
+            Faerun.hide(bindings.loader);
           }
         });
       }

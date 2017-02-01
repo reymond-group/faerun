@@ -299,6 +299,10 @@ Lore.Renderer.prototype = {
         setTimeout(function() {
             _this.updateViewport(0, 0, _this.getWidth(), _this.getHeight());
         }, 1000);
+        
+        // Also do it immediately, in case the timeout is not needed
+        this.updateViewport(0, 0, _this.getWidth(), _this.getHeight());
+
 
         window.addEventListener('resize', function(event) {
             var width = _this.getWidth();
@@ -328,8 +332,8 @@ Lore.Renderer.prototype = {
     },
 
     updateViewport: function(x, y, width, height) {
-        width *= this.devicePixelRatio;
-        height *= this.devicePixelRatio;
+        // width *= this.devicePixelRatio;
+        // height *= this.devicePixelRatio;
         this.canvas.width = width;
         this.canvas.height = height;
         this.gl.viewport(x, y, width, height);
@@ -1096,7 +1100,7 @@ Lore.ControlsBase = function(renderer) {
         if(that.mouse.touches == 2) source = 'right';
 
         e.preventDefault();
-        
+        console.log(touch.pageX, touch.pageY); 
         if (that.mouse.previousPosition.x !== null && that.mouse.touched) {
             that.mouse.delta.x = touch.pageX - that.mouse.previousPosition.x;
             that.mouse.delta.y = touch.pageY - that.mouse.previousPosition.y;

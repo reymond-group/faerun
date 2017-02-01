@@ -1,129 +1,127 @@
 <!doctype html>
 <html lang="en">
 
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="description" content="A front-end template that helps you build fast, modern mobile web apps.">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-  <title>FAERUN &middot; Details</title>
-  <!-- Add to homescreen for Chrome on Android -->
-  <meta name="mobile-web-app-capable" content="yes">
-  <link rel="icon" sizes="192x192" href="images/android-desktop.png">
-  <!-- Add to homescreen for Safari on iOS -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="Material Design Lite">
-  <link rel="apple-touch-icon-precomposed" href="images/ios-desktop.png">
-  <!-- Tile icon for Win8 (144x144 + tile color) -->
-  <meta name="msapplication-TileImage" content="images/touch/ms-touch-icon-144x144-precomposed.png">
-  <meta name="msapplication-TileColor" content="#3372DF">
-  <link rel="shortcut icon" href="images/favicon.png">
-  <!-- SEO: If your mobile URL is different from the desktop URL, add a canonical link to the desktop page https://developers.google.com/webmasters/smartphone-sites/feature-phones -->
-  <!--
-    <link rel="canonical" href="http://www.example.com/">
-    -->
-  <script src="libs/socketio/socket.io-1.4.5.js"></script>
-  <script src="libs/lore/lore.min.js"></script>
-  <script src="libs/smilesDrawer/smiles.js"></script>
-  <script src="libs/smilesDrawer/smilesDrawer.js"></script>
-  <script src="libs/handlebars/handlebars-v4.0.5.js"></script>
-  <script defer src="libs/mdl-selectified/mdl-selectified.min.js"></script>
-  
-  <link rel="stylesheet" href="libs/mdl-selectified/mdl-selectified.min.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-  <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.grey-red.min.css" />
-  <link rel="stylesheet" href="styles/details.css">
-  <link rel="stylesheet" href="libs/smilesDrawer/smilesDrawer.light.css">
-</head>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="description" content="A front-end template that helps you build fast, modern mobile web apps.">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+        <title>FAERUN &middot; Details</title>
+        <!-- Add to homescreen for Chrome on Android -->
+        <meta name="mobile-web-app-capable" content="yes">
+        <link rel="icon" sizes="192x192" href="images/android-desktop.png">
+        <!-- Add to homescreen for Safari on iOS -->
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <meta name="apple-mobile-web-app-title" content="Material Design Lite">
+        <link rel="apple-touch-icon-precomposed" href="images/ios-desktop.png">
+        <!-- Tile icon for Win8 (144x144 + tile color) -->
+        <meta name="msapplication-TileImage" content="images/touch/ms-touch-icon-144x144-precomposed.png">
+        <meta name="msapplication-TileColor" content="#3372DF">
+        <link rel="shortcut icon" href="images/favicon.png">
+        <!-- SEO: If your mobile URL is different from the desktop URL, add a canonical link to the desktop page https://developers.google.com/webmasters/smartphone-sites/feature-phones -->
+        <!--
+        <link rel="canonical" href="http://www.example.com/">
+        -->
+        <script src="libs/socketio/socket.io-1.4.5.js"></script>
+        <script src="libs/lore/lore.min.js"></script>
+        <script src="libs/smilesDrawer/smiles.js"></script>
+        <script src="libs/smilesDrawer/smilesDrawer.js"></script>
+        <script src="libs/handlebars/handlebars-v4.0.5.js"></script>
+        <script defer src="libs/mdl-selectified/mdl-selectified.min.js"></script>
 
-<body>
-  <div class="faerun-layout mdl-layout mdl-js-layout mdl-layout--fixed-header">
-    <header class="faerun-header mdl-layout__header mdl-layout__header--seamed mdl-color--black mdl-color-text--grey-300">
-      <div class="mdl-layout__header-row">
-        <span id="dataTitle" data-binding-id="dataTitle" class="mdl-layout-title">Details</span>
-        <div class="mdl-layout-spacer"></div>
-        <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="hdrbtn">
-            <i class="material-icons">more_vert</i>
-          </button>
-        <ul class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu--bottom-right" for="hdrbtn">
-          <li class="mdl-menu__item">About</li>
-          <li class="mdl-menu__item">Contact</li>
-          <li class="mdl-menu__item">Legal information</li>
-        </ul>
-      </div>
-    </header>
-    <div class="faerun-drawer mdl-layout__drawer mdl-color--grey-300 mdl-color-text--black">
-      <header class="faerun-drawer-header">
-        <p class="faerun-title"><i class="material-icons">map</i>&nbsp;&nbsp;FAERUN</p>
-      </header>
-      <div class="faerun-controls mdl-color--grey-300 mdl-color-text--grey-900">
-        <p class="faerun-controls-header">3D Map Settings</p>
-        <div class="mdl-selectfield mdl-js-selectfield mdl-selectfield--floating-label">
-          <select id="select-view" data-binding-id="selectView" name="select-view" class="mdl-selectfield__select">
-              <option value="option0_value">Free View</option>
-              <option value="option1_value">Top View</option>
-              <option value="option2_value">Bottom View</option>
-              <option value="option3_value">Left View</option>
-              <option value="option4_value">Right View</option>
-              <option value="option5_value">Front View</option>
-              <option value="option6_value">Back View</option>
-            </select>
-          <label class="mdl-selectfield__label" for="select-view">View</label>
-        </div>
-        <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-fullscreen">
-            <input type="checkbox" id="switch-fullscreen" data-binding-id="switchFullscreen" class="mdl-switch__input">
-            <span class="mdl-switch__label">Fullscreen</span>
-          </label>
-        <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-color">
-            <input type="checkbox" id="switch-color" data-binding-id="switchColor" class="mdl-switch__input">
-            <span id="label-switch-color" class="mdl-switch__label">Dark Background</span>
-          </label>
-      </div>
-    </div>
-    <main id="main" data-binding-id="main" class="mdl-layout__content mdl-color--grey-900">
-      <div class="mdl-grid mdl-grid--no-spacing">
-        <div id="loreCell" data-binding-id="loreCell" class="mdl-cell mdl-cell--6-col-desktop mdl-cell--4-col-tablet mdl-cell--4-col-phone mdl-color--grey-900" style="position:relative">
-          <canvas id="lore" data-binding-id="lore"></canvas>
-          <div id="loader" data-binding-id="loader" class="hidden">
-            <div id="loader-inner" data-binding-id="loaderInner">
-              <div class="mdl-spinner mdl-js-spinner is-active"></div>
+        <link rel="stylesheet" href="libs/mdl-selectified/mdl-selectified.min.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.grey-red.min.css" />
+        <link rel="stylesheet" href="styles/details.css">
+        <link rel="stylesheet" href="libs/smilesDrawer/smilesDrawer.light.css">
+    </head>
+
+    <body>
+        <div id="faerun-layout" class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+            <header class="mdl-layout__header mdl-layout__header--seamed mdl-color--black mdl-color-text--grey-300">
+                <div class="mdl-layout__header-row">
+                    <span id="dataTitle" data-binding-id="dataTitle" class="mdl-layout-title">Details</span>
+                    <div class="mdl-layout-spacer"></div>
+                    <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="hdrbtn">
+                        <i class="material-icons">more_vert</i>
+                    </button>
+                    <ul class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu--bottom-right" for="hdrbtn">
+                        <li class="mdl-menu__item">About</li>
+                        <li class="mdl-menu__item">Contact</li>
+                        <li class="mdl-menu__item">Legal information</li>
+                    </ul>
+                </div>
+            </header>
+            <div id="faerun-drawer" class="mdl-layout__drawer mdl-color--grey-300 mdl-color-text--black">
+                <header>
+                    <p class="faerun-title"><img src="images/faerun-logo.svg" />FAERUN</p>
+                </header>
+
+                <div id="faerun-controls" class="mdl-color--grey-300 mdl-color-text--grey-900">
+                    <p class="faerun-controls-header">3D Map Settings</p>
+                    <div class="mdl-selectfield mdl-js-selectfield mdl-selectfield--floating-label">
+                        <select id="select-view" data-binding-id="selectView" name="select-view" class="mdl-selectfield__select">
+                            <option value="free">Free View</option>
+                            <option value="top">Top View</option>
+                            <option value="left">Left View</option>
+                            <option value="right">Right View</option>
+                            <option value="front">Front View</option>
+                            <option value="back">Back View</option>
+                        </select>                        
+                        <label class="mdl-selectfield__label" for="select-view">View</label>
+                    </div>
+                    <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-fullscreen">
+                        <input type="checkbox" id="switch-fullscreen" data-binding-id="switchFullscreen" class="mdl-switch__input">
+                        <span class="mdl-switch__label">Fullscreen</span>
+                    </label>
+                    <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-color">
+                        <input type="checkbox" id="switch-color" data-binding-id="switchColor" class="mdl-switch__input">
+                        <span id="label-switch-color" class="mdl-switch__label">Dark Background</span>
+                    </label>
+                </div>
             </div>
-          </div>
-          <span id="hover-indicator" data-binding-id="hoverIndicator" class="hidden"></span>
+            <main id="main" data-binding-id="main" class="mdl-layout__content mdl-color--grey-900">
+                <div id="lore-cell" data-binding-id="loreCell">
+                    <canvas id="lore" data-binding-id="lore"></canvas>
+                    <span id="hover-indicator" data-binding-id="hoverIndicator" class="hidden"></span>
+                </div>
+                <div id="molecule-cell" data-binding-id="moleculeCell">
+                    <div id="molecules" data-binding-id="molecules">
+                    </div>
+                </div>
+                <div id="loader" data-binding-id="loader" class="hidden">
+                    <div id="loader-inner" data-binding-id="loaderInner">
+                        <div class="mdl-spinner mdl-js-spinner is-active"></div>
+                    </div>
+                </div>
+            </main>
         </div>
-        <div id="moleculeCell" data-binding-id="moleculeCell" class="mdl-cell mdl-cell--6-col-desktop mdl-cell--4-col-tablet mdl-cell--4-col-phone mdl-color--white">
-          <div id="molecules" data-binding-id="molecules">
-          </div>
-        </div>
-      </div>
-    </main>
-  </div>
 
-  <!-- Templates -->
-  <script id="molecule-template" type="text/x-handlebars-template">
-    <div id="mol{{id}}" data-index="{{id}}" class="molecule demo-card-wide mdl-card mdl-shadow--6dp dimmed">
-      <p>{{compoundId}}</p>
-      <div id="structure-more{{id}}" class="structure-more hidden">
-        <p>More information on this compound can be found in the following databases:</p>
-      </div>
-      <div id="structure-compounds{{id}}" class="structure-compounds"></div>
-      <canvas class="structure-view" width="300" height="300" id="structure-view{{id}}"></canvas>
-      <a href="{{schemblUrl}}" class="details">Details</a><a id="menu{{id}}" href="#" class="more" data-target="structure-more{{id}}">More ...</a>
-    </div>
-  </script>
+        <!-- Templates -->
+        <script id="molecule-template" type="text/x-handlebars-template">
+            <div id="mol{{id}}" data-index="{{id}}" class="molecule demo-card-wide mdl-card mdl-shadow--6dp dimmed">
+            <p>{{compoundId}}</p>
+            <div id="structure-more{{id}}" class="structure-more hidden">
+            <p>More information on this compound can be found in the following databases:</p>
+            </div>
+            <div id="structure-compounds{{id}}" class="structure-compounds"></div>
+            <canvas class="structure-view" width="300" height="300" id="structure-view{{id}}"></canvas>
+            <a href="{{schemblUrl}}" class="details">Details</a><a id="menu{{id}}" href="#" class="more" data-target="structure-more{{id}}">More ...</a>
+            </div>
+        </script>
 
-  <script id="more-template" type="text/x-handlebars-template">
-    {{#each items}}
-    <a href="{{url}}">{{name}}</a><br />
-    {{/each}}
-  </script>
+        <script id="more-template" type="text/x-handlebars-template">
+            {{#each items}}
+            <a href="{{url}}">{{name}}</a><br />
+{{/each}}
+        </script>
 
-  <script src="https://code.getmdl.io/1.2.1/material.min.js"></script>
-  <script src="scripts/jsonp.js"></script>
-  <script src="scripts/faerun-common.js"></script>
-  <script src="scripts/details.js"></script>
-</body>
+        <script src="https://code.getmdl.io/1.2.1/material.min.js"></script>
+        <script src="scripts/jsonp.js"></script>
+        <script src="scripts/faerun-common.js"></script>
+        <script src="scripts/details.js"></script>
+    </body>
 
 </html>

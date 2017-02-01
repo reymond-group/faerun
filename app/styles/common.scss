@@ -1,0 +1,205 @@
+@import "bourbon";
+@import "variables.scss";
+
+/**
+ * Elements 
+ */
+html, body {
+    font-family: 'Roboto', 'Helvetica', sans-serif;
+    @include user-select(none); 
+    overflow: hidden;
+}
+
+main, #main {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+    font-size: 0;
+    
+    background-color: #121212 !important;
+    > * {
+        font-size: 1rem;
+    }
+}
+
+/**
+ *  ID - Elements
+ */
+#faerun-layout {
+    .faerun-header {
+        .mdl-textfield {
+            padding: 0px;
+            margin-top: 41px;
+
+            .mdl-textfield__expandable-holder {
+                bottom: 19px;
+            }
+        }
+    }
+
+    .mdl-layout__header {
+        .mdl-layout__drawer-button {
+            color: rgba(255, 255, 255, 0.54);
+        }
+    }
+}
+
+#faerun-drawer {
+    border: none;
+
+    header {
+        box-sizing: border-box;
+        display: -webkit-flex;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-flex-direction: column;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        -webkit-justify-content: flex-end;
+        -ms-flex-pack: end;
+        justify-content: flex-end;
+        padding: 16px;
+        height: 64px;
+
+        .faerun-title {
+            position: relative;
+            font-size: 30px;
+            font-weight: 300;
+            line-height: 30px;
+            padding: 0;
+            margin: 0;
+            padding-left: 35px;
+
+            img {
+                position: absolute;
+                width: 42px;
+                left: -13px;
+                top: -10px;
+            }
+        }
+    }
+
+    /* Start: iOS Safari hacks */
+    .mdl-menu__container {
+        z-index: -1;
+    }
+
+    .faerun-navigation {
+        z-index: -2;
+    }
+    /* End: iOS Safari hacks */
+
+    .mdl-menu {
+        .mdl-menu__item {
+            display: -webkit-flex;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-align-items: center;
+            -ms-flex-align: center;
+            align-items: center;
+
+        }
+    }
+}
+
+#faerun-controls {
+    padding: 0px 16px 16px 16px;
+    overflow-x: hidden;
+    -webkit-flex-grow: 1;
+    -ms-flex-positive: 1;
+    flex-grow: 1;
+
+    .mdl-slider__container { 
+        margin-left: -25px;
+        margin-right: -25px;
+        margin-bottom: 10px;
+    }
+
+    .spacer {
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    .faerun-controls-header {
+        margin-top: 12px;
+        margin-bottom: 2px;
+        font-size: 14px;
+        font-weight: 700;
+
+        i {
+            display: none;
+            position: absolute;
+            left: 12px;
+        }
+    }
+}
+
+#lore {
+    width: 100%;
+    height: 100%;
+}
+
+#loader {
+    position: absolute;
+    z-index: 999999;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    text-align: center;
+
+    #loader-inner {
+        position: relative;
+        display: inline-block;
+        margin-top: 20px;
+        padding: 20px 20px 15px 20px;
+        background-color: #fff;
+    }
+}
+/**
+ * Classes 
+ */
+.hidden {
+    display: none;
+}
+
+.faerun-info {
+    padding: 10px;
+    background-color: #FFDA77;
+}
+
+.flex-box {
+    @include display(flex);
+    @include flex-direction(column);
+    @include flex-wrap(nowrap);
+    @include justify-content(flex-start);
+    @include align-content(stretch);
+    @include align-items(stretch);
+
+    height: 100%;
+
+    .flex-item {
+        position: relative;
+        box-sizing: border-box;
+
+        @include align-self(auto);
+        @include order(0);
+
+        &:nth-child(1) {
+            @include flex(0 1 auto);
+        }
+
+        &:nth-child(2) {
+            @include flex(0 1 auto); 
+        }
+
+        &:nth-child(3) {
+            @include flex(1 1 auto);
+        }
+
+        &:nth-child(4) {
+            @include flex(0 1 auto);
+        }
+    }
+}

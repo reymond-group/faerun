@@ -105,7 +105,9 @@ gulp.task('styles', () => {
     .pipe($.newer('.tmp/styles'))
     .pipe($.sourcemaps.init())
     .pipe($.sass({
-      precision: 10
+      precision: 10,
+      includePaths: require('node-bourbon').includePaths,
+      errLogToConsole: true
     }).on('error', $.sass.logError))
     .pipe($.autoprefixer(AUTOPREFIXER_BROWSERS))
     .pipe(gulp.dest('.tmp/styles'))
