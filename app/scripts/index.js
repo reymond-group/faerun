@@ -633,7 +633,7 @@
             projections.push({
                 color: Faerun.hex2hsl(bindings.colorpickerDialogProjectInput.value),
                 pointHelper: ph,
-                octreeHelper. oh
+                octreeHelper: oh
             });
         });
     }
