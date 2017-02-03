@@ -550,6 +550,55 @@ Faerun.initViewSelect = function(selectElement, lore) {
     });
 }
 
+Faerun.initColorpicker = function(element, colors) {
+    var input = element.getElementsByTagName('input')[0];
+    var initialColor = Faerun.hex2rgb(colors[0], true);
+
+    var container = document.createElement('div');
+    container.classList.add('colorpicker');
+    container.classList.add('hidden');
+
+    var indicator = document.createElement('div');
+    indicator.classList.add('indicator');
+    
+    setTimeout(function() {
+        input.parentElement.MaterialTextfield.change(colors[0]);
+        indicator.style.backgroundColor = initialColor;
+    }, 1000);
+
+    for (var i = 0; i < colors.length; i++) {
+        var colorElement = document.createElement('div');
+        colorElement.style.backgroundColor = colors[i];
+        container.appendChild(colorElement);
+
+        colorElement.addEventListener('click', function(e) {
+            var hex = Faerun.rgb2hex(this.style.backgroundColor); 
+            input.parentElement.MaterialTextfield.change(hex);
+            Faerun.triggerEvent(input, 'keyup');
+        });
+
+        if ((i + 1) % 5 === 0) {
+            container.appendChild(document.createElement('br'));
+        }
+    }
+
+    element.appendChild(container);
+    element.appendChild(indicator);
+    
+    input.addEventListener('focus', function(e) {
+        Faerun.removeClasses(container, [ 'hidden' ]); 
+    });
+    input.addEventListener('blur', function(e) {
+        setTimeout(function() {
+            Faerun.addClasses(container, [ 'hidden' ]);
+        }, 200);
+    });
+    
+    input.addEventListener('keyup', function(e) {
+        indicator.style.backgroundColor = Faerun.hex2rgb(this.value, true); 
+    });
+}
+
 Faerun.addEventListeners = function (eventNames, element, callback) {
     var names = eventNames.split(' ');
     for (var i = 0; i < names.length; i++) {
@@ -572,3 +621,118 @@ Faerun.unblockElements = function() {
         arguments[i].style.opacity = 1.0;
     }
 };
+
+Faerun.format = function(str, args) {
+    return str.replace(/{(\d+)}/g, function(match, number) { 
+        return typeof args[number] != 'undefined'
+            ? args[number]
+            : match
+            ;
+    });
+};
+
+Faerun.loadFingerprint = function(url, callback) {
+    var xhr = new XMLHttpRequest();
+
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            callback(xhr.responseText.split(':')[1].trim());
+        }
+    }
+    xhr.open('GET', url, true);
+    xhr.send();
+};
+
+Faerun.loadProjection = function(url, data, callback) {
+    var xhr = new XMLHttpRequest();
+
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            callback(JSON.parse(xhr.responseText));
+        }
+    }
+    xhr.open('POST', url, true);
+    xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+    xhr.send(JSON.stringify(data));
+}
+
+
+Faerun.rgb2hex = function (rgb) {
+    if (/^#[0-9A-F]{6}$/i.test(rgb)) return rgb;
+
+    rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+    function hex(x) {
+        return ("0" + parseInt(x).toString(16)).slice(-2);
+    }
+
+    return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+}
+
+Faerun.hex2rgb = function (hex, format) {
+    var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+    hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+        return r + r + g + g + b + b;
+    });
+
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    
+    if (result) {
+        if (format) {
+            return 'rgb(' + parseInt(result[1], 16) + ',' + parseInt(result[2], 16) + ',' + parseInt(result[3], 16) + ')';
+        }
+        else { 
+            return {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            }
+        }
+    }
+    else {
+        return null;
+    }
+}
+
+Faerun.hex2hsl = function (hex) {
+    var rgb = Faerun.hex2rgb(hex);
+    var r = rgb.r;
+    var g = rgb.g;
+    var b = rgb.b;
+
+    r /= 255, g /= 255, b /= 255;
+    var max = Math.max(r, g, b), min = Math.min(r, g, b);
+    var h, s, l = (max + min) / 2;
+
+    if (max == min){
+        h = s = 0; // achromatic
+    } 
+    else {
+        var d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch(max) {
+            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+            case g: h = (b - r) / d + 2; break;
+            case b: h = (r - g) / d + 4; break;
+        }
+
+        h /= 6;
+    }
+
+    return {
+        h: h,
+        s: s,
+        l: l
+    };
+}
+
+Faerun.triggerEvent = function(element, eventName) {
+    if ('createEvent' in document) {
+        var e = document.createEvent('HTMLEvents');
+        e.initEvent(eventName, false, true);
+        element.dispatchEvent(e);
+    } else {
+        var e = document.createEventObject();
+        e.eventType = type;
+        element.fireEvent('on' + e.eventType, e);
+    }
+}

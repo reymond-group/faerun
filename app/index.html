@@ -188,9 +188,15 @@
                         <h4 class="mdl-dialog__title flex-item">Project Compounds</h4>
                         <div class="mdl-dialog__subtitle flex-item">
                             <p class="faerun-info">You may enter one compund per line. A compound has to be a valid SMILES string.</p>
+                            <div id="colorpicker-dialog-project" data-binding-id="colorpickerDialogProject" class="colorpicker-container">
+                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                    <input class="mdl-textfield__input" type="text" id="colorpicker-dialog-project-input" data-binding-id="colorpickerDialogProjectInput">
+                                    <label class="mdl-textfield__label" for="sample1">Pick Color ...</label>
+                                </div>
+                            </div>
                         </div>
                         <div class="mdl-dialog__content flex-item">
-                            <textarea id="textarea-project" data-binding-id="textareaProject" type="text" ></textarea>
+                            <textarea id="textarea-project" data-binding-id="textareaProject" type="text" autofocus="autofocus"></textarea>
                         </div>
                         <div class="mdl-dialog__actions flex-item">
                             <button id="button-exec-project" data-binding-id="buttonExecProject" type="button" class="mdl-button">Project</button>
@@ -201,6 +207,8 @@
 
             </div>
             <script src="https://code.getmdl.io/1.2.1/material.min.js"></script>
+            <script src="config.js"></script>
+            <script src="scripts/jsonp.js"></script>
             <script src="scripts/faerun-common.js"></script>
             <script src="scripts/index.js"></script>
         </body>

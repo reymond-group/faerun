@@ -203,3 +203,48 @@ main, #main {
         }
     }
 }
+
+.colorpicker-container {
+    position: relative;
+    padding-left: 34px;
+
+    .colorpicker {
+        z-index: 9999999;
+        position: absolute;
+        top: 50px;
+        padding: 2px;
+        background-color: #fff;
+        box-shadow: 0px 2px 2px 0px rgba(0,0,0,0.5);
+        
+        font-size: 0;
+        line-height: 0;
+
+        div {
+            display: inline-block;
+            width: 25px;
+            height: 25px;
+            margin: 2px;
+
+            border: 1px solid #fff;
+
+            font-size: 0;
+            line-height: 0;
+
+            @include transition(all 0.2s ease-in-out);
+
+            &:hover {
+                border: 1px solid #555;
+            }
+        }
+    }
+
+    .indicator {
+        position: absolute;
+        
+        left: 0px;
+        top: 22px;
+
+        width: 25px;
+        height: 25px;
+    }
+}

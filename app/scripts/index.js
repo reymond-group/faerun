@@ -3,7 +3,7 @@
     var lore = null;
     var smilesDrawer = null;
     var pointHelper = null;
-    var octreeHelper = null;
+    var octreeHelper = null; 
     var coordinatesHelper = null;
     var config = null;
     var currentDatabase = null;
@@ -11,6 +11,7 @@
     var currentVariant = null;
     var currentMap = null;
     var center = null;
+    var projections = [];
     var selectIndicators = [];
     var selectCanvas = {};
     var selectSmiles = {};
@@ -182,6 +183,13 @@
 
     bindings.dialogProject.querySelector('.close').addEventListener('click', function() {
         bindings.dialogProject.close();
+    });
+
+    bindings.buttonExecProject.addEventListener('click', function() {
+        project();
+
+        bindings.dialogProject.close();
+        // Faerun.show(bindings.loader);
     });
 
 
@@ -362,6 +370,7 @@
 
         Faerun.initFullscreenSwitch(bindings.switchFullscreen);
         Faerun.initViewSelect(bindings.selectView, lore);
+        Faerun.initColorpicker(bindings.colorpickerDialogProject, FaerunConfig.colors.colorpickerDialogProject);
 
         socketWorker.onmessage = function (e) {
             if (e.data.cmd === 'init')
@@ -507,5 +516,125 @@
         }
 
         Faerun.hide(bindings.loader);
+    }
+
+    function project() {
+        if (!currentVariant) {
+            bindings.toastError.MaterialSnackbar.showSnackbar({
+                message: 'Please select a variant before projecting ...'
+            });
+            return; 
+        }
+
+        var smiles = bindings.textareaProject.value.split('\n');
+        var hsl = Faerun.hex2hsl(bindings.colorpickerDialogProjectInput.value);
+        var fingerprints = new Array();
+
+        if (smiles.length < 1 || smiles[0] === '') {
+            bindings.toastError.MaterialSnackbar.showSnackbar({
+                message: 'Please enter at least one molecule in SMILES form ...'
+            });
+            return; 
+        }
+
+        var fingerprintId = currentFingerprint.id.split('.').pop();
+        var baseUrl = FaerunConfig.services.fpUrls[fingerprintId];
+
+        // Split smiles into chunks to not overload the fingerprint server
+        var chunks = [];
+
+        var chunkSize = 250;
+        for (var i = 0, j = smiles.length; i < j; i += chunkSize) {
+            chunks.push(smiles.slice(i, i + chunkSize));
+        }
+            
+        console.log(chunks.length);
+
+        var x = [];
+        var y = [];
+        var z = [];
+
+        var chunkIndex = 0;
+
+        var loadChunk = function(callback) {
+            var chunk = chunks[chunkIndex];
+
+            for (var i = 0; i < chunk.length; i++) {
+                chunk[i] = chunk[i].trim();
+                if (chunk[i] === '') continue;
+
+                var url = Faerun.format(baseUrl, [ encodeURIComponent(chunk[i]) ]);
+                var done = 0;
+
+                Faerun.loadFingerprint(url, function(fpRaw) {
+                    var fp = fpRaw.split(';');
+
+                    // Something is wrong when the fp is of length 1
+                    if (fp.length > 1) {
+                        for (var j = 0; j < fp.length; j++) fp[j] = parseInt(fp[j]);
+                        fingerprints.push(fp);
+                    }
+
+                    done++;
+
+                    if (done === chunk.length) {
+                        Faerun.loadProjection(FaerunConfig.services.pcaUrl, {
+                            "database": currentDatabase.id,
+                            "fingerprint": fingerprintId,
+                            "dimensions": 3,
+                            "binning": true,
+                            "resolution": currentVariant.resolution,
+                            "data": fingerprints
+                        }, function(projections) {
+                            if (!projections.success) {
+                                bindings.toastError.MaterialSnackbar.showSnackbar({
+                                    message: 'Oops, something went wrong, please try projecting again ...'
+                                });
+                                return;
+                            }
+
+                            var data = projections.data;
+
+                            for (var j = 0; j < data.length; j++) {
+                                x.push(data[j][0]);
+                                y.push(data[j][1]);
+                                z.push(data[j][2]);
+                            }
+
+                            // To the next chunk
+                            console.log('Chunk ' + chunkIndex + ' done.');
+                            if (chunkIndex < chunks.length - 1) {
+                                chunkIndex++;
+                                loadChunk(callback);
+                            }
+                            else
+                                callback();
+                        }); 
+                    }
+                });
+            }
+        }
+
+        loadChunk(function() {
+            console.log('Loading ...');
+            var ph = new Lore.PointHelper(lore, 'ProjectionGeometry' + pointHelpers.length, 'defaultAnimated');
+            ph.setFogDistance(currentVariant.resolution * Math.sqrt(3) + 500);
+            ph.setPositionsXYZHSS(x, y, z, hsl.h, hsl.s, 1.0);
+
+            var oh = new Lore.OctreeHelper(lore, 'ProjectionOctreeGeometry' + octreeHelpers.length, 'default', ph);
+
+            oh.addEventListener('hoveredchanged', function (e) {
+                if (!e.e) {
+                    return;
+                }
+                console.log(e);
+            });
+            
+            projections.push({
+                color: Faerun.hex2hsl(bindings.colorpickerDialogProjectInput.value),
+                pointHelper: ph,
+                octreeHelper. oh
+            });
+        });
     }
 })();
