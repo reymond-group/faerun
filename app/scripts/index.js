@@ -2,8 +2,6 @@
     // Globals
     var lore = null;
     var smilesDrawer = null;
-    var pointHelper = null;
-    var octreeHelper = null; 
     var coordinatesHelper = null;
     var config = null;
     var currentDatabase = null;
@@ -84,12 +82,12 @@
 
 
     bindings.sliderCutoff.addEventListener('input', function () {
-        pointHelper.setCutoff(bindings.sliderCutoff.value);
+        projections[0].pointhelper.setCutoff(bindings.sliderCutoff.value);
     });
 
     bindings.sliderColor.addEventListener('input', function () {
         var val = parseFloat(bindings.sliderColor.value);
-        var filter = pointHelper.getFilter('hueRange');
+        var filter = projections[0].pointHelper.getFilter('hueRange');
 
         if (val < 0.02) {
             filter.reset();
@@ -126,7 +124,7 @@
     });
 
     bindings.buttonSelectHovered.addEventListener('click', function () {
-        octreeHelper.selectHovered();
+        projections[0].octreeHelper.selectHovered();
     });
 
     // Search
@@ -251,58 +249,53 @@
      * @param {Number} idx - The index for the selected element
      * @param {Number} id - The id of the bin / point
      */
-    function createSelected(idx, id) {
-        var selected = octreeHelper.selected[idx];
-        var hue = pointHelper.getHue(id);
-        var rgb = Lore.Color.hslToRgb(hue, 1.0, 0.75);
-
+    function createSelected(idx, id, layer) {
+        var selected = projections[0].octreeHelper.selected[idx];
+        var hue = projections[0].pointHelper.getHue(id);
+        var rgb = Lore.Color.hslToRgb(hue, 1.0, 0.5);
+        
         for (var i = 0; i < rgb.length; i++)
             rgb[i] = Math.round(rgb[i] * 255);
-
-        var structure = document.createElement('a');
-        structure.classList.add('mdl-badge', 'mdl-badge--overlap');
-        structure.setAttribute('id', 'selected-' + idx);
-        structure.setAttribute('data-badge', idx);
-        structure.setAttribute('href', 'details.html?binIndex=' + id + '&databaseId=' + currentDatabase.id + '&fingerprintId=' + currentFingerprint.id + '&variantId=' + currentVariant.id);
-        structure.setAttribute('target', '_blank');
-        structure.style.borderColor = 'rgba(' + rgb[0] + ', ' + rgb[1] + ', ' + rgb[2] + ', 1.0)';
-
-        var closer = document.createElement('span');
-        closer.innerHTML = '&times;';
-        closer.addEventListener('click', function (e) {
-            octreeHelper.removeSelected(idx);
-            e.stopPropagation();
-            e.preventDefault();
+        
+        Faerun.appendTemplate(bindings.selectContainer, 'selected-bin-template', {
+            id: id,
+            idx: idx,
+            layer: layer,
+            color: 'rgba(' + rgb[0] + ', ' + rgb[1] + ', ' + rgb[2] + ', 0.5)'
         });
-        structure.appendChild(closer);
 
-        Faerun.hover(structure, function () {
-            var data = smiles.parse(selectSmiles[id]);
+        var structure = document.getElementById('selected-structure-' + layer + '-' + id);
+        var item = document.getElementById('selected-bin-item-' + layer + '-' + id);
+        var closer = document.getElementById('bin-closer-' + layer + '-' + id);
+
+        selectCanvas[layer + '-' + id] = structure;
+       
+        Faerun.hover(item, function () {
+            var data = smiles.parse(selectSmiles[layer + '-' + id]);
             smilesDrawer.draw(data, 'hover-structure-drawing', false);
         }, function () {
             Faerun.clearCanvas('hover-structure-drawing');
         });
+        
+        item.addEventListener('click', function(e) {
+           window.open('details.html?binIndex=' + id + '&databaseId=' + currentDatabase.id + '&fingerprintId=' + currentFingerprint.id + '&variantId=' + currentVariant.id, '_blank'); 
+        });
 
-        var canvas = document.createElement('canvas');
-        canvas.setAttribute('id', 'select-structure-drawing-' + id);
-        canvas.setAttribute('width', '50');
-        canvas.setAttribute('height', '50');
-        structure.appendChild(canvas);
+        closer.addEventListener('click', function(e) {
+            projections[layer].octreeHelper.removeSelected(idx);
+            e.stopPropagation();
+            e.preventDefault();
+        });
 
         var indicator = document.createElement('span');
         indicator.classList.add('mdl-badge', 'mdl-badge--overlap', 'select-indicator');
-        indicator.setAttribute('id', 'selected-indicator-' + idx);
+        indicator.setAttribute('id', 'selected-indicator-' + layer + '-' + id);
         indicator.setAttribute('data-badge', idx);
         Faerun.translateAbsolute(indicator, selected.screenPosition[0], selected.screenPosition[1], true);
-        var pointSize = pointHelper.getPointSize();
+        var pointSize = projections[0].pointHelper.getPointSize();
         Faerun.resize(indicator, pointSize, pointSize);
-
-        selectCanvas[id] = canvas;
-
         selectIndicators.push(indicator);
-
-        bindings.selectContainer.appendChild(structure);
-        bindings.selectContainer.parentElement.appendChild(indicator);
+        bindings.main.appendChild(indicator);
     }
 
     /**
@@ -324,9 +317,9 @@
      * Update all HTML elements representing selected bins.
      */
     function updateSelected() {
-        var pointSize = pointHelper.getPointSize();
+        var pointSize = projections[0].pointHelper.getPointSize();
         for (var i = 0; i < selectIndicators.length; i++) {
-            var selected = octreeHelper.selected[i];
+            var selected = projections[0].octreeHelper.selected[i];
             var indicator = selectIndicators[i];
             Faerun.translateAbsolute(indicator, selected.screenPosition[0], selected.screenPosition[1], true);
             Faerun.resize(indicator, pointSize, pointSize);
@@ -338,8 +331,8 @@
      */
     function updateHovered() {
         Faerun.show(bindings.hoverIndicator);
-        Faerun.translateAbsolute(bindings.hoverIndicator, octreeHelper.hovered.screenPosition[0], octreeHelper.hovered.screenPosition[1], true);
-        var pointSize = pointHelper.getPointSize();
+        Faerun.translateAbsolute(bindings.hoverIndicator, projections[0].octreeHelper.hovered.screenPosition[0], projections[0].octreeHelper.hovered.screenPosition[1], true);
+        var pointSize = projections[0].pointHelper.getPointSize();
         Faerun.resize(bindings.hoverIndicator, pointSize, pointSize);
     }
 
@@ -412,15 +405,17 @@
         var cs = Faerun.updateCoordinatesHelper(lore, currentVariant.resolution);
         center = cs.center;
         coordinatesHelper = cs.helper;
+        
+        
 
-        pointHelper = new Lore.PointHelper(lore, 'TestGeometry', 'default');
-        pointHelper.setFogDistance(currentVariant.resolution * Math.sqrt(3) + 500);
-        pointHelper.setPositionsXYZHSS(message.data[0], message.data[1], message.data[2], 0.6, 1.0, 1.0);
-        pointHelper.addFilter('hueRange', new Lore.InRangeFilter('color', 0, 0.22, 0.25));
+        var ph = new Lore.PointHelper(lore, 'TestGeometry', 'default');
+        ph.setFogDistance(currentVariant.resolution * Math.sqrt(3) + 500);
+        ph.setPositionsXYZHSS(message.data[0], message.data[1], message.data[2], 0.6, 1.0, 1.0);
+        ph.addFilter('hueRange', new Lore.InRangeFilter('color', 0, 0.22, 0.25));
 
-        octreeHelper = new Lore.OctreeHelper(lore, 'OctreeGeometry', 'default', pointHelper);
+        var oh = new Lore.OctreeHelper(lore, 'OctreeGeometry', 'default', ph);
 
-        octreeHelper.addEventListener('hoveredchanged', function (e) {
+        oh.addEventListener('hoveredchanged', function (e) {
             if (!e.e) {
                 Faerun.hide(bindings.hoverIndicator);
                 return;
@@ -439,11 +434,11 @@
             });
         });
 
-        octreeHelper.addEventListener('selectedchanged', function (e) {
+        oh.addEventListener('selectedchanged', function (e) {
             clearSelected();
-            for (var i = 0; i < octreeHelper.selected.length; i++) {
-                var selected = octreeHelper.selected[i];
-                createSelected(i, selected.index);
+            for (var i = 0; i < oh.selected.length; i++) {
+                var selected = oh.selected[i];
+               createSelected(i, selected.index, 0);
 
                 socketWorker.postMessage({
                     cmd: 'load:binpreview',
@@ -457,9 +452,15 @@
             }
         });
 
-        octreeHelper.addEventListener('updated', function () {
-            if (octreeHelper.hovered) updateHovered();
-            if (octreeHelper.selected) updateSelected();
+        oh.addEventListener('updated', function () {
+            if (oh.hovered) updateHovered();
+            if (oh.selected) updateSelected();
+        });
+
+        projections.push({
+            color: null,
+            pointHelper: ph,
+            octreeHelper: oh
         });
 
         bindings.dataTitle.innerHTML = currentDatabase.name;
@@ -481,7 +482,7 @@
             message.data[i] = Faerun.initArrayFromBuffer(message.dataTypes[i], message.data[i]);
         }
 
-        pointHelper.setRGB(message.data[0], message.data[1], message.data[2]);
+        projections[0].pointHelper.setRGB(message.data[0], message.data[1], message.data[2]);
         Faerun.setTitle(currentDatabase.name + ' &middot; ' + currentMap.name);
         bindings.selectMap.parentElement.style.pointerEvents = 'auto';
         Faerun.hide(bindings.loader);
@@ -499,11 +500,11 @@
     function onBinPreviewLoaded (message) {
         var target = 'hover-structure-drawing';
 
-        if (selectCanvas.hasOwnProperty(message.index)) {
-            target = 'select-structure-drawing-' + message.index;
-            selectSmiles[message.index] = message.smiles;
+        if (selectCanvas.hasOwnProperty('0-' + message.index)) {
+            // Smiles are only loaded from 0 layer (the one loaded from the server)
+            target = 'select-structure-drawing-0-' + message.index;
+            selectSmiles['0-' + message.index] = message.smiles;
         }
-
         var data = smiles.parse(message.smiles);
         smilesDrawer.draw(data, target, false);
     }
@@ -511,7 +512,7 @@
     function onInfosSearched (message) {
         for (var i = 0; i < message.binIndices.length; i++) {
             for (var j = 0; j < message.binIndices[i].length; j++) {
-                octreeHelper.addSelected(message.binIndices[i][j]);
+                projections[0].octreeHelper.addSelected(message.binIndices[i][j]);
             }
         }
 
@@ -617,11 +618,11 @@
 
         loadChunk(function() {
             console.log('Loading ...');
-            var ph = new Lore.PointHelper(lore, 'ProjectionGeometry' + pointHelpers.length, 'defaultAnimated');
+            var ph = new Lore.PointHelper(lore, 'ProjectionGeometry' + projections.length, 'defaultAnimated');
             ph.setFogDistance(currentVariant.resolution * Math.sqrt(3) + 500);
             ph.setPositionsXYZHSS(x, y, z, hsl.h, hsl.s, 1.0);
 
-            var oh = new Lore.OctreeHelper(lore, 'ProjectionOctreeGeometry' + octreeHelpers.length, 'default', ph);
+            var oh = new Lore.OctreeHelper(lore, 'ProjectionOctreeGeometry' + projections.length, 'default', ph);
 
             oh.addEventListener('hoveredchanged', function (e) {
                 if (!e.e) {

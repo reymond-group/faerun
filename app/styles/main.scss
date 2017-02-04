@@ -117,83 +117,69 @@
 }
 
 #hover-structure {
-    z-index: 9999;
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    background-color: rgba(0, 0, 0, 0.8);
-    padding: 30px;
-    border-radius: 200px;
     pointer-events: none;
-
+    
     @media only screen and (max-device-width: $responsive-mobile-max-width) {
         top: 50px;
         left: 0;
         right: 0;
-        width: 250px;
-        height: 250px;
+        width: 300px;
+        height: 300px;
         margin: auto;
         background-color: rgba(0, 0, 0, 0.2);
     }
-}
+
+    canvas {
+        margin: 0px 5px 10px 5px;
+    }
+ }
 
 #select-container {
-    z-index: 9999;
-    position: absolute;
-    top: 20px;
-    left: 310px;
-    width: calc(100% - 420px);
-    height: 300px;
-    pointer-events: none;
+    margin: 0px 5px 0px 5px;
 
-    @media only screen and (max-device-width: $responsive-mobile-max-width) {
-        top: 5px;
-        left: 0;
-        width: 100%;
-        height: 120px;
-        max-height: 120px;
-        margin: auto;
-        white-space: nowrap;
-        overflow-x: scroll;
-        pointer-events: auto;
-    }
-
-
-    a {
-        z-index: 9999;
+    .item {
         position: relative;
-        display: inline-block;
-        padding: 15px;
-        margin: 10px;
-        background-color: rgba(0, 0, 0, 0.8);
-        border-width: 1px;
-        border-style: solid;
-        border-radius: 100px;
-        pointer-events: all;
-
-        transition: background .1s linear;
-        box-shadow: 0px 0px 10px 2px rgba(0,0,0,0.5);
+        height: 54px;
+        padding: 2px;
+        margin-bottom: 2px;
+        background-color: rgba(255, 255, 255, 0.02); 
         
         &:hover {
-            background-color: rgba(0, 0, 0, 1.0);
+            background-color: rgba(255, 255, 255, 0.04);
         }
 
-        span {
+        .closer {
             position: absolute;
-            top: 15px;
-            right: -10px;
-            width: 20px;
-            height: 20px;
-            background-color: #f00;
+            display: block;
+            right: 5px;
+            top: 5px;
             color: #fff;
-            border-radius: 50px;
+            text-decoration: none;
+            font-size: 1.6em;
+            font-weight: bold;
             text-align: center;
-            transition: background .1s linear;
-        
+            opacity: 0.75;
+
             &:hover {
-                background-color: #fff;
+                opacity: 0.75;
                 color: #f00;
             }
+        }
+
+        .id, .idx {
+            position: absolute;
+            display: block;
+            left: 60px;
+            top: 5px;
+            text-decoration: none;
+            font-size: 1.0em;
+            text-align: center;
+            color: #fff;
+            opacity: 0.5;
+        }
+
+        .idx {
+            top: 25px;
         }
     }
 }
@@ -223,6 +209,77 @@
             outline: none !important;
             border: 1px solid rgba(0, 0, 0, 0.25);
         }
+    }
+}
+
+#faerun-panel {
+    @include display(flex);
+    @include flex-direction(column);
+    @include flex-wrap(nowrap);
+    @include justify-content(flex-start);
+    @include align-content(stretch);
+    @include align-items(stretch);
+
+    z-index: 999998;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    height: calc(100% - 20px);
+    width: 300px;
+
+    background-color: rgba(0, 0, 0, 0.8);
+    border: 1px solid #151515;
+
+    cursor: default !important;
+
+    .flex-item {
+        position: relative;
+        box-sizing: border-box;
+
+        @include align-self(auto);
+        @include order(0);
+
+        &:nth-child(1) {
+            @include flex(0 1 auto);
+        }
+        
+        &:nth-child(2) {
+            @include flex(0 1 auto);
+        }
+        
+        &:nth-child(3) {
+            @include flex(0 1 auto);
+        }
+
+        &:nth-child(4) {
+            @include flex(0 1 auto);
+        }
+        
+        &:nth-child(5) {
+            @include flex(0 1 auto);
+        }
+
+        &:nth-child(6) {
+            @include flex(1 1 auto);
+            overflow-y: auto;
+        }
+        
+        &:nth-child(7) {
+            @include flex(0 1 auto);
+        }
+
+        &:nth-child(8) {
+            @include flex(0 1 auto);
+        }
+    }
+
+    .title {
+        margin: 5px 5px 0px 5px;
+        padding: 5px;
+        background-color: rgba(255, 255, 255, 0.05);
+        color: rgba(255, 255, 255, 0.75);
+        font-size: 1em;
+        line-height: 1em;
     }
 }
 
