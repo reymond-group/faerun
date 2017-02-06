@@ -110,6 +110,9 @@
                     <a href="#" id="button-project" data-binding-id="buttonProject" class="faerun-controls-button">
                         Project
                     </a>
+                    <a href="#" id="button-knn" data-binding-id="buttonKNN" class="faerun-controls-button">
+                        KNN Search 
+                    </a>
                 </div>
             </div>
 
@@ -135,7 +138,7 @@
                         <div class="title">Layers</div>
                     </div>
                     <div id="layers" data-binding-id="layers" class="flex-item">
-                        
+                        <div id="layer-container" data-binding-id="layerContainer"></div> 
                     </div>
                     <div class="flex-tiem">
                         <div class="title">Selected Bins</div>
@@ -146,7 +149,8 @@
                     <div class="flex-tiem">
                         <div class="title">Controls</div>
                     </div>
-                    <div id="touch-controls" data-binding-id="touchControls" class="flex-item"></div>
+                    <div id="touch-controls" data-binding-id="touchControls" class="flex-item">
+                    </div>
                 </div>
 
                 <div id="hud-container" data-binding-id="hudContainer" class="hidden-n mdl-color--grey-300">
@@ -218,6 +222,13 @@
                                 <label class="mdl-textfield__label" for="sample1">Pick Color ...</label>
                             </div>
                         </div>
+                        <div class="name-container">
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                <input class="mdl-textfield__input" type="text" id="name-dialog-project-input" data-binding-id="nameDialogProjectInput">
+                                <label class="mdl-textfield__label" for="sample1">Name</label>
+                            </div>
+                        </div>
+
                     </div>
                     <div class="mdl-dialog__content flex-item">
                         <textarea id="textarea-project" data-binding-id="textareaProject" type="text" autofocus="autofocus"></textarea>
@@ -241,8 +252,17 @@
         </script>
 
         <script id="layer-template" type="text/x-handlebars-template">
-            <div id="layer-{{layer}}" class="item">
-                
+            <div id="layer-{{id}}" class="item">
+                <div class="color" style="background-color: {{color}}"></div>
+                <div class="name">{{name}}</div>
+                <div class="checkbox-container">
+                    <input id="checkbox-visible-{{id}}" class="checkbox" name="checkbox-visible-{{id}}" type="checkbox">
+                    <label for="checkbox-visible-{{id}}" class="checkbox-label"></label>
+                </div>
+                <div class="radio-container">
+                    <input id="radio-current-{{id}}" class="radio" name="radio-current" type="radio">
+                    <label for="radio-current-{{id}}" class="radio-label"></label>
+                </div>
             </div>
         </script>
 

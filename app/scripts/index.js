@@ -190,6 +190,25 @@
         // Faerun.show(bindings.loader);
     });
 
+    // KNN
+    bindings.buttonKNN.addEventListener('click', function() {
+        var oh = projections[0].octreeHelper;
+        var ph = projections[0].pointHelper;
+        var positions = ph.getAttribute('position');
+
+        var results = oh.octree.kNearestNeighbours(100, new Lore.Vector3f(150, 150, 150), null, positions);
+        
+        for (var i = 0; i < ph.geometry.attributes['color'].data.length; i++) {
+            ph.geometry.attributes['color'].data[i * 3 + 2] = -Math.abs(ph.geometry.attributes['color'].data[i * 3 + 2]);
+        }
+        
+        for (var i = 0; i < results.length; i++) {
+            ph.geometry.attributes['color'].data[i * 3 + 2] = Math.abs(ph.geometry.attributes['color'].data[i * 3 + 2]);
+        }
+
+        ph.geometry.updateAttribute('color');
+    });
+
 
     /**
      * Populates the HTMLSelectElement containing the databases available on the server.
@@ -244,6 +263,32 @@
     }
 
     /**
+     * Update the layer list
+     */
+    function updateLayers() {
+        Faerun.removeChildren(bindings.layerContainer);
+
+        for (var i = 0; i < projections.length; i++) {
+            var projection = projections[i];
+            Faerun.appendTemplate(bindings.layerContainer, 'layer-template', {
+                id: i,
+                name: projection.name,
+                color: projection.color
+            });
+        }
+    }
+
+    /**
+     * Add a layer to the available projections
+     *
+     * @param {any} projection - A projection item to be added to the available projections
+     */
+    function addProjection(projection) {
+        projections.push(projection);
+        updateLayers();
+    }
+
+    /**
      * Create an HTML element with index 'idx' representing the bin specified by 'id'.
      *
      * @param {Number} idx - The index for the selected element
@@ -278,7 +323,9 @@
         });
         
         item.addEventListener('click', function(e) {
-           window.open('details.html?binIndex=' + id + '&databaseId=' + currentDatabase.id + '&fingerprintId=' + currentFingerprint.id + '&variantId=' + currentVariant.id, '_blank'); 
+           window.open('details.html?binIndex=' + id + '&databaseId=' + currentDatabase.id + 
+                       '&fingerprintId=' + currentFingerprint.id + '&variantId=' + 
+                       currentVariant.id, '_blank'); 
         });
 
         closer.addEventListener('click', function(e) {
@@ -298,7 +345,7 @@
         bindings.main.appendChild(indicator);
     }
 
-    /**
+     /**
      * Remove all HTML elements representing selected bins.
      */
     function clearSelected() {
@@ -457,8 +504,9 @@
             if (oh.selected) updateSelected();
         });
 
-        projections.push({
-            color: null,
+        addProjection({
+            name: currentDatabase.name,
+            color: '#fff',
             pointHelper: ph,
             octreeHelper: oh
         });
@@ -631,8 +679,9 @@
                 console.log(e);
             });
             
-            projections.push({
-                color: Faerun.hex2hsl(bindings.colorpickerDialogProjectInput.value),
+            addProjection({
+                name: bindings.nameDialogProjectInput.value,
+                color: bindings.colorpickerDialogProjectInput.value,
                 pointHelper: ph,
                 octreeHelper: oh
             });

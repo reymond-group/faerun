@@ -184,6 +184,44 @@
     }
 }
 
+#layer-container {
+    .item {
+        @include display(flex);
+        @include flex-direction(row);
+        @include flex-wrap(nowrap);
+        @include justify-content(flex-start);
+        @include align-content(stretch);
+        @include align-items(stretch);
+
+        height: 30px;
+
+        div {
+            @include align-self(auto);
+            @include order(0);
+        }
+
+        .color {
+            width: 20px;
+            height: 20px;
+            margin: 5px;
+            @include flex(0 1 auto);
+        }
+
+        .name {
+            color: #fff;
+            font-size: 1.2em;
+            line-height: 30px;
+
+            @include flex(1 1 auto);
+        }
+
+        .checkbox-container, .radio-container {
+
+            @include flex(0 1 auto);
+        }
+    }
+}
+
 #toast-error {
     background-color: #c0392b;
 }
@@ -209,6 +247,16 @@
             outline: none !important;
             border: 1px solid rgba(0, 0, 0, 0.25);
         }
+    }
+}
+
+#dialog-project {
+    .colorpicker-container, .name-container {
+        display: inline-block;
+    }
+
+    .name-container {
+        padding-left: 34px;
     }
 }
 
