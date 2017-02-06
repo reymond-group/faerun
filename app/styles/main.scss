@@ -153,12 +153,11 @@
             display: block;
             right: 5px;
             top: 5px;
-            color: #fff;
+            color: #bbb;
             text-decoration: none;
             font-size: 1.6em;
             font-weight: bold;
             text-align: center;
-            opacity: 0.75;
 
             &:hover {
                 opacity: 0.75;
@@ -172,14 +171,17 @@
             left: 60px;
             top: 5px;
             text-decoration: none;
-            font-size: 1.0em;
+            font-size: 0.9em;
             text-align: center;
-            color: #fff;
-            opacity: 0.5;
+            color: #bbb;
+
+            b {
+                color: #eee;
+            }
         }
 
-        .idx {
-            top: 25px;
+        .id {
+            top: 20px;
         }
     }
 }

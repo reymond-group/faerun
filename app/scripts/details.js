@@ -36,7 +36,7 @@
     Faerun.toggle(moreContainer);
   });
 
-  Faerun.hoverClass('molecule', function(e) {
+  Faerun.hoverClass('structure-view', function(e) {
     var index = e.target.getAttribute('data-index');
     console.log(index);
     console.log('Hovered!');
