@@ -82,7 +82,7 @@
 
 
     bindings.sliderCutoff.addEventListener('input', function () {
-        projections[0].pointhelper.setCutoff(bindings.sliderCutoff.value);
+        projections[0].pointHelper.setCutoff(bindings.sliderCutoff.value);
     });
 
     bindings.sliderColor.addEventListener('input', function () {
@@ -195,15 +195,14 @@
         var oh = projections[0].octreeHelper;
         var ph = projections[0].pointHelper;
         var positions = ph.getAttribute('position');
-
-        var results = oh.octree.kNearestNeighbours(100, new Lore.Vector3f(150, 150, 150), null, positions);
+        var results = oh.octree.kNearestNeighbours(500, { x: 100, y: 100, z: 100 }, null, positions);
         
         for (var i = 0; i < ph.geometry.attributes['color'].data.length; i++) {
             ph.geometry.attributes['color'].data[i * 3 + 2] = -Math.abs(ph.geometry.attributes['color'].data[i * 3 + 2]);
         }
         
         for (var i = 0; i < results.length; i++) {
-            ph.geometry.attributes['color'].data[i * 3 + 2] = Math.abs(ph.geometry.attributes['color'].data[i * 3 + 2]);
+            ph.geometry.attributes['color'].data[results[i] * 3 + 2] = Math.abs(ph.geometry.attributes['color'].data[results[i] * 3 + 2]);
         }
 
         ph.geometry.updateAttribute('color');
@@ -460,7 +459,7 @@
         ph.setPositionsXYZHSS(message.data[0], message.data[1], message.data[2], 0.6, 1.0, 1.0);
         ph.addFilter('hueRange', new Lore.InRangeFilter('color', 0, 0.22, 0.25));
 
-        var oh = new Lore.OctreeHelper(lore, 'OctreeGeometry', 'default', ph);
+        var oh = new Lore.OctreeHelper(lore, 'OctreeGeometry', 'default', ph, { visualize: false });
 
         oh.addEventListener('hoveredchanged', function (e) {
             if (!e.e) {
