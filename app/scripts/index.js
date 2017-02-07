@@ -82,7 +82,7 @@
 
 
     bindings.sliderCutoff.addEventListener('input', function () {
-        projections[0].pointhelper.setCutoff(bindings.sliderCutoff.value);
+        projections[0].pointHelper.setCutoff(bindings.sliderCutoff.value);
     });
 
     bindings.sliderColor.addEventListener('input', function () {
@@ -195,8 +195,7 @@
         var oh = projections[0].octreeHelper;
         var ph = projections[0].pointHelper;
         var positions = ph.getAttribute('position');
-
-        var results = oh.octree.kNearestNeighbours(100, new Lore.Vector3f(150, 150, 150), null, positions);
+        var results = oh.octree.kNearestNeighbours(5, oh.selected[0].index, oh.selected[0].locCode, positions);
         
         for (var i = 0; i < ph.geometry.attributes['color'].data.length; i++) {
             ph.geometry.attributes['color'].data[i * 3 + 2] = -Math.abs(ph.geometry.attributes['color'].data[i * 3 + 2]);

@@ -14,7 +14,7 @@ var FaerunConfig = {
         ]
     },
     "server": {
-        "url": 'ws://nerdlab.ch:8080/underdark' 
+        "url": 'ws://underdark.gdb.tools/underdark' 
     },
     "services": {
         "fpUrls": {
@@ -25,7 +25,7 @@ var FaerunConfig = {
             "sfp": "http://gdbtools.unibe.ch:8080/fpService/calculateFP2.jsp?smi={0}&fp=Sfp",
             "ecfp4": "http://gdbtools.unibe.ch:8080/fpService/calculateFP2.jsp?smi={0}&fp=ECfp4"
         },
-        "pcaUrl": "http://nerdlab.ch:8081/",
+        "pcaUrl": "http://planes.gdb.tools/",
         "pcaParameters": {
             "mqn": {
                 "database": "surechembl",
