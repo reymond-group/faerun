@@ -636,7 +636,8 @@ Faerun.loadFingerprint = function(url, callback) {
 
     xhr.onreadystatechange = function() {
         if (xhr.readyState == 4 && xhr.status == 200) {
-            callback(xhr.responseText.split(':')[1].trim());
+            var data = xhr.responseText.split(':');
+            callback(data[1].trim(), data[2].trim());
         }
     }
     xhr.open('GET', url, true);

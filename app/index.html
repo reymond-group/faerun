@@ -121,7 +121,7 @@
                 <div id="loader" data-binding-id="loader" class="hidden">
                     <div id="loader-inner" data-binding-id="loaderInner">
                         <div class="mdl-spinner mdl-js-spinner is-active"></div>
-                        <div class="loader-message">Loading ...</div>
+                        <div id="loading-message" data-binding-id="loadingMessage" class="loader-message"></div>
                     </div>
                 </div>
                 <span id="hover-indicator" data-binding-id="hoverIndicator" class="hidden"></span>
@@ -260,7 +260,11 @@
                     <label for="checkbox-visible-{{id}}" class="checkbox-label"></label>
                 </div>
                 <div class="radio-container">
-                    <input id="radio-current-{{id}}" class="radio" name="radio-current" type="radio">
+                    {{#if current}}
+                        <input id="radio-current-{{id}}" value="{{id}}" class="radio radio-current-layer" name="radio-current-layer" type="radio" checked="checked">
+                    {{else}}
+                        <input id="radio-current-{{id}}" value="{{id}}" class="radio radio-current-layer" name="radio-current-layer" type="radio"> 
+                    {{/if}}
                     <label for="radio-current-{{id}}" class="radio-label"></label>
                 </div>
             </div>

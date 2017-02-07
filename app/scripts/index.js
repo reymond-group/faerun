@@ -8,6 +8,7 @@
     var currentFingerprint = null;
     var currentVariant = null;
     var currentMap = null;
+    var currentLayer = 0;
     var center = null;
     var projections = [];
     var selectIndicators = [];
@@ -51,6 +52,7 @@
                 bindings.selectVariant.parentElement, bindings.selectMap.parentElement);
 
         // Show the loader (blocks the main view)
+        bindings.loadingMessage.innerHTML = 'Loading variant ...';
         Faerun.show(bindings.loader);
 
         socketWorker.postMessage({
@@ -77,6 +79,7 @@
         });
 
         bindings.selectMap.parentElement.style.pointerEvents = 'none';
+        bindings.loadingMessage.innerHTML = 'Loading map ...';
         Faerun.show(bindings.loader);
     }, false);
 
@@ -167,6 +170,7 @@
         });
 
         bindings.dialogSearch.close();
+        bindings.loadingMessage.innerHTML = 'Searching ...';
         Faerun.show(bindings.loader);
     });
 
@@ -187,22 +191,29 @@
         project();
 
         bindings.dialogProject.close();
-        // Faerun.show(bindings.loader);
+        bindings.loadingMessage.innerHTML = 'Projecting ...';
+        Faerun.show(bindings.loader);
     });
 
     // KNN
     bindings.buttonKNN.addEventListener('click', function() {
+        if (currentLayer === 0) return;
+
         var oh = projections[0].octreeHelper;
         var ph = projections[0].pointHelper;
-        var positions = ph.getAttribute('position');
-        var results = oh.octree.kNearestNeighbours(500, { x: 100, y: 100, z: 100 }, null, positions);
+        
+        var positions = projections[currentLayer].pointHelper.getAttribute('position');
         
         for (var i = 0; i < ph.geometry.attributes['color'].data.length; i++) {
             ph.geometry.attributes['color'].data[i * 3 + 2] = -Math.abs(ph.geometry.attributes['color'].data[i * 3 + 2]);
         }
         
-        for (var i = 0; i < results.length; i++) {
-            ph.geometry.attributes['color'].data[results[i] * 3 + 2] = Math.abs(ph.geometry.attributes['color'].data[results[i] * 3 + 2]);
+        for (var i = 0; i < positions.length; i += 3) {
+            var results = oh.octree.kNearestNeighbours(50, { x: positions[i], y: positions[i + 1], z: positions[i + 2] }, null, positions);
+            
+            for (var j = 0; j < results.length; j++) {
+                ph.geometry.attributes['color'].data[results[j] * 3 + 2] = Math.abs(ph.geometry.attributes['color'].data[results[j] * 3 + 2]);
+            }
         }
 
         ph.geometry.updateAttribute('color');
@@ -272,7 +283,15 @@
             Faerun.appendTemplate(bindings.layerContainer, 'layer-template', {
                 id: i,
                 name: projection.name,
-                color: projection.color
+                color: projection.color,
+                current: i === currentLayer
+            });
+        }
+
+        var layers = document.getElementsByClassName('radio-current-layer');
+        for (var i = 0; i < layers.length; i++) {
+            layers[i].addEventListener('click', function(e) {
+                currentLayer = parseFloat(this.value);
             });
         }
     }
@@ -375,10 +394,11 @@
     /**
      * Update the hover indicators.
      */
-    function updateHovered() {
+    function updateHovered(layer) {
+        layer = layer || 0;
         Faerun.show(bindings.hoverIndicator);
-        Faerun.translateAbsolute(bindings.hoverIndicator, projections[0].octreeHelper.hovered.screenPosition[0], projections[0].octreeHelper.hovered.screenPosition[1], true);
-        var pointSize = projections[0].pointHelper.getPointSize();
+        Faerun.translateAbsolute(bindings.hoverIndicator, projections[layer].octreeHelper.hovered.screenPosition[0], projections[layer].octreeHelper.hovered.screenPosition[1], true);
+        var pointSize = projections[layer].pointHelper.getPointSize();
         Faerun.resize(bindings.hoverIndicator, pointSize, pointSize);
     }
 
@@ -462,6 +482,8 @@
         var oh = new Lore.OctreeHelper(lore, 'OctreeGeometry', 'default', ph, { visualize: false });
 
         oh.addEventListener('hoveredchanged', function (e) {
+            if (currentLayer !== 0) return;
+            
             if (!e.e) {
                 Faerun.hide(bindings.hoverIndicator);
                 return;
@@ -481,10 +503,12 @@
         });
 
         oh.addEventListener('selectedchanged', function (e) {
+            if (currentLayer !== 0) return;
+
             clearSelected();
             for (var i = 0; i < oh.selected.length; i++) {
                 var selected = oh.selected[i];
-               createSelected(i, selected.index, 0);
+                createSelected(i, selected.index, 0);
 
                 socketWorker.postMessage({
                     cmd: 'load:binpreview',
@@ -574,11 +598,12 @@
             return; 
         }
 
-        var smiles = bindings.textareaProject.value.split('\n');
+        var smilesData = bindings.textareaProject.value.split('\n');
         var hsl = Faerun.hex2hsl(bindings.colorpickerDialogProjectInput.value);
         var fingerprints = new Array();
+        var fingerprintSmiles = new Array();
 
-        if (smiles.length < 1 || smiles[0] === '') {
+        if (smilesData.length < 1 || smilesData[0] === '') {
             bindings.toastError.MaterialSnackbar.showSnackbar({
                 message: 'Please enter at least one molecule in SMILES form ...'
             });
@@ -592,11 +617,9 @@
         var chunks = [];
 
         var chunkSize = 250;
-        for (var i = 0, j = smiles.length; i < j; i += chunkSize) {
-            chunks.push(smiles.slice(i, i + chunkSize));
+        for (var i = 0, j = smilesData.length; i < j; i += chunkSize) {
+            chunks.push(smilesData.slice(i, i + chunkSize));
         }
-            
-        console.log(chunks.length);
 
         var x = [];
         var y = [];
@@ -614,13 +637,14 @@
                 var url = Faerun.format(baseUrl, [ encodeURIComponent(chunk[i]) ]);
                 var done = 0;
 
-                Faerun.loadFingerprint(url, function(fpRaw) {
+                Faerun.loadFingerprint(url, function(fpRaw, smi) {
                     var fp = fpRaw.split(';');
 
                     // Something is wrong when the fp is of length 1
                     if (fp.length > 1) {
                         for (var j = 0; j < fp.length; j++) fp[j] = parseInt(fp[j]);
                         fingerprints.push(fp);
+                        fingerprintSmiles.push(smi);
                     }
 
                     done++;
@@ -650,7 +674,7 @@
                             }
 
                             // To the next chunk
-                            console.log('Chunk ' + chunkIndex + ' done.');
+                            bindings.loadingMessage.innerHTML = 'Projecting chunk ' + (chunkIndex + 1) + ' of ' + chunks.length + ' ...';
                             if (chunkIndex < chunks.length - 1) {
                                 chunkIndex++;
                                 loadChunk(callback);
@@ -664,26 +688,38 @@
         }
 
         loadChunk(function() {
-            console.log('Loading ...');
             var ph = new Lore.PointHelper(lore, 'ProjectionGeometry' + projections.length, 'defaultAnimated');
             ph.setFogDistance(currentVariant.resolution * Math.sqrt(3) + 500);
             ph.setPositionsXYZHSS(x, y, z, hsl.h, hsl.s, 1.0);
 
             var oh = new Lore.OctreeHelper(lore, 'ProjectionOctreeGeometry' + projections.length, 'default', ph);
+            
+            var layer = projections.length;
 
             oh.addEventListener('hoveredchanged', function (e) {
+                if (currentLayer !== layer) return;
+                
                 if (!e.e) {
+                    Faerun.hide(bindings.hoverIndicator);
                     return;
                 }
-                console.log(e);
+
+                var target = 'hover-structure-drawing';
+                var data = smiles.parse(projections[layer].smiles[e.e.index]);
+                smilesDrawer.draw(data, target, false);
+                    
+                updateHovered(layer);
             });
             
             addProjection({
                 name: bindings.nameDialogProjectInput.value,
                 color: bindings.colorpickerDialogProjectInput.value,
+                smiles: fingerprintSmiles,
                 pointHelper: ph,
                 octreeHelper: oh
             });
+
+            Faerun.hide(bindings.loader);
         });
     }
 })();
