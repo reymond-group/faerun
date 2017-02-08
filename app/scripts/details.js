@@ -14,7 +14,7 @@
   var sourceInfos = {};
   var sources = {};
   var schemblIdToId = {};
-  var socketWorker = new Worker('scripts/socketWorkerIndex.js');
+  var socketWorker = new Worker('scripts/socketWorker.js');
   var treeWorker = new Worker('libs/kmst/kmst-worker.js');
 
   var bindings = Faerun.getBindings();

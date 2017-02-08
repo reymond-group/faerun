@@ -1,5 +1,5 @@
 importScripts('../libs/socketio/socket.io-1.4.5.js');
-importScripts('../scripts/faerun-common.js');
+importScripts('../scripts/common.js');
 importScripts('../config.js');
 
 // var socket = socket = io.connect('http://130.92.75.77:8080/underdark');

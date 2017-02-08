@@ -5539,6 +5539,43 @@ Lore.Octree.prototype = {
         else
             return this.getClosestBox(point, threshold, closest);
     },
+    
+    /**
+     * This function returns the closest box in the octree to the point given as an argument. The distance measured is to the
+     * box center.
+     * @param {Lore.Vector3f} point - The point.
+     * @param {number} threshold - The minimum number of points an axis-aligned bounding box should contain to count as a hit.
+     * @param {number} locCode - The starting locCode, if not set, starts at the root.
+     * @returns {Lore.AABB} The closest axis-aligned bounding box to the input point.
+     */
+    getClosestBoxFromCenter: function(point, threshold, locCode) {
+        locCode = locCode || 1;
+
+        var closest = -1;
+        var minDist = Number.MAX_VALUE;
+
+        for(var i = 0; i < 8; i++) {
+            var next = locCode << 3 | i;
+
+            // If it has an aabb, it exists
+            if(this.aabbs[next]) {
+                // Continue if under threshold
+                if(this.points[next] && this.points[next].length < threshold)
+                    continue;
+
+                var dist = this.aabbs[next].distanceFromCenterToPointSq(point.components[0], point.components[1], point.components[2]);
+                if(dist < minDist) {
+                    minDist = dist;
+                    closest = next;
+                }
+            }
+        }
+
+        if(closest < 0)
+            return this.aabbs[locCode];
+        else
+            return this.getClosestBox(point, threshold, closest);
+    },
 
     /**
      * This function returns the farthest box in the octree to the point given as an argument.
@@ -5712,14 +5749,14 @@ Lore.Octree.prototype = {
      */
     kNearestNeighbours: function(k, point, locCode, positions, kNNCallback) {
         k += 1; // Account for the fact, that the point itself should be returned as well.
-        var length = this.positions / 3;
+        var length = positions / 3;
         var p = point;
 
         if(!isNaN(parseFloat(point)))
             var p = { x: positions[p * 3], y: positions[p * 3 + 1], z: positions[p * 3 + 2] };
         
         if(locCode === null)
-            locCode = this.getClosestBox(new Lore.Vector3f(p.x, p.y, p.z), 0).locCode;
+            locCode = this.getClosestBoxFromCenter(new Lore.Vector3f(p.x, p.y, p.z), 0).locCode;
 
         // Calculte the distances to the other cells
         var cellDistances = this.getCellDistancesToPoint(p.x, p.y, p.z, locCode);
@@ -5733,24 +5770,27 @@ Lore.Octree.prototype = {
 
         // Sort the neighbours according to distance
         var sortedCellDistances = radixSort.sort(cellDistances.distancesSq, true);
-
+        
         // Since the closest points always stay the closest points event when adding
         // the points of another cell, instead of resizing the array, just define
         // an offset
         var pointOffset = 0;
 
-        // Get all the neighbours from this cell that are closer than the once from
+        // Get all the neighbours from this cell that are closer than the nereast box
         var indexCount = 0;
         var indices = new Uint32Array(k);
+        console.log(sortedPointDistances, sortedCellDistances); 
         for(var i = 0; indexCount < k && i < sortedPointDistances.array.length; i++) {
             // Break if closest neighbouring cell is closer than the closest remaining point
             if(sortedPointDistances.array[i] > sortedCellDistances.array[0]) {
                 // Set the offset to the most distant closest member
                 pointOffset = i;
+                console.log('...');
                 break;
             }
 
             indices[i] = pointDistances.indices[sortedPointDistances.indices[i]];
+            console.log(i, indices[i]);
             indexCount++;
         }
 
@@ -5916,7 +5956,7 @@ Lore.Octree.prototype = {
         var points = this.points[locCode];
         var indices = new Uint32Array(points.length);
         var dists = new Float32Array(points.length);
-
+        
         for(var i = 0; i < points.length; i++) {
             var index = points[i] * 3;
             var x2 = positions[index];
@@ -6165,6 +6205,18 @@ Lore.AABB.prototype = {
         }
 
         return sqDist;
+    },
+
+    /**
+     * Returns the box that is closest to the point (measured from center).
+     * @param {number} x - The x component of the point coordinate.
+     * @param {number} y - The y component of the point coordinate.
+     * @param {number} z - The z component of the point coordinate.
+     * @returns {number} The square distance of this axis-aligned bounding box to the input point.
+     */
+    distanceFromCenterToPointSq: function(x, y, z) {
+        var center = this.center.components;
+        return Math.pow(center[0] - x, 2) + Math.pow(center[1] - y, 2) + Math.pow(center[2] - z, 2);
     },
 
     /**

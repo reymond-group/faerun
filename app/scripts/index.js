@@ -14,7 +14,7 @@
     var selectIndicators = [];
     var selectCanvas = {};
     var selectSmiles = {};
-    var socketWorker = new Worker('scripts/socketWorkerIndex.js');
+    var socketWorker = new Worker('scripts/socketWorker.js');
 
     var bindings = Faerun.getBindings();
 
@@ -196,27 +196,25 @@
     });
 
     // KNN
+    if (!bindings.dialogKNN.showModal) {
+        dialogPolyfill.registerDialog(bindings.dialogKNN);
+    }
+
     bindings.buttonKNN.addEventListener('click', function() {
-        if (currentLayer === 0) return;
+        bindings.dialogKNN.showModal();
+    });
 
-        var oh = projections[0].octreeHelper;
-        var ph = projections[0].pointHelper;
-        
-        var positions = projections[currentLayer].pointHelper.getAttribute('position');
-        
-        for (var i = 0; i < ph.geometry.attributes['color'].data.length; i++) {
-            ph.geometry.attributes['color'].data[i * 3 + 2] = -Math.abs(ph.geometry.attributes['color'].data[i * 3 + 2]);
-        }
-        
-        for (var i = 0; i < positions.length; i += 3) {
-            var results = oh.octree.kNearestNeighbours(50, { x: positions[i], y: positions[i + 1], z: positions[i + 2] }, null, positions);
-            
-            for (var j = 0; j < results.length; j++) {
-                ph.geometry.attributes['color'].data[results[j] * 3 + 2] = Math.abs(ph.geometry.attributes['color'].data[results[j] * 3 + 2]);
-            }
-        }
+    bindings.dialogKNN.querySelector('.close').addEventListener('click', function() {
+        bindings.dialogKNN.close();
+    });
 
-        ph.geometry.updateAttribute('color');
+    bindings.buttonExecKNN.addEventListener('click', function() {
+        knn();
+        bindings.dialogProject.close();
+    });
+    
+    bindings.buttonKNN.addEventListener('click', function() {
+        
     });
 
 
@@ -588,6 +586,31 @@
         }
 
         Faerun.hide(bindings.loader);
+    }
+
+    function knn() {
+        if (currentLayer === 0) return;
+        
+        var k = parseFloat(bindings.kKNN.value);
+
+        var oh = projections[0].octreeHelper;
+        var ph = projections[0].pointHelper;
+        
+        var positions = projections[currentLayer].pointHelper.getAttribute('position');
+        
+        for (var i = 0; i < ph.geometry.attributes['color'].data.length; i++) {
+            ph.geometry.attributes['color'].data[i * 3 + 2] = -Math.abs(ph.geometry.attributes['color'].data[i * 3 + 2]);
+        }
+        
+        for (var i = 0; i < positions.length; i += 3) {
+            var results = oh.octree.kNearestNeighbours(k - 1, { x: positions[i], y: positions[i + 1], z: positions[i + 2] }, null, ph.getAttribute('position'));
+            
+            for (var j = 0; j < results.length; j++) {
+                ph.geometry.attributes['color'].data[results[j] * 3 + 2] = Math.abs(ph.geometry.attributes['color'].data[results[j] * 3 + 2]);
+            }
+        }
+
+        ph.geometry.updateAttribute('color');
     }
 
     function project() {

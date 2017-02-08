@@ -36,7 +36,7 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
         <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.grey-red.min.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.4.6/dialog-polyfill.min.css" />
-        <link rel="stylesheet" href="styles/main.css">
+        <link rel="stylesheet" href="styles/index.css">
         <link rel="stylesheet" href="libs/smilesDrawer/smilesDrawer.css">
     </head>
 
@@ -194,7 +194,7 @@
                 <button class="mdl-snackbar__action" type="button"></button>
             </div>
 
-            <!-- Modals -->
+            <!-- Dialogs -->
             <dialog id="dialog-search" data-binding-id="dialogSearch" class="mdl-dialog">
                 <div class="flex-box">
                     <h4 class="mdl-dialog__title flex-item">Search Compounds</h4>
@@ -211,6 +211,7 @@
                     </div>
                 </div>
             </dialog>
+
             <dialog id="dialog-project" data-binding-id="dialogProject" class="mdl-dialog">
                 <div class="flex-box">
                     <h4 class="mdl-dialog__title flex-item">Project Compounds</h4>
@@ -225,7 +226,7 @@
                         <div class="name-container">
                             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                                 <input class="mdl-textfield__input" type="text" id="name-dialog-project-input" data-binding-id="nameDialogProjectInput">
-                                <label class="mdl-textfield__label" for="sample1">Name</label>
+                                <label class="mdl-textfield__label" for="nameDialogProjectInput">Name</label>
                             </div>
                         </div>
 
@@ -235,6 +236,26 @@
                     </div>
                     <div class="mdl-dialog__actions flex-item">
                         <button id="button-exec-project" data-binding-id="buttonExecProject" type="button" class="mdl-button">Project</button>
+                        <button type="button" class="mdl-button close">Cancel</button>
+                    </div>
+                </div>
+            </dialog>
+
+            <dialog id="dialog-knn" data-binding-id="dialogKNN" class="mdl-dialog">
+                <div class="flex-box">
+                    <h4 class="mdl-dialog__title flex-item">K-Nearest-Neighbour Search</h4>
+                    <div class="mdl-dialog__subtitle flex-item">
+                        <p class="faerun-info">Use this tool to search the k closest neighbours in the loaded database for each data point in the selected layer.</p>
+                    </div>
+                    <div class="mdl-dialog__content flex-item">
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                            <input class="mdl-textfield__input" type="text" pattern="-?[0-9]*(\.[0-9]+)?" id="kKNN" data-binding-id="kKNN">
+                            <label class="mdl-textfield__label" for="kKNN">Number of Neighbours (k)</label>
+                            <span class="mdl-textfield__error">Input is not a number!</span>
+                        </div>
+                    </div>
+                    <div class="mdl-dialog__actions flex-item">
+                        <button id="button-exec-knn" data-binding-id="buttonExecKNN" type="button" class="mdl-button">Search</button>
                         <button type="button" class="mdl-button close">Cancel</button>
                     </div>
                 </div>
@@ -273,7 +294,7 @@
         <script src="https://code.getmdl.io/1.2.1/material.min.js"></script>
         <script src="config.js"></script>
         <script src="scripts/jsonp.js"></script>
-        <script src="scripts/faerun-common.js"></script>
+        <script src="scripts/common.js"></script>
         <script src="scripts/index.js"></script>
     </body>
 
