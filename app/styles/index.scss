@@ -231,6 +231,15 @@
 #dialog-search, #dialog-project, #dialog-knn {
     width: 75%;
     height: 75%;
+    
+    &::backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.75);   
+    }
 
     textarea {
         position: absolute;
@@ -366,26 +375,6 @@
 .switch-separator {
     height: 8px;
 }
-
-.faerun-controls-button {
-    display: block;
-    padding: 10px 15px 10px 15px;
-    margin: 0 -15px 0 -15px;
-    text-decoration: none;
-    color: #212121;
-    font-size: 16px;
-    font-weight: normal;
-    transition: background .1s linear, padding .1s linear;
-
-    &:hover {
-        padding-left: 20px;
-        background-color: rgba(0, 0, 0, 0.075);
-    }
-
-    &:active {
-        background-color: rgba(0, 0, 0, 0.15);
-    }
-}    
 
 .mdl-dialog__title {
 }

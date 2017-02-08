@@ -68,13 +68,17 @@ main, #main {
             line-height: 30px;
             padding: 0;
             margin: 0;
-            padding-left: 35px;
+            padding-left: 55px;
+            padding-top: 5px;
 
             img {
                 position: absolute;
-                width: 42px;
-                left: -13px;
-                top: -10px;
+                width: 36px;
+                left: -5px;
+                top: -2px;
+                padding: 5px;
+                background-color: rgba(0, 0, 0, 0);
+                border-radius: 1px;
             }
         }
     }
@@ -103,7 +107,7 @@ main, #main {
 }
 
 #faerun-controls {
-    padding: 0px 16px 16px 16px;
+    padding: 5px 16px 16px 16px;
     overflow-x: hidden;
     -webkit-flex-grow: 1;
     -ms-flex-positive: 1;
@@ -132,6 +136,36 @@ main, #main {
             left: 12px;
         }
     }
+
+    .faerun-controls-button {
+        position: relative;
+        display: block;
+        padding: 10px 15px 10px 50px;
+        margin: 0 -15px 0 -15px;
+        text-decoration: none;
+        color: rgba(255, 255, 255, 0.75);
+        font-size: 16px;
+        font-weight: normal;
+        cursor: pointer;
+        transition: background .1s linear, padding .1s linear;
+
+        &:hover {
+            // padding-left: 20px;
+            background-color: rgba(0, 0, 0, 0.075);
+        }
+
+        &:active {
+            background-color: rgba(0, 0, 0, 0.15);
+        }
+
+        i {
+            position: absolute;
+            top: 8px;
+            left: 15px;
+        }
+    }    
+
+
 }
 
 #lore {
@@ -302,3 +336,13 @@ main, #main {
 
 .checkbox:focus + .checkbox-label, .radio:focus + .radio-label {
 }
+
+// Dark theme for selectfield
+.mdl-selectfield__box {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+    i {
+        color: #fff;
+    }
+}
+

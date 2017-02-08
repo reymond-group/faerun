@@ -56,11 +56,11 @@
                     </ul>
                 </div>
             </header>
-            <div id="faerun-drawer" class="mdl-layout__drawer mdl-color--grey-300 mdl-color-text--black">
+            <div id="faerun-drawer" class="mdl-layout__drawer mdl-color--purple-900 mdl-color-text--white">
                 <header>
-                    <p class="faerun-title"><img src="images/faerun-logo.svg" />FAERUN</p>
+                    <p class="faerun-title"><img src="images/logo.png" />FAERUN</p>
                 </header>
-                <div id="faerun-controls" class="mdl-color--grey-300 mdl-color-text--grey-900">
+                <div id="faerun-controls" class="mdl-color--grey-900 mdl-color-text--white">
                     <p class="faerun-controls-header"><i class="material-icons">open_in_browser</i>DATA</p>
                     <div class="mdl-selectfield mdl-js-selectfield mdl-selectfield--floating-label">
                         <select id="select-database" data-binding-id="selectDatabase" name="select-database" class="mdl-selectfield__select"><option value=""></option></select>
@@ -105,13 +105,13 @@
                     <br />
                     <p class="faerun-controls-header"><i class="material-icons">build</i>TOOLS</p>
                     <a href="#" id="button-search" data-binding-id="buttonSearch" class="faerun-controls-button">
-                        Search
+                        <i class="material-icons">search</i>Search
                     </a>
                     <a href="#" id="button-project" data-binding-id="buttonProject" class="faerun-controls-button">
-                        Project
+                        <i class="material-icons">bubble_chart</i>Project
                     </a>
                     <a href="#" id="button-knn" data-binding-id="buttonKNN" class="faerun-controls-button">
-                        KNN Search 
+                        <i class="material-icons">location_searching</i>KNN Search 
                     </a>
                 </div>
             </div>
@@ -197,7 +197,7 @@
             <!-- Dialogs -->
             <dialog id="dialog-search" data-binding-id="dialogSearch" class="mdl-dialog">
                 <div class="flex-box">
-                    <h4 class="mdl-dialog__title flex-item">Search Compounds</h4>
+                    <h4 class="mdl-dialog__title flex-item"><i class="material-icons">search</i>&nbsp;Search Compounds</h4>
                     <div class="mdl-dialog__subtitle flex-item">
                         <p class="faerun-info">You may enter one search query per line. A search query might include the ID, the SMILES or the fingerprint of
                             a compound. Each query can return multiple matches. The search is case-sensitive (ABC is not equal to abc).</p>
@@ -214,7 +214,7 @@
 
             <dialog id="dialog-project" data-binding-id="dialogProject" class="mdl-dialog">
                 <div class="flex-box">
-                    <h4 class="mdl-dialog__title flex-item">Project Compounds</h4>
+                    <h4 class="mdl-dialog__title flex-item"><i class="material-icons">bubble_chart</i>&nbsp;Project Compounds</h4>
                     <div class="mdl-dialog__subtitle flex-item">
                         <p class="faerun-info">You may enter one compund per line. A compound has to be a valid SMILES string.</p>
                         <div id="colorpicker-dialog-project" data-binding-id="colorpickerDialogProject" class="colorpicker-container">
@@ -243,7 +243,7 @@
 
             <dialog id="dialog-knn" data-binding-id="dialogKNN" class="mdl-dialog">
                 <div class="flex-box">
-                    <h4 class="mdl-dialog__title flex-item">K-Nearest-Neighbour Search</h4>
+                    <h4 class="mdl-dialog__title flex-item"><i class="material-icons">location_searching</i>&nbsp;K-Nearest-Neighbour Search</h4>
                     <div class="mdl-dialog__subtitle flex-item">
                         <p class="faerun-info">Use this tool to search the k closest neighbours in the loaded database for each data point in the selected layer.</p>
                     </div>
