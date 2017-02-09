@@ -346,3 +346,33 @@ main, #main {
     }
 }
 
+.mdl-selectfield__label {
+    color: #888 !important;
+}
+
+.switch-separator {
+    height: 8px;
+}
+
+.mdl-dialog__subtitle {
+    padding-left: 24px;
+    padding-right: 24px;
+    padding-top: 24px;
+}
+
+/* Badge overrides */
+.mdl-badge[data-badge]:after {
+    background-color: #fff !important;
+    color: #000 !important;
+}
+
+/* Snackbar overrides */
+.mdl-snackbar {
+    z-index: 9999999;
+}
+
+.hidden-mobile {
+    @media only screen and (max-device-width: $responsive-mobile-max-width) {
+        display: none;
+    }
+}

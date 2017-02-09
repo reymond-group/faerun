@@ -1,4 +1,5 @@
 @import "common.scss";
+@import "mixins.scss";
 
 /**
  * Elements 
@@ -13,28 +14,47 @@
     margin: auto;
     z-index: 9999999;
     width: 360px;
-    bottom: 0;
+    bottom: -20px;
+    @include transition(bottom 1s $ease-in-out-back);
     left: calc(50% - 180px);
-    /* background-color: #fff; */
-    padding-bottom: 5px;
-    border-left: 2px solid #c0392b;
-    border-right: 2px solid #c0392b;
-    opacity: 1.0;
-    transition: bottom .2s cubic-bezier(.4,0,1,1), opacity .2s cubic-bezier(.4,0,1,1);
-    box-shadow: 0px 0px 5px 2px rgba(0,0,0,0.5);
+    background-color: rgba(0, 0, 0, 0.8);
+    padding-bottom: 25px;
 
     &.hidden {
         display: block !important;
-        bottom: calc(34px - 190px);
-        opacity: 0.75;
+        bottom: calc(34px - 190px - 20px);
+        @include transition(bottom 1s $ease-in-out-back);
     }
 
     label {
+        color: rgba(255, 255, 255, 0.8);
         margin-left: 20px;
     }
 
     .mdl-button {
         margin: 5px;
+
+        i {
+            color: rgba(255, 255, 255, 1.0);
+        }
+    }
+
+    @include mdl-slider (rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.15));
+
+    // The rainbow
+    .slider-color-container { 
+        .mdl-slider__background-flex {
+            @include linear-gradient(to right, rgba(0,0,255,1) 0%, rgba(0,255,255,1) 25%, rgba(255,255,0,1) 50%, rgba(255,0,0,1) 75%, rgba(255,0,255,1) 100%);
+        }
+
+        .mdl-slider__background-lower {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .mdl-slider__background-upper {
+            background: transparent;
+        }
     }
 
     .spacer {
@@ -45,8 +65,6 @@
     @media only screen and (max-device-width: $responsive-mobile-max-width) {
         width: 100%;
         left: 0px;
-        border-left: none;
-        border-right: none;
     }
 
 
@@ -55,10 +73,8 @@
         height: 24px;
         margin-bottom: 5px;
         padding: 5px;
-        transition: box-shadow .2s cubic-bezier(.4,0,1,1), background-color .2s cubic-bezier(.4,0,.2,1), color .2s cubic-bezier(.4,0,.2,1);
         outline: none;
         cursor: pointer;
-        background-color: #c0392b;
 
         @media only screen and (max-device-width: $responsive-mobile-max-width) {
             height: 42px;
@@ -67,14 +83,20 @@
         &:hover {
             i, span {
                 opacity: 1.0;
+                @include transition(opacity 0.2s $ease-in-out-cubic);
             }
+        }
+
+        i, span {
+            opacity: 0.75; 
+            @include transition(opacity 0.2s $ease-in-out-cubic);
+            line-height: 24px;
         }
 
         span {
             padding-left: 5px;
-            font-size: 0.9m;
-            line-height: 24px;
-            opacity: 0.5;
+            font-size: 1.0em;
+            font-weight: bold;
 
             @media only screen and (max-device-width: $responsive-mobile-max-width) {
                 font-size: 1.2em;
@@ -84,21 +106,19 @@
 
         i {
             float: right;
-            transform: rotate(0deg);
-            transition: transform .2s linear, opacity .2s linear;
-            opacity: 0.5;
-       
             font-size: 1.8em;
-            line-height: 24px;
+
+            transform: rotate(0deg);
+            @include transition(transform 1s $ease-in-out-back);
+
+            &.rotate {
+                transform: rotate(180deg) !important;
+                @include transition(transform 1s $ease-in-out-back);
+            }
             
             @media only screen and (max-device-width: $responsive-mobile-max-width) {
                 font-size: 2.2em;
                 line-height: 42px;
-            }
-
-            &.rotate {
-                transform: rotate(180deg) !important;
-                transition: transform .2s linear;
             }
         }
     }
@@ -118,7 +138,7 @@
 
 #hover-structure {
     pointer-events: none;
-    
+
     @media only screen and (max-device-width: $responsive-mobile-max-width) {
         top: 50px;
         left: 0;
@@ -132,7 +152,7 @@
     canvas {
         margin: 0px 5px 10px 5px;
     }
- }
+}
 
 #select-container {
     margin: 0px 5px 0px 5px;
@@ -143,7 +163,7 @@
         padding: 2px;
         margin-bottom: 2px;
         background-color: rgba(255, 255, 255, 0.02); 
-        
+
         &:hover {
             background-color: rgba(255, 255, 255, 0.04);
         }
@@ -231,7 +251,7 @@
 #dialog-search, #dialog-project, #dialog-knn {
     width: 75%;
     height: 75%;
-    
+
     &::backdrop {
         position: fixed;
         top: 0;
@@ -301,11 +321,11 @@
         &:nth-child(1) {
             @include flex(0 1 auto);
         }
-        
+
         &:nth-child(2) {
             @include flex(0 1 auto);
         }
-        
+
         &:nth-child(3) {
             @include flex(0 1 auto);
         }
@@ -313,7 +333,7 @@
         &:nth-child(4) {
             @include flex(0 1 auto);
         }
-        
+
         &:nth-child(5) {
             @include flex(0 1 auto);
         }
@@ -322,43 +342,22 @@
             @include flex(1 1 auto);
             overflow-y: auto;
         }
-        
-        &:nth-child(7) {
-            @include flex(0 1 auto);
-        }
-
-        &:nth-child(8) {
-            @include flex(0 1 auto);
-        }
     }
 
     .title {
         margin: 5px 5px 0px 5px;
         padding: 5px;
-        background-color: rgba(255, 255, 255, 0.05);
         color: rgba(255, 255, 255, 0.75);
+        font-weight: bold;
         font-size: 1em;
         line-height: 1em;
+        text-align: center;
     }
 }
 
 /**
  * Classes 
  */
-
-.slider-color-container { 
-    .mdl-slider__background-flex {
-        @include linear-gradient(to right, rgba(0,0,255,1) 0%, rgba(0,255,255,1) 25%, rgba(255,255,0,1) 50%, rgba(255,0,0,1) 75%, rgba(255,0,255,1) 100%);
-    }
-
-    .mdl-slider__background-lower {
-        background: rgba(255, 255, 255, 0.75);
-    }
-
-    .mdl-slider__background-upper {
-        background: transparent;
-    }
-}
 
 .select-indicator {
     z-index: 999;
@@ -372,37 +371,4 @@
     pointer-events: none;
 }
 
-.switch-separator {
-    height: 8px;
-}
 
-.mdl-dialog__title {
-}
-
-.mdl-dialog__subtitle {
-    padding-left: 24px;
-    padding-right: 24px;
-    padding-top: 24px;
-}
-
-/* Selectfield overrides */
-.mdl-selectfield__label {
-    color: #888 !important;
-}
-
-/* Badge overrides */
-.mdl-badge[data-badge]:after {
-    background-color: #fff !important;
-    color: #000 !important;
-}
-
-/* Snackbar overrides */
-.mdl-snackbar {
-    z-index: 9999999;
-}
-
-.hidden-mobile {
-    @media only screen and (max-device-width: $responsive-mobile-max-width) {
-        display: none;
-    }
-}

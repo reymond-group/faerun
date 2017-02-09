@@ -34,7 +34,7 @@
         <link rel="stylesheet" href="libs/mdl-selectified/mdl-selectified.min.css">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-        <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.grey-red.min.css" />
+        <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.deep_purple-purple.min.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.4.6/dialog-polyfill.min.css" />
         <link rel="stylesheet" href="styles/index.css">
         <link rel="stylesheet" href="libs/smilesDrawer/smilesDrawer.css">
@@ -127,33 +127,27 @@
                 <span id="hover-indicator" data-binding-id="hoverIndicator" class="hidden"></span>
                 
                 <div id="faerun-panel" data-binding-id="faerunPanel"> 
-                    <div class="flex-tiem">
+                    <div class="flex-item">
                         <div class="title">Hovered Bin Preview</div>
                     </div>
                     <div id="hover-structure" data-binding-id="hoverStructure" class="hidden-mobile flex-item">
-                        <canvas id="hover-structure-drawing" data-binding-id="hoverStructureDrawing" width="290" height="290">
-                        </canvas>
+                        <canvas id="hover-structure-drawing" data-binding-id="hoverStructureDrawing" width="290" height="290"></canvas>
                     </div>
-                    <div class="flex-tiem">
+                    <div class="flex-item">
                         <div class="title">Layers</div>
                     </div>
                     <div id="layers" data-binding-id="layers" class="flex-item">
                         <div id="layer-container" data-binding-id="layerContainer"></div> 
                     </div>
-                    <div class="flex-tiem">
+                    <div class="flex-item">
                         <div class="title">Selected Bins</div>
                     </div>
                     <div class="flex-item">
                         <div id="select-container" data-binding-id="selectContainer"></div> 
                     </div>
-                    <div class="flex-tiem">
-                        <div class="title">Controls</div>
-                    </div>
-                    <div id="touch-controls" data-binding-id="touchControls" class="flex-item">
-                    </div>
                 </div>
 
-                <div id="hud-container" data-binding-id="hudContainer" class="hidden-n mdl-color--grey-300">
+                <div id="hud-container" data-binding-id="hudContainer" class="hidden-n">
                     <div id="hud-header" data-binding-id="hudHeader" class="mdl-color-text--white">
                         <span id="hud-header-text">Filters & Touch Controls</span>
                         <i id="hud-header-icon" data-binding-id="hudHeaderIcon" class="material-icons">keyboard_arrow_down</i>
