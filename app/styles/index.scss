@@ -175,13 +175,36 @@
             top: 5px;
             color: #bbb;
             text-decoration: none;
-            font-size: 1.6em;
             font-weight: bold;
             text-align: center;
 
             &:hover {
                 opacity: 0.75;
                 color: #f00;
+            }
+
+            i {
+                font-size: 1.2em;
+            }
+        }
+
+        .center {
+            position: absolute;
+            display: block;
+            right: 25px;
+            top: 5px;
+            color: #bbb;
+            text-decoration: none;
+            font-weight: bold;
+            text-align: center;
+
+            &:hover {
+                opacity: 0.75;
+                color: #0f0;
+            }
+
+            i {
+                font-size: 1.2em;
             }
         }
 

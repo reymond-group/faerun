@@ -328,6 +328,7 @@
         var structure = document.getElementById('selected-structure-' + layer + '-' + id);
         var item = document.getElementById('selected-bin-item-' + layer + '-' + id);
         var closer = document.getElementById('bin-closer-' + layer + '-' + id);
+        var center = document.getElementById('bin-center-' + layer + '-' + id);
 
         selectCanvas[layer + '-' + id] = structure;
        
@@ -349,6 +350,13 @@
             e.stopPropagation();
             e.preventDefault();
         });
+
+        center.addEventListener('click', function(e) {
+            projections[layer].pointHelper.removeSelected(idx);
+            e.stopPropagation();
+            e.preventDefault();
+        });
+
 
         var indicator = document.createElement('span');
         indicator.classList.add('mdl-badge', 'mdl-badge--overlap', 'select-indicator');
