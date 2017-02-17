@@ -333,7 +333,7 @@
        
         Faerun.hover(item, function () {
             var data = smiles.parse(selectSmiles[layer + '-' + id]);
-            smilesDrawer.draw(data, 'hover-structure-drawing', false);
+            smilesDrawer.draw(data, 'hover-structure-drawing');
         }, function () {
             Faerun.clearCanvas('hover-structure-drawing');
         });
@@ -575,7 +575,7 @@
             selectSmiles['0-' + message.index] = message.smiles;
         }
         var data = smiles.parse(message.smiles);
-        smilesDrawer.draw(data, target, false);
+        smilesDrawer.draw(data, target);
     }
 
     function onInfosSearched (message) {
@@ -729,7 +729,7 @@
 
                 var target = 'hover-structure-drawing';
                 var data = smiles.parse(projections[layer].smiles[e.e.index]);
-                smilesDrawer.draw(data, target, false);
+                smilesDrawer.draw(data, target);
                     
                 updateHovered(layer);
             });

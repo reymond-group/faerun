@@ -229,7 +229,7 @@
       });
 
       var data = smiles.parse(smile);
-      smilesDrawer.draw(data, structureViewId, false, true);
+      smilesDrawer.draw(data, structureViewId);
 
       for (var j = 0; j < schemblIdsSplit.length; j++) {
         var schemblId = schemblIdsSplit[j];
