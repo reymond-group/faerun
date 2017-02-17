@@ -259,7 +259,8 @@
         <script id="selected-bin-template" type="text/x-handlebars-template">
             <div id="selected-bin-item-{{layer}}-{{id}}" class="item" style="border-left: 5px solid {{color}}">
                 <canvas id="select-structure-drawing-{{layer}}-{{id}}" width="50" height="50"></canvas>
-                <a href="#" class="closer" id="bin-closer-{{layer}}-{{id}}">&times;</a>
+                <a href="#" class="closer" id="bin-closer-{{layer}}-{{id}}"><i class="material-icons">close</i></a>
+                <a href="#" class="center" id="bin-center-{{layer}}-{{id}}"><i class="material-icons">all_out</i></a>
                 <span class="idx"><b>{{idx}}</b></span>
                 <span class="id">Database Id: <b>{{id}}</b></span>
             </div>
