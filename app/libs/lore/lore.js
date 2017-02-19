@@ -4633,6 +4633,9 @@ Lore.Shaders['default'] = new Lore.Shader('Default', { size: new Lore.Uniform('s
         'vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);',
         'return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);',
     '}',
+    'float rand(vec2 co) {',
+        'return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);',
+    '}',
     'void main() {',
         'vec3 hsv = vec3(color.r, color.g, 1.0);',
         'float saturation = color.g;',
@@ -4651,6 +4654,7 @@ Lore.Shaders['default'] = new Lore.Shader('Default', { size: new Lore.Uniform('s
         'if(fogDistance > 0.0) {',
             'hsv.b = clamp((fog_end - dist) / (fog_end - fog_start), 0.0, 1.0);',
         '}',
+        'hsv.g = 0.5 + 0.4 * rand(position.xy);',
         'vColor = hsv2rgb(hsv);',
     '}'
 ], [
@@ -5785,12 +5789,10 @@ Lore.Octree.prototype = {
             if(sortedPointDistances.array[i] > sortedCellDistances.array[0]) {
                 // Set the offset to the most distant closest member
                 pointOffset = i;
-                console.log('...');
                 break;
             }
 
             indices[i] = pointDistances.indices[sortedPointDistances.indices[i]];
-            console.log(i, indices[i]);
             indexCount++;
         }
 
