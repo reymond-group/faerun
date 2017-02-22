@@ -581,6 +581,8 @@
             // Smiles are only loaded from 0 layer (the one loaded from the server)
             target = 'select-structure-drawing-0-' + message.index;
             selectSmiles['0-' + message.index] = message.smiles;
+
+            document.getElementById('select-bin-size-0-' + message.index).innerHTML = message.binSize;
         }
         var data = smiles.parse(message.smiles);
         smilesDrawer.draw(data, target);

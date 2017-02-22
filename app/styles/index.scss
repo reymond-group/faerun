@@ -209,7 +209,7 @@
             }
         }
 
-        .id, .idx {
+        .id, .idx, .size {
             position: absolute;
             display: block;
             left: 60px;
@@ -226,6 +226,10 @@
 
         .id {
             top: 20px;
+        }
+
+        .size {
+            top: 35px;
         }
     }
 }
