@@ -119,7 +119,8 @@
 
         if (message.binSize > 2) {
             lore = Lore.init('lore', {
-                clearColor: '#121212'
+                clearColor: '#121212',
+                limitRotationToHorizon: true
             });
 
             Faerun.initViewSelect(bindings.selectView, lore);

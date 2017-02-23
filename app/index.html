@@ -130,6 +130,10 @@
                     </div>
                     <div id="hover-structure" data-binding-id="hoverStructure" class="hidden-mobile flex-item">
                         <canvas id="hover-structure-drawing" data-binding-id="hoverStructureDrawing" width="290" height="290"></canvas>
+                        <div class="hover-bin-size">
+                            <label>Bin Size:</label>
+                            <span id="hover-bin-size">-</span>
+                        </div>
                     </div>
                     <div class="flex-item">
                         <div class="title">Layers</div>
@@ -256,10 +260,14 @@
 
         <!-- Templates -->
         <script id="selected-bin-template" type="text/x-handlebars-template">
-            <div id="selected-bin-item-{{layer}}-{{id}}" class="item" style="border-left: 5px solid {{color}}">
+            <div id="selected-bin-item-{{layer}}-{{id}}" 
+             class="item" style="border-left: 5px solid {{color}}">
                 <canvas id="select-structure-drawing-{{layer}}-{{id}}" width="50" height="50"></canvas>
                 <a href="#" class="closer" id="bin-closer-{{layer}}-{{id}}"><i class="material-icons">close</i></a>
-                <a href="#" class="center" id="bin-center-{{layer}}-{{id}}"><i class="material-icons">all_out</i></a>
+                <a href="#" class="center" data-layer="{{layer}}" data-id="{{id}}"
+                   id="bin-center-{{layer}}-{{id}}">
+                    <i class="material-icons">all_out</i>
+                </a>
                 <span class="idx"><b>{{idx}}</b></span>
                 <span class="id">Database Id: <b>{{id}}</b></span>
                 <span class="size">Bin Size: <b id="select-bin-size-{{layer}}-{{id}}"></b></span>

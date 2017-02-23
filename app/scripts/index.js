@@ -49,7 +49,7 @@
 
         // Block the select elements during loading
         Faerun.blockElements(bindings.selectDatabase.parentElement, bindings.selectFingerprint.parentElement,
-                bindings.selectVariant.parentElement, bindings.selectMap.parentElement);
+            bindings.selectVariant.parentElement, bindings.selectMap.parentElement);
 
         // Show the loader (blocks the main view)
         bindings.loadingMessage.innerHTML = 'Loading variant ...';
@@ -69,7 +69,7 @@
 
         // Block the select elements during loading
         Faerun.blockElements(bindings.selectDatabase.parentElement, bindings.selectFingerprint.parentElement,
-                bindings.selectVariant.parentElement, bindings.selectMap.parentElement);
+            bindings.selectVariant.parentElement, bindings.selectMap.parentElement);
 
         socketWorker.postMessage({
             cmd: 'load:map',
@@ -135,20 +135,20 @@
         dialogPolyfill.registerDialog(bindings.dialogSearch)
     }
 
-    bindings.buttonSearch.addEventListener('click', function() {
+    bindings.buttonSearch.addEventListener('click', function () {
         bindings.dialogSearch.showModal();
     });
 
-    bindings.dialogSearch.querySelector('.close').addEventListener('click', function() {
+    bindings.dialogSearch.querySelector('.close').addEventListener('click', function () {
         bindings.dialogSearch.close();
     });
 
-    bindings.buttonExecSearch.addEventListener('click', function() {
+    bindings.buttonExecSearch.addEventListener('click', function () {
         if (!currentVariant) {
             bindings.toastError.MaterialSnackbar.showSnackbar({
                 message: 'Please select a variant before searching ...'
             });
-            return; 
+            return;
         }
 
         var queries = bindings.textareaSearch.value.split('\n');
@@ -157,7 +157,7 @@
             bindings.toastError.MaterialSnackbar.showSnackbar({
                 message: 'Please enter at least one query ...'
             });
-            return; 
+            return;
         }
 
         socketWorker.postMessage({
@@ -179,15 +179,15 @@
         dialogPolyfill.registerDialog(bindings.dialogProject)
     }
 
-    bindings.buttonProject.addEventListener('click', function() {
+    bindings.buttonProject.addEventListener('click', function () {
         bindings.dialogProject.showModal();
     });
 
-    bindings.dialogProject.querySelector('.close').addEventListener('click', function() {
+    bindings.dialogProject.querySelector('.close').addEventListener('click', function () {
         bindings.dialogProject.close();
     });
 
-    bindings.buttonExecProject.addEventListener('click', function() {
+    bindings.buttonExecProject.addEventListener('click', function () {
         project();
 
         bindings.dialogProject.close();
@@ -200,23 +200,22 @@
         dialogPolyfill.registerDialog(bindings.dialogKNN);
     }
 
-    bindings.buttonKNN.addEventListener('click', function() {
+    bindings.buttonKNN.addEventListener('click', function () {
         bindings.dialogKNN.showModal();
     });
 
-    bindings.dialogKNN.querySelector('.close').addEventListener('click', function() {
+    bindings.dialogKNN.querySelector('.close').addEventListener('click', function () {
         bindings.dialogKNN.close();
     });
 
-    bindings.buttonExecKNN.addEventListener('click', function() {
+    bindings.buttonExecKNN.addEventListener('click', function () {
         knn();
         bindings.dialogProject.close();
     });
-    
-    bindings.buttonKNN.addEventListener('click', function() {
-        
-    });
 
+    bindings.buttonKNN.addEventListener('click', function () {
+
+    });
 
     /**
      * Populates the HTMLSelectElement containing the databases available on the server.
@@ -288,7 +287,7 @@
 
         var layers = document.getElementsByClassName('radio-current-layer');
         for (var i = 0; i < layers.length; i++) {
-            layers[i].addEventListener('click', function(e) {
+            layers[i].addEventListener('click', function (e) {
                 currentLayer = parseFloat(this.value);
             });
         }
@@ -314,10 +313,10 @@
         var selected = projections[0].octreeHelper.selected[idx];
         var hue = projections[0].pointHelper.getHue(id);
         var rgb = Lore.Color.hslToRgb(hue, 1.0, 0.5);
-        
+
         for (var i = 0; i < rgb.length; i++)
             rgb[i] = Math.round(rgb[i] * 255);
-        
+
         Faerun.appendTemplate(bindings.selectContainer, 'selected-bin-template', {
             id: id,
             idx: idx,
@@ -331,28 +330,30 @@
         var center = document.getElementById('bin-center-' + layer + '-' + id);
 
         selectCanvas[layer + '-' + id] = structure;
-       
+
         Faerun.hover(item, function () {
             var data = smiles.parse(selectSmiles[layer + '-' + id]);
             smilesDrawer.draw(data, 'hover-structure-drawing');
         }, function () {
             Faerun.clearCanvas('hover-structure-drawing');
         });
-        
-        item.addEventListener('click', function(e) {
-           window.open('details.html?binIndex=' + id + '&databaseId=' + currentDatabase.id + 
-                       '&fingerprintId=' + currentFingerprint.id + '&variantId=' + 
-                       currentVariant.id, '_blank'); 
+
+        item.addEventListener('click', function (e) {
+            window.open('details.html?binIndex=' + id + '&databaseId=' + currentDatabase.id +
+                '&fingerprintId=' + currentFingerprint.id + '&variantId=' +
+                currentVariant.id, '_blank');
         });
 
-        closer.addEventListener('click', function(e) {
+        closer.addEventListener('click', function (e) {
             projections[layer].octreeHelper.removeSelected(idx);
             e.stopPropagation();
             e.preventDefault();
         });
 
-        center.addEventListener('click', function(e) {
-            projections[layer].pointHelper.removeSelected(idx);
+        center.addEventListener('click', function (e) {
+            var vec = projections[layer].pointHelper.getPosition(id);
+
+            lore.controls.setLookAt(vec);
             e.stopPropagation();
             e.preventDefault();
         });
@@ -369,7 +370,7 @@
         bindings.main.appendChild(indicator);
     }
 
-     /**
+    /**
      * Remove all HTML elements representing selected bins.
      */
     function clearSelected() {
@@ -422,7 +423,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         // Hide the hud with animation (to show a brief glimpse to the user
         // so that he knows it's there)
-        setTimeout(function() {
+        setTimeout(function () {
             Faerun.toggle(bindings.hudContainer);
             Faerun.toggleClass(bindings.hudHeaderIcon, 'rotate');
         }, 1000);
@@ -477,19 +478,21 @@
         var cs = Faerun.updateCoordinatesHelper(lore, currentVariant.resolution);
         center = cs.center;
         coordinatesHelper = cs.helper;
-        
-        
+
+
 
         var ph = new Lore.PointHelper(lore, 'TestGeometry', 'sphere');
         ph.setFogDistance(currentVariant.resolution * Math.sqrt(3) + 500);
         ph.setPositionsXYZHSS(message.data[0], message.data[1], message.data[2], 0.6, 1.0, 1.0);
         ph.addFilter('hueRange', new Lore.InRangeFilter('color', 0, 0.22, 0.25));
 
-        var oh = new Lore.OctreeHelper(lore, 'OctreeGeometry', 'default', ph, { visualize: false });
+        var oh = new Lore.OctreeHelper(lore, 'OctreeGeometry', 'default', ph, {
+            visualize: false
+        });
 
         oh.addEventListener('hoveredchanged', function (e) {
             if (currentLayer !== 0) return;
-            
+
             if (!e.e) {
                 Faerun.hide(bindings.hoverIndicator);
                 return;
@@ -546,7 +549,7 @@
 
         // Unblock the select elements after loading
         Faerun.unblockElements(bindings.selectDatabase.parentElement, bindings.selectFingerprint.parentElement,
-                bindings.selectVariant.parentElement, bindings.selectMap.parentElement);
+            bindings.selectVariant.parentElement, bindings.selectMap.parentElement);
     }
 
     /**
@@ -554,7 +557,7 @@
      *
      * @param {any} message - The server message containing the map data
      */
-    function onMapLoaded (message) {
+    function onMapLoaded(message) {
         for (var i = 0; i < message.data.length; i++) {
             message.data[i] = Faerun.initArrayFromBuffer(message.dataTypes[i], message.data[i]);
         }
@@ -566,7 +569,7 @@
 
         // Unblock the select elements after loading
         Faerun.unblockElements(bindings.selectDatabase.parentElement, bindings.selectFingerprint.parentElement,
-                bindings.selectVariant.parentElement, bindings.selectMap.parentElement);
+            bindings.selectVariant.parentElement, bindings.selectMap.parentElement);
     }
 
     /**
@@ -574,21 +577,23 @@
      *
      * @param {any} message - The server message containing the bin preview data
      */
-    function onBinPreviewLoaded (message) {
+    function onBinPreviewLoaded(message) {
         var target = 'hover-structure-drawing';
 
         if (selectCanvas.hasOwnProperty('0-' + message.index)) {
             // Smiles are only loaded from 0 layer (the one loaded from the server)
             target = 'select-structure-drawing-0-' + message.index;
             selectSmiles['0-' + message.index] = message.smiles;
-
             document.getElementById('select-bin-size-0-' + message.index).innerHTML = message.binSize;
+        } else {
+            document.getElementById('hover-bin-size').innerHTML = message.binSize;
         }
+
         var data = smiles.parse(message.smiles);
         smilesDrawer.draw(data, target);
     }
 
-    function onInfosSearched (message) {
+    function onInfosSearched(message) {
         for (var i = 0; i < message.binIndices.length; i++) {
             for (var j = 0; j < message.binIndices[i].length; j++) {
                 projections[0].octreeHelper.addSelected(message.binIndices[i][j]);
@@ -600,21 +605,25 @@
 
     function knn() {
         if (currentLayer === 0) return;
-        
+
         var k = parseFloat(bindings.kKNN.value);
 
         var oh = projections[0].octreeHelper;
         var ph = projections[0].pointHelper;
-        
+
         var positions = projections[currentLayer].pointHelper.getAttribute('position');
-        
+
         for (var i = 0; i < ph.geometry.attributes['color'].data.length; i++) {
             ph.geometry.attributes['color'].data[i * 3 + 2] = -Math.abs(ph.geometry.attributes['color'].data[i * 3 + 2]);
         }
-        
+
         for (var i = 0; i < positions.length; i += 3) {
-            var results = oh.octree.kNearestNeighbours(k - 1, { x: positions[i], y: positions[i + 1], z: positions[i + 2] }, null, ph.getAttribute('position'));
-            
+            var results = oh.octree.kNearestNeighbours(k - 1, {
+                x: positions[i],
+                y: positions[i + 1],
+                z: positions[i + 2]
+            }, null, ph.getAttribute('position'));
+
             for (var j = 0; j < results.length; j++) {
                 ph.geometry.attributes['color'].data[results[j] * 3 + 2] = Math.abs(ph.geometry.attributes['color'].data[results[j] * 3 + 2]);
             }
@@ -628,7 +637,7 @@
             bindings.toastError.MaterialSnackbar.showSnackbar({
                 message: 'Please select a variant before projecting ...'
             });
-            return; 
+            return;
         }
 
         var smilesData = bindings.textareaProject.value.split('\n');
@@ -640,7 +649,7 @@
             bindings.toastError.MaterialSnackbar.showSnackbar({
                 message: 'Please enter at least one molecule in SMILES form ...'
             });
-            return; 
+            return;
         }
 
         var fingerprintId = currentFingerprint.id.split('.').pop();
@@ -660,17 +669,17 @@
 
         var chunkIndex = 0;
 
-        var loadChunk = function(callback) {
+        var loadChunk = function (callback) {
             var chunk = chunks[chunkIndex];
 
             for (var i = 0; i < chunk.length; i++) {
                 chunk[i] = chunk[i].trim();
                 if (chunk[i] === '') continue;
 
-                var url = Faerun.format(baseUrl, [ encodeURIComponent(chunk[i]) ]);
+                var url = Faerun.format(baseUrl, [encodeURIComponent(chunk[i])]);
                 var done = 0;
 
-                Faerun.loadFingerprint(url, function(fpRaw, smi) {
+                Faerun.loadFingerprint(url, function (fpRaw, smi) {
                     var fp = fpRaw.split(';');
 
                     // Something is wrong when the fp is of length 1
@@ -690,7 +699,7 @@
                             "binning": true,
                             "resolution": currentVariant.resolution,
                             "data": fingerprints
-                        }, function(projections) {
+                        }, function (projections) {
                             if (!projections.success) {
                                 bindings.toastError.MaterialSnackbar.showSnackbar({
                                     message: 'Oops, something went wrong, please try projecting again ...'
@@ -711,27 +720,26 @@
                             if (chunkIndex < chunks.length - 1) {
                                 chunkIndex++;
                                 loadChunk(callback);
-                            }
-                            else
+                            } else
                                 callback();
-                        }); 
+                        });
                     }
                 });
             }
         }
 
-        loadChunk(function() {
+        loadChunk(function () {
             var ph = new Lore.PointHelper(lore, 'ProjectionGeometry' + projections.length, 'defaultAnimated');
             ph.setFogDistance(currentVariant.resolution * Math.sqrt(3) + 500);
             ph.setPositionsXYZHSS(x, y, z, hsl.h, hsl.s, 1.0);
 
             var oh = new Lore.OctreeHelper(lore, 'ProjectionOctreeGeometry' + projections.length, 'default', ph);
-            
+
             var layer = projections.length;
 
             oh.addEventListener('hoveredchanged', function (e) {
                 if (currentLayer !== layer) return;
-                
+
                 if (!e.e) {
                     Faerun.hide(bindings.hoverIndicator);
                     return;
@@ -740,10 +748,10 @@
                 var target = 'hover-structure-drawing';
                 var data = smiles.parse(projections[layer].smiles[e.e.index]);
                 smilesDrawer.draw(data, target);
-                    
+
                 updateHovered(layer);
             });
-            
+
             addProjection({
                 name: bindings.nameDialogProjectInput.value,
                 color: bindings.colorpickerDialogProjectInput.value,
