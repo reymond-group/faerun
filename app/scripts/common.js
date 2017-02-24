@@ -349,16 +349,16 @@ Faerun.translateAbsolute = function (element, x, y, center) {
 };
 
 
-/**
- * Resize the element to a new width and height.
- *
- * @param {HTMLElement} element - HtmlElement to resize.
- * @param {Number} width - The width to resize the element to.
- * @param {Number} height - The height to resize the element to.
- */
 Faerun.resize = function (element, width, height) {
     element.style.width = width + 'px';
     element.style.height = height + 'px';
+};
+
+Faerun.positionIndicator = function (element, pointSize, x, y) {
+    element.style.width = pointSize + 'px';
+    element.style.height = pointSize + 'px';
+    element.style.left = (x - pointSize / 2.0 - 2) + 'px';
+    element.style.top = (y - pointSize / 2.0 - 2) + 'px';
 };
 
 /**

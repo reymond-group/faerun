@@ -363,11 +363,12 @@
         indicator.classList.add('mdl-badge', 'mdl-badge--overlap', 'select-indicator');
         indicator.setAttribute('id', 'selected-indicator-' + layer + '-' + id);
         indicator.setAttribute('data-badge', idx);
-        Faerun.translateAbsolute(indicator, selected.screenPosition[0], selected.screenPosition[1], true);
+
         var pointSize = projections[0].pointHelper.getPointSize();
-        Faerun.resize(indicator, pointSize, pointSize);
         selectIndicators.push(indicator);
         bindings.main.appendChild(indicator);
+
+        updateSelected();
     }
 
     /**
@@ -390,11 +391,13 @@
      */
     function updateSelected() {
         var pointSize = projections[0].pointHelper.getPointSize();
+
         for (var i = 0; i < selectIndicators.length; i++) {
             var selected = projections[0].octreeHelper.selected[i];
             var indicator = selectIndicators[i];
-            Faerun.translateAbsolute(indicator, selected.screenPosition[0], selected.screenPosition[1], true);
-            Faerun.resize(indicator, pointSize, pointSize);
+            var screenPosition = projections[0].octreeHelper.getScreenPosition(selected.index);
+
+            Faerun.positionIndicator(indicator, pointSize, screenPosition[0], screenPosition[1]);
         }
     }
 
@@ -404,9 +407,9 @@
     function updateHovered(layer) {
         layer = layer || 0;
         Faerun.show(bindings.hoverIndicator);
-        Faerun.translateAbsolute(bindings.hoverIndicator, projections[layer].octreeHelper.hovered.screenPosition[0], projections[layer].octreeHelper.hovered.screenPosition[1], true);
         var pointSize = projections[layer].pointHelper.getPointSize();
-        Faerun.resize(bindings.hoverIndicator, pointSize, pointSize);
+        Faerun.positionIndicator(bindings.hoverIndicator, pointSize, projections[layer].octreeHelper.hovered.screenPosition[0],
+            projections[layer].octreeHelper.hovered.screenPosition[1]);
     }
 
     /**
