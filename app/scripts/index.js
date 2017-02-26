@@ -45,23 +45,7 @@
     }, false);
 
     bindings.selectVariant.addEventListener('change', function () {
-        currentVariant = currentFingerprint.variants[bindings.selectVariant.value];
-
-        // Block the select elements during loading
-        Faerun.blockElements(bindings.selectDatabase.parentElement, bindings.selectFingerprint.parentElement,
-            bindings.selectVariant.parentElement, bindings.selectMap.parentElement);
-
-        // Show the loader (blocks the main view)
-        bindings.loadingMessage.innerHTML = 'Loading variant ...';
-        Faerun.show(bindings.loader);
-
-        socketWorker.postMessage({
-            cmd: 'load:variant',
-            msg: {
-                variantId: currentVariant.id
-            }
-        });
-        populateMaps(currentVariant);
+        loadVariant(bindings.selectVariant.value);
     }, false);
 
     bindings.selectMap.addEventListener('change', function () {
@@ -253,6 +237,11 @@
         Faerun.appendEmptyOption(bindings.selectVariant);
         for (var i = 0; i < fingerprint.variants.length; i++) {
             Faerun.appendOption(bindings.selectVariant, i, fingerprint.variants[i].name);
+        }
+
+        if (fingerprint.variants.length === 1) {
+            bindings.selectVariant.value = 0;
+            loadVariant(0);
         }
     }
 
@@ -765,5 +754,25 @@
 
             Faerun.hide(bindings.loader);
         });
+    }
+
+    function loadVariant(variantIndex) {
+        currentVariant = currentFingerprint.variants[variantIndex];
+
+        // Block the select elements during loading
+        Faerun.blockElements(bindings.selectDatabase.parentElement, bindings.selectFingerprint.parentElement,
+            bindings.selectVariant.parentElement, bindings.selectMap.parentElement);
+
+        // Show the loader (blocks the main view)
+        bindings.loadingMessage.innerHTML = 'Loading variant ...';
+        Faerun.show(bindings.loader);
+
+        socketWorker.postMessage({
+            cmd: 'load:variant',
+            msg: {
+                variantId: currentVariant.id
+            }
+        });
+        populateMaps(currentVariant);
     }
 })();

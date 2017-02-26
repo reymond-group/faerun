@@ -161,8 +161,6 @@
         bottom: 10px;
         color: #ddd;
 
-        background-color: rgba(255, 255, 255, 0.1);
-
         label:first-child {
             margin-left: 5px;
         }
@@ -181,10 +179,10 @@
         height: 54px;
         padding: 2px;
         margin-bottom: 2px;
-        background-color: rgba(255, 255, 255, 0.02); 
+        background-color: rgba(0, 0, 0, 0.75); 
 
         &:hover {
-            background-color: rgba(255, 255, 255, 0.04);
+            background-color: rgba(20, 20, 20, 0.75);
         }
 
         .closer {
@@ -262,6 +260,7 @@
         @include align-items(stretch);
 
         height: 30px;
+        background-color: rgba(0, 0, 0, 0.75);
 
         div {
             @include align-self(auto);
@@ -392,8 +391,9 @@
 
     .title {
         margin: 5px 5px 0px 5px;
-        padding: 5px;
+        padding: 10px;
         color: rgba(255, 255, 255, 0.75);
+        background-color: rgba(0, 0, 0, 0.75);
         font-weight: bold;
         font-size: 1em;
         line-height: 1em;

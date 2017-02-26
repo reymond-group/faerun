@@ -376,3 +376,20 @@ main, #main {
         display: none;
     }
 }
+
+/* Layer overrides */
+.mdl-layout__header-row {
+    @media screen and (max-width: 1024px) {
+        height: 64px !important;
+        padding: 0 40px 0 80px !important;
+    }
+}
+
+.mdl-layout__header {
+    .mdl-layout__drawer-button {
+        @media screen and (max-width: 1024px) {
+            margin: 8px 12px !important;
+        }
+    }
+}
+
