@@ -242,6 +242,7 @@
 
         if (fingerprint.variants.length === 1) {
             bindings.selectVariant.value = 0;
+            loadStats(0);
             loadVariant(0);
         }
     }
@@ -548,7 +549,13 @@
     }
 
     function onStatsLoaded(message) {
-        console.log(message);
+        Faerun.drawHistogram(bindings.statsCanvas, message.binHist, message.histMax);
+
+        bindings.statsAvg.innerHTML = Faerun.formatNumber(message.avgCompoundCount);
+        bindings.statsMin.innerHTML = Faerun.formatNumber(message.histMin);
+        bindings.statsMax.innerHTML = Faerun.formatNumber(message.histMax);
+        bindings.statsCompounds.innerHTML = Faerun.formatNumber(message.compoundCount);
+        bindings.statsBins.innerHTML = Faerun.formatNumber(message.binCount);
     }
 
     /**
@@ -785,7 +792,6 @@
 
     function loadStats(variantIndex) {
         currentVariant = currentFingerprint.variants[variantIndex];
-
         socketWorker.postMessage({
             cmd: 'load:stats',
             msg: {

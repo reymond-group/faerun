@@ -165,7 +165,13 @@ main, #main {
         }
     }    
 
-
+    .faerun-controls-small {
+        font-size: 0.75em;
+        line-height: 1.0em;
+        margin-bottom: 5px;
+        margin-top: 5px;
+        opacity: 0.75;
+    }
 }
 
 #lore {

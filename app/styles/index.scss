@@ -401,6 +401,31 @@
     }
 }
 
+#stats-canvas {
+    position: relative;
+    border: 1px solid #111;
+    background-color: #111;
+}
+
+#stats-x-label, #stats-y-label {
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    font-size: 0.5em;
+    opacity: 0.5;
+}
+
+#stats-x-label {
+    top: 96px;
+    left: 65px;
+}
+
+#stats-y-label {
+    top: 40px;
+    left: -30px;
+    transform: rotate(-90deg);
+}
+
 /**
  * Classes 
  */

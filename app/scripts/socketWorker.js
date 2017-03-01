@@ -9,212 +9,212 @@ importScripts('../config.js');
 var ws = new WebSocket(FaerunConfig.server.url);
 var config = null;
 
-ws.onopen = function(e) {
-  postMessage({
-    cmd: 'connection:open',
-    msg: ''
-  });
+ws.onopen = function (e) {
+    postMessage({
+        cmd: 'connection:open',
+        msg: ''
+    });
 
-  // Initialize as soon as connection is established
-  ws.send(JSON.stringify({
-    cmd: 'init',
-    msg: []
-  }));
+    // Initialize as soon as connection is established
+    ws.send(JSON.stringify({
+        cmd: 'init',
+        msg: []
+    }));
 };
 
-ws.onclose = function(e) {
-  postMessage({
-    cmd: 'connection:closed',
-    msg: ''
-  });
+ws.onclose = function (e) {
+    postMessage({
+        cmd: 'connection:closed',
+        msg: ''
+    });
 };
 
-ws.onerror = function(e) {
-  postMessage({
-    cmd: 'connection:error',
-    msg: ''
-  });
+ws.onerror = function (e) {
+    postMessage({
+        cmd: 'connection:error',
+        msg: ''
+    });
 };
 
-ws.onmessage = function(e) {
-  var data = JSON.parse(e.data);
-  
-  if (data.cmd === 'init')
-    onInit(data);
-  else if (data.cmd === 'load:variant')
-    onLoadVariant(data);
-  else if (data.cmd === 'load:map')
-    onLoadMap(data);
-  else if (data.cmd === 'load:binpreview')
-    onLoadBinPreview(data);
-  else if (data.cmd === 'load:bin')
-    onLoadBin(data);
-  else if (data.cmd === 'search:infos')
-    onSearchInfos(data);
-  else if (data.cmd === 'load:stats')
-    onStatsLoaded(data);
+ws.onmessage = function (e) {
+    var data = JSON.parse(e.data);
+
+    if (data.cmd === 'init')
+        onInit(data);
+    else if (data.cmd === 'load:variant')
+        onLoadVariant(data);
+    else if (data.cmd === 'load:map')
+        onLoadMap(data);
+    else if (data.cmd === 'load:binpreview')
+        onLoadBinPreview(data);
+    else if (data.cmd === 'load:bin')
+        onLoadBin(data);
+    else if (data.cmd === 'search:infos')
+        onSearchInfos(data);
+    else if (data.cmd === 'load:stats')
+        onStatsLoaded(data);
 };
 
 onmessage = function (e) {
-  var cmd = e.data.cmd;
-  var message = e.data.msg;
+    var cmd = e.data.cmd;
+    var message = e.data.msg;
 
-  if (cmd === 'load:variant') {
-    // response.msg.databases[0].fingerprints[0].variants[0].id
-    ws.send(JSON.stringify({
-      cmd: 'load:variant',
-      msg: [
-        message.variantId
-      ]
-    }));
-  }
+    if (cmd === 'load:variant') {
+        // response.msg.databases[0].fingerprints[0].variants[0].id
+        ws.send(JSON.stringify({
+            cmd: 'load:variant',
+            msg: [
+                message.variantId
+            ]
+        }));
+    }
 
-  if (cmd === 'load:stats') {
-    // response.msg.databases[0].fingerprints[0].variants[0].id
-    ws.send(JSON.stringify({
-      cmd: 'load:stats',
-      msg: [
-        message.variantId
-      ]
-    }));
-  }
+    if (cmd === 'load:stats') {
+        // response.msg.databases[0].fingerprints[0].variants[0].id
+        ws.send(JSON.stringify({
+            cmd: 'load:stats',
+            msg: [
+                message.variantId
+            ]
+        }));
+    }
 
-  if (cmd === 'load:map') {
-    // response.msg.databases[0].fingerprints[0].variants[0].maps[0].id
-    ws.send(JSON.stringify({
-      cmd: 'load:map',
-      msg: [
-        message.mapId
-      ]
-    }));
-  }
+    if (cmd === 'load:map') {
+        // response.msg.databases[0].fingerprints[0].variants[0].maps[0].id
+        ws.send(JSON.stringify({
+            cmd: 'load:map',
+            msg: [
+                message.mapId
+            ]
+        }));
+    }
 
-  if (cmd === 'load:binpreview') {
-    // response.msg.databases[0].id,
-    // response.msg.databases[0].fingerprints[0].variants[0].id,
-    // '654321'
-    ws.send(JSON.stringify({
-      cmd: 'load:binpreview',
-      msg: [
-        message.databaseId,
-        message.fingerprintId,
-        message.variantId,
-        message.binIndex.toString()
-      ]
-    }));
-  }
+    if (cmd === 'load:binpreview') {
+        // response.msg.databases[0].id,
+        // response.msg.databases[0].fingerprints[0].variants[0].id,
+        // '654321'
+        ws.send(JSON.stringify({
+            cmd: 'load:binpreview',
+            msg: [
+                message.databaseId,
+                message.fingerprintId,
+                message.variantId,
+                message.binIndex.toString()
+            ]
+        }));
+    }
 
-  if (cmd === 'load:bin') {
-    // response.msg.databases[0].id,
-    // response.msg.databases[0].fingerprints[0].id,
-    // response.msg.databases[0].fingerprints[0].variants[0].id,
-    // '654321'
-    ws.send(JSON.stringify({
-      cmd: 'load:bin',
-      msg: [
-        message.databaseId,
-        message.fingerprintId,
-        message.variantId,
-        message.binIndex.toString()
-      ]
-    }));
-  }
+    if (cmd === 'load:bin') {
+        // response.msg.databases[0].id,
+        // response.msg.databases[0].fingerprints[0].id,
+        // response.msg.databases[0].fingerprints[0].variants[0].id,
+        // '654321'
+        ws.send(JSON.stringify({
+            cmd: 'load:bin',
+            msg: [
+                message.databaseId,
+                message.fingerprintId,
+                message.variantId,
+                message.binIndex.toString()
+            ]
+        }));
+    }
 
-  if (cmd === 'search:infos') {
-    msg = [
-      message.fingerprintId,
-      message.variantId
-    ];
+    if (cmd === 'search:infos') {
+        msg = [
+            message.fingerprintId,
+            message.variantId
+        ];
 
-    msg.append
+        msg.append
 
-    ws.send(JSON.stringify({
-      cmd: 'search:infos',
-      msg: msg.concat(message.searchTerms)
-    }));
-  }
+        ws.send(JSON.stringify({
+            cmd: 'search:infos',
+            msg: msg.concat(message.searchTerms)
+        }));
+    }
 };
 
 function onInit(data) {
-  config = data.msg;
-  postMessage(data);
+    config = data.msg;
+    postMessage(data);
 }
 
 function onLoadVariant(data) {
-  var variant = Faerun.getConfigItemById(config, data.id);
+    var variant = Faerun.getConfigItemById(config, data.id);
 
-  var arr = Faerun.csvToArray(data.msg, variant.dataTypes);
-  for (var i = 0; i < arr.length; i++) arr[i] = arr[i].buffer;
+    var arr = Faerun.csvToArray(data.msg, variant.dataTypes);
+    for (var i = 0; i < arr.length; i++) arr[i] = arr[i].buffer;
 
-  postMessage({
-    cmd: data.cmd,
-    msg: {
-      data: arr,
-      dataTypes: variant.dataTypes
-    }
-  });
+    postMessage({
+        cmd: data.cmd,
+        msg: {
+            data: arr,
+            dataTypes: variant.dataTypes
+        }
+    });
 }
 
 function onLoadMap(data) {
-  var map = Faerun.getConfigItemById(config, data.id);
+    var map = Faerun.getConfigItemById(config, data.id);
 
-  var arr = Faerun.csvToArray(data.msg, map.dataTypes);
-  for (var i = 0; i < arr.length; i++) arr[i] = arr[i].buffer;
+    var arr = Faerun.csvToArray(data.msg, map.dataTypes);
+    for (var i = 0; i < arr.length; i++) arr[i] = arr[i].buffer;
 
-  postMessage({
-    cmd: data.cmd,
-    msg: {
-      data: arr,
-      dataTypes: map.dataTypes
-    }
-  });
+    postMessage({
+        cmd: data.cmd,
+        msg: {
+            data: arr,
+            dataTypes: map.dataTypes
+        }
+    });
 }
 
 function onLoadBinPreview(data) {
-  postMessage({
-    cmd: data.cmd,
-    msg: {
-      smiles: data.smiles,
-      index: parseInt(data.index, 10),
-      binSize: parseInt(data.binSize, 10)
-    }
-  });
+    postMessage({
+        cmd: data.cmd,
+        msg: {
+            smiles: data.smiles,
+            index: parseInt(data.index, 10),
+            binSize: parseInt(data.binSize, 10)
+        }
+    });
 }
 
 function onLoadBin(data) {
-  postMessage({
-    cmd: data.cmd,
-    msg: {
-      smiles: data.smiles,
-      ids: data.ids,
-      fps: data.fps,
-      coordinates: data.coordinates,
-      index: parseInt(data.index, 10),
-      binSize: parseInt(data.binSize, 10)
-    }
-  });
+    postMessage({
+        cmd: data.cmd,
+        msg: {
+            smiles: data.smiles,
+            ids: data.ids,
+            fps: data.fps,
+            coordinates: data.coordinates,
+            index: parseInt(data.index, 10),
+            binSize: parseInt(data.binSize, 10)
+        }
+    });
 }
 
 function onSearchInfos(data) {
-  postMessage({
-    cmd: data.cmd,
-    msg: {
-      binIndices: data.binIndices,
-      searchTerms: data.searchTerms
-    }
-  });
+    postMessage({
+        cmd: data.cmd,
+        msg: {
+            binIndices: data.binIndices,
+            searchTerms: data.searchTerms
+        }
+    });
 }
 
 function onStatsLoaded(data) {
-  postMessage({
-    cmd: data.cmd,
-    msg: { 
-      data.msg.compoundCount,
-	  data.msg.binCount,
-	  data.msg.avgCompoundCount,
-	  data.msg.binHist,
-      data.msg.histMin,
-	  data.msg.histMax
-    }
-  });
+    postMessage({
+        cmd: data.cmd,
+        msg: {
+            compoundCount: data.msg.compoundCount,
+            binCount: data.msg.binCount,
+            avgCompoundCount: data.msg.avgCompoundCount,
+            binHist: data.msg.binHist,
+            histMin: data.msg.histMin,
+            histMax: data.msg.histMax
+        }
+    });
 }

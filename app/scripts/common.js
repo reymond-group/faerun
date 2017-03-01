@@ -737,3 +737,32 @@ Faerun.triggerEvent = function(element, eventName) {
         element.fireEvent('on' + e.eventType, e);
     }
 }
+
+Faerun.drawHistogram = function(element, values, max) {
+    var ctx = element.getContext('2d');
+    var width = element.width;
+    var height = element.height;
+
+    var padding = 2;
+    var barWidth = (width / values.length);
+    var pos = 0;
+    
+
+    ctx.clearRect(0, 0, width, height);
+    ctx.fillStyle = '#E040Fb';
+    
+    max = Math.sqrt(max);
+
+    for (var i = 0; i < values.length; i++) {
+        var value = Math.sqrt(values[i]);
+        var barHeight = value === 0 ? 0 : height * (value / max);
+
+        ctx.fillRect(pos, height - barHeight, barWidth, barHeight);
+
+        pos += barWidth;
+    }
+}
+
+Faerun.formatNumber = function(str) {
+   return str.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
