@@ -51,6 +51,8 @@ ws.onmessage = function(e) {
     onLoadBin(data);
   else if (data.cmd === 'search:infos')
     onSearchInfos(data);
+  else if (data.cmd === 'load:stats')
+    onStatsLoaded(data);
 };
 
 onmessage = function (e) {
@@ -61,6 +63,16 @@ onmessage = function (e) {
     // response.msg.databases[0].fingerprints[0].variants[0].id
     ws.send(JSON.stringify({
       cmd: 'load:variant',
+      msg: [
+        message.variantId
+      ]
+    }));
+  }
+
+  if (cmd === 'load:stats') {
+    // response.msg.databases[0].fingerprints[0].variants[0].id
+    ws.send(JSON.stringify({
+      cmd: 'load:stats',
       msg: [
         message.variantId
       ]
@@ -193,3 +205,16 @@ function onSearchInfos(data) {
   });
 }
 
+function onStatsLoaded(data) {
+  postMessage({
+    cmd: data.cmd,
+    msg: { 
+      data.msg.compoundCount,
+	  data.msg.binCount,
+	  data.msg.avgCompoundCount,
+	  data.msg.binHist,
+      data.msg.histMin,
+	  data.msg.histMax
+    }
+  });
+}
