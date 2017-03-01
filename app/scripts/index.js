@@ -45,6 +45,7 @@
     }, false);
 
     bindings.selectVariant.addEventListener('change', function () {
+        loadStats(bindings.selectVariant.value);
         loadVariant(bindings.selectVariant.value);
     }, false);
 
@@ -441,6 +442,8 @@
                 onBinPreviewLoaded(e.data.msg);
             else if (e.data.cmd === 'search:infos')
                 onInfosSearched(e.data.msg);
+            else if (e.data.cmd === 'load:stats')
+                onStatsLoaded(e.data.msg);
         };
     });
 
@@ -542,6 +545,10 @@
         // Unblock the select elements after loading
         Faerun.unblockElements(bindings.selectDatabase.parentElement, bindings.selectFingerprint.parentElement,
             bindings.selectVariant.parentElement, bindings.selectMap.parentElement);
+    }
+
+    function onStatsLoaded(message) {
+        console.log(message);
     }
 
     /**
@@ -774,5 +781,16 @@
             }
         });
         populateMaps(currentVariant);
+    }
+
+    function loadStats(variantIndex) {
+        currentVariant = currentFingerprint.variants[variantIndex];
+
+        socketWorker.postMessage({
+            cmd: 'load:stats',
+            msg: {
+                variantId: currentVariant.id
+            }
+        });
     }
 })();
