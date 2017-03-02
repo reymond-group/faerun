@@ -167,10 +167,10 @@
             Faerun.addClasses(bindings.moleculeCell, ['full-width']);
         }
 
-
+        console.log(Faerun.sourceIdsUrl);
         JSONP.get(Faerun.sourceIdsUrl, function (srcIds) {
             var length = srcIds.length;
-
+            
             for (var i = 0; i < srcIds.length; i++) {
                 JSONP.get(Faerun.sourceInformationUrl(srcIds[i].src_id), function (sourceData) {
                     sourceInfos[sourceData[0].src_id] = sourceData[0];
