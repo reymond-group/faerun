@@ -317,8 +317,8 @@
         let hue = projections[0].pointHelper.getHue(id);
         let rgb = Lore.Color.hslToRgb(hue, 1.0, 0.5);
 
-        for (let component of rgb) {
-            component = Math.round(component * 255);
+        for (let i = 0; i < rgb.length; i++) {
+            rgb[i] = Math.round(rgb[i] * 255);
         }
 
         Faerun.appendTemplate(bindings.selectContainer, 'selected-bin-template', {
@@ -398,7 +398,7 @@
         selectIndicators = [];
         let indicators = document.getElementsByClassName('select-indicator');
         
-        for (let i = 0; i < indicators.length; i++) {
+        for (let i = indicators.length - 1; i >= 0; i--) {
             indicators[i].parentNode.removeChild(indicators[i]);
         }
     }
