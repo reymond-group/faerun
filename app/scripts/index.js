@@ -627,6 +627,7 @@
             document.getElementById('hover-bin-size').innerHTML = message.binSize;
         }
 
+        console.log('Received bin preview', message);
         let data = smiles.parse(message.smiles);
         smilesDrawer.draw(data, target);
     }
