@@ -186,9 +186,11 @@ function onLoadVariant(data) {
 
 function onLoadMap(data) {
     var map = Faerun.getConfigItemById(config, data.id);
-
     var arr = Faerun.csvToArray(data.msg, map.dataTypes);
-    for (var i = 0; i < arr.length; i++) arr[i] = arr[i].buffer;
+    
+    for (var i = 0; i < arr.length; i++) {
+        arr[i] = arr[i].buffer;
+    }
 
     postMessage({
         cmd: data.cmd,

@@ -72,7 +72,7 @@ Faerun.csvToArray = function (str, dataTypes) {
                 arrays[j][i] = parseInt(values[j], 10);
         }
     }
-    console.log(arrays);
+    
     return arrays;
 };
 

@@ -600,6 +600,7 @@
         }
 
         projections[0].pointHelper.setRGB(message.data[0], message.data[1], message.data[2]);
+        
         Faerun.setTitle(currentDatabase.name + ' &middot; ' + currentMap.name);
         bindings.selectMap.parentElement.style.pointerEvents = 'auto';
         Faerun.hide(bindings.loader);
