@@ -66,7 +66,8 @@ Lore.init = function (canvas, options) {
         clearColor: cc,
         verbose: true,
         fps: document.getElementById('fps'),
-        center: new Lore.Vector3f(125, 125, 125)
+        center: new Lore.Vector3f(125, 125, 125),
+        antialiasing: this.opts.antialiasing
     });
 
     renderer.controls.limitRotationToHorizon(this.opts.limitRotationToHorizon);
@@ -115,7 +116,8 @@ Lore.init = function (canvas, options) {
 
 Lore.defaults = {
     clearColor: '#001821',
-    limitRotationToHorizon: false
+    limitRotationToHorizon: false,
+    antialiasing: false
 };
 
 Lore.DrawModes = {

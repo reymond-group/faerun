@@ -344,7 +344,6 @@
 
         item.addEventListener('click', function (e) {
             let nCompounds = parseFloat(document.getElementById('select-bin-size-0-' + id).innerHTML);
-
             let indices = id;
             if (nCompounds < 10) {
                 let nearestNeighbours = binKnn(id, 26);
@@ -627,7 +626,6 @@
             document.getElementById('hover-bin-size').innerHTML = message.binSize;
         }
 
-        console.log('Received bin preview', message);
         let data = smiles.parse(message.smiles);
         smilesDrawer.draw(data, target);
     }

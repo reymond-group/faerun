@@ -6,59 +6,74 @@ importScripts('../config.js');
 // var socket = socket = io.connect('http://192.168.1.3:8080/underdark');
 // var socket = socket = io.connect('http://46.101.234.147:8080/underdark');
 
-var ws = new WebSocket(FaerunConfig.server.url);
+var ws;
 var config = null;
+var initialized = false;
 
-ws.onopen = function (e) {
-    postMessage({
-        cmd: 'connection:open',
-        msg: ''
-    });
+function connectSocket(callback) {
+    ws = new WebSocket(FaerunConfig.server.url) 
+    
+    ws.onopen = function (e) {
+        if (!initialized) {
+            postMessage({
+                cmd: 'connection:open',
+                msg: ''
+            });
 
-    // Initialize as soon as connection is established
-    ws.send(JSON.stringify({
-        cmd: 'init',
-        msg: []
-    }));
-};
+            // Initialize as soon as connection is established
+            ws.send(JSON.stringify({
+                cmd: 'init',
+                msg: []
+            }));
 
-ws.onclose = function (e) {
-    postMessage({
-        cmd: 'connection:closed',
-        msg: ''
-    });
-};
+            initialized = true;
+        } else {
+            postMessage({
+                cmd: 'connection:reopened',
+                msg: ''
+            }); 
+        }
 
-ws.onerror = function (e) {
-    postMessage({
-        cmd: 'connection:error',
-        msg: ''
-    });
-};
+        if (callback) {
+            callback();
+        }
+    };
 
-ws.onmessage = function (e) {
-    var data = JSON.parse(e.data);
+    ws.onclose = function (e) {
+        postMessage({
+            cmd: 'connection:closed',
+            msg: ''
+        });
+    };
 
-    if (data.cmd === 'init')
-        onInit(data);
-    else if (data.cmd === 'load:variant')
-        onLoadVariant(data);
-    else if (data.cmd === 'load:map')
-        onLoadMap(data);
-    else if (data.cmd === 'load:binpreview')
-        onLoadBinPreview(data);
-    else if (data.cmd === 'load:bin')
-        onLoadBin(data);
-    else if (data.cmd === 'search:infos')
-        onSearchInfos(data);
-    else if (data.cmd === 'load:stats')
-        onStatsLoaded(data);
-};
+    ws.onerror = function (e) {
+        postMessage({
+            cmd: 'connection:error',
+            msg: ''
+        });
+    };
 
-onmessage = function (e) {
-    var cmd = e.data.cmd;
-    var message = e.data.msg;
+    ws.onmessage = function (e) {
+        var data = JSON.parse(e.data);
 
+        if (data.cmd === 'init')
+            onInit(data);
+        else if (data.cmd === 'load:variant')
+            onLoadVariant(data);
+        else if (data.cmd === 'load:map')
+            onLoadMap(data);
+        else if (data.cmd === 'load:binpreview')
+            onLoadBinPreview(data);
+        else if (data.cmd === 'load:bin')
+            onLoadBin(data);
+        else if (data.cmd === 'search:infos')
+            onSearchInfos(data);
+        else if (data.cmd === 'load:stats')
+            onStatsLoaded(data);
+    };
+}
+
+function socketComm(cmd, message) {
     if (cmd === 'load:variant') {
         // response.msg.databases[0].fingerprints[0].variants[0].id
         ws.send(JSON.stringify({
@@ -132,6 +147,20 @@ onmessage = function (e) {
             cmd: 'search:infos',
             msg: msg.concat(message.searchTerms)
         }));
+    }
+}
+
+connectSocket();
+
+onmessage = function (e) {
+    var cmd = e.data.cmd;
+    var message = e.data.msg;
+
+    // If the connection has been closed (due to timeout) -> reopen
+    if (ws.readyState === 3) {
+        connectSocket(function() { socketComm(cmd, message); });
+    } else {
+        socketComm(cmd, message);
     }
 };
 
