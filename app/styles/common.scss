@@ -6,7 +6,7 @@
  */
 html, body {
     font-family: 'Roboto', 'Helvetica', sans-serif;
-    @include user-select(none); 
+    user-select: none;
     overflow: hidden;
 }
 
@@ -49,14 +49,8 @@ main, #main {
 
     header {
         box-sizing: border-box;
-        display: -webkit-flex;
-        display: -ms-flexbox;
         display: flex;
-        -webkit-flex-direction: column;
-        -ms-flex-direction: column;
         flex-direction: column;
-        -webkit-justify-content: flex-end;
-        -ms-flex-pack: end;
         justify-content: flex-end;
         padding: 16px;
         height: 64px;
@@ -95,13 +89,8 @@ main, #main {
 
     .mdl-menu {
         .mdl-menu__item {
-            display: -webkit-flex;
-            display: -ms-flexbox;
             display: flex;
-            -webkit-align-items: center;
-            -ms-flex-align: center;
             align-items: center;
-
         }
     }
 }
@@ -109,8 +98,6 @@ main, #main {
 #faerun-controls {
     padding: 5px 16px 16px 16px;
     overflow-x: hidden;
-    -webkit-flex-grow: 1;
-    -ms-flex-positive: 1;
     flex-grow: 1;
 
     .mdl-slider__container { 
@@ -140,13 +127,17 @@ main, #main {
     .faerun-controls-button {
         position: relative;
         display: block;
-        padding: 10px 15px 10px 50px;
-        margin: 0 -15px 0 -15px;
+        padding: 10px 10px 10px 40px;
+        margin-bottom: 5px;
         text-decoration: none;
         color: rgba(255, 255, 255, 0.75);
         font-size: 16px;
         font-weight: normal;
         cursor: pointer;
+
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 2px;
+
         transition: background .1s linear, padding .1s linear;
 
         &:hover {
@@ -161,11 +152,12 @@ main, #main {
         i {
             position: absolute;
             top: 8px;
-            left: 15px;
+            left: 10px;
         }
     }    
 
     .faerun-controls-small {
+        font-family: 'Roboto Mono', monospace;
         font-size: 0.75em;
         line-height: 1.0em;
         margin-bottom: 5px;
@@ -218,36 +210,36 @@ main, #main {
 }
 
 .flex-box {
-    @include display(flex);
-    @include flex-direction(column);
-    @include flex-wrap(nowrap);
-    @include justify-content(flex-start);
-    @include align-content(stretch);
-    @include align-items(stretch);
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-content: stretch;
+    align-items: stretch;
 
     height: 100%;
 
     .flex-item {
         position: relative;
         box-sizing: border-box;
-
-        @include align-self(auto);
-        @include order(0);
+        
+        align-self: auto;
+        order: 0;
 
         &:nth-child(1) {
-            @include flex(0 1 auto);
+            flex: 0 1 auto;
         }
 
         &:nth-child(2) {
-            @include flex(0 1 auto); 
+            flex: 0 1 auto;
         }
 
         &:nth-child(3) {
-            @include flex(1 1 auto);
+            flex: 1 1 auto;
         }
 
         &:nth-child(4) {
-            @include flex(0 1 auto);
+            flex: 0 1 auto;
         }
     }
 }
@@ -278,7 +270,7 @@ main, #main {
             font-size: 0;
             line-height: 0;
 
-            @include transition(all 0.2s ease-in-out);
+            transition: all 0.2s ease-in-out;
 
             &:hover {
                 border: 1px solid #555;
@@ -345,6 +337,7 @@ main, #main {
 
 
 .checkbox:focus + .checkbox-label, .radio:focus + .radio-label {
+
 }
 
 // Dark theme for selectfield
