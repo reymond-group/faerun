@@ -411,43 +411,28 @@ Faerun.updateCoordinatesHelper = function (lore, size) {
         position: new Lore.Vector3f(0, 0, 0),
         axis: {
             x: {
-                length: size,
-                color: Lore.Color.fromHex('#123273')
+                length: size
             },
             y: {
-                length: size,
-                color: Lore.Color.fromHex('#123273')
+                length: size
             },
             z: {
-                length: size,
-                color: Lore.Color.fromHex('#123273')
+                length: size
             }
         },
         ticks: {
             x: {
-                length: 10,
-                color: Lore.Color.fromHex('#123273')
+                length: 10
             },
             y: {
-                length: 10,
-                color: Lore.Color.fromHex('#123273')
+                length: 10
             },
             z: {
-                length: 10,
-                color: Lore.Color.fromHex('#123273')
+                length: 10
             }
         },
         box: {
-            enabled: false,
-            x: {
-                color: Lore.Color.fromHex('#123273')
-            },
-            y: {
-                color: Lore.Color.fromHex('#123273')
-            },
-            z: {
-                color: Lore.Color.fromHex('#123273')
-            }
+            enabled: true
         }
     });
 

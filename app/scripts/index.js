@@ -289,8 +289,8 @@
 
         let layers = document.getElementsByClassName('radio-current-layer');
         
-        for (let layer of layers) {
-            layer.addEventListener('click', function (e) {
+        for (let i = 0; i < layers.length; i++) {
+            layers[i].addEventListener('click', function (e) {
                 currentLayer = parseFloat(this.value);
             });
         }

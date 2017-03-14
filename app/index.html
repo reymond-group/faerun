@@ -33,6 +33,7 @@
         <link rel="stylesheet" href="libs/mdl-selectified/mdl-selectified.min.css">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,400,500,700">
         <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.deep_purple-purple.min.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.4.6/dialog-polyfill.min.css" />
         <link rel="stylesheet" href="styles/index.css">
@@ -147,6 +148,7 @@
                     <div id="hover-structure" data-binding-id="hoverStructure" class="hidden-mobile flex-item">
                         <canvas id="hover-structure-drawing" data-binding-id="hoverStructureDrawing" width="290" height="290"></canvas>
                         <div class="hover-bin-size">
+                            <i class="material-icons">info_outline</i>
                             <label>Bin Size:</label>
                             <span id="hover-bin-size">-</span>
                         </div>
@@ -241,7 +243,6 @@
                                 <label class="mdl-textfield__label" for="nameDialogProjectInput">Name</label>
                             </div>
                         </div>
-
                     </div>
                     <div class="mdl-dialog__content flex-item">
                         <textarea id="textarea-project" data-binding-id="textareaProject" type="text" autofocus="autofocus"></textarea>
@@ -284,7 +285,7 @@
                    id="bin-center-{{layer}}-{{id}}">
                     <i class="material-icons">all_out</i>
                 </a>
-                <span class="idx"><b>{{idx}}</b></span>
+                <span class="idx">Id: <b>{{idx}}</b></span>
                 <span class="id">Database Id: <b>{{id}}</b></span>
                 <span class="size">Bin Size: <b id="select-bin-size-{{layer}}-{{id}}"></b></span>
             </div>

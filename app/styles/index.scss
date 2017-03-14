@@ -11,19 +11,76 @@
 
 #hud-container {
     position: absolute;
-    margin: auto;
     z-index: 9999999;
     width: 360px;
     bottom: -20px;
-    @include transition(bottom 1s $ease-in-out-back);
     left: calc(50% - 180px);
     background-color: rgba(0, 0, 0, 0.8);
+    margin: auto;
     padding-bottom: 25px;
+
+    border-radius: 2px;
+    border: 1px solid rgba(40, 40, 40, 0.8);
+
+    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.75);
+
+    transition: all 0.5s $ease-in-out-back;
 
     &.hidden {
         display: block !important;
         bottom: calc(34px - 190px - 20px);
-        @include transition(bottom 1s $ease-in-out-back);
+    }
+
+    #hud-header {
+        z-index: 99999;
+        height: 24px;
+        margin-bottom: 5px;
+        padding: 5px;
+        outline: none;
+        cursor: pointer;
+        opacity: 0.75;
+
+        transition: all 0.2s ease;
+
+        @media only screen and (max-device-width: $responsive-mobile-max-width) {
+            height: 42px;
+        }
+
+        &:hover {
+            opacity: 1.0;
+        }
+
+        i, span {
+            line-height: 24px;
+        }
+
+        span {
+            padding-left: 5px;
+            font-size: 1.0em;
+            font-weight: bold;
+
+            @media only screen and (max-device-width: $responsive-mobile-max-width) {
+                font-size: 1.2em;
+                line-height: 42px;
+            }
+        }
+
+        i {
+            float: right;
+            font-size: 1.8em;
+
+            transform: rotate(0deg);
+            transition: all 0.5s $ease-in-out-back;
+
+            &.rotate {
+                transform: rotate(180deg);
+            }
+            
+            @media only screen and (max-device-width: $responsive-mobile-max-width) {
+                font-size: 2.2em;
+                line-height: 42px;
+            }
+        }
     }
 
     label {
@@ -45,7 +102,7 @@
     // The rainbow
     .slider-color-container { 
         .mdl-slider__background-flex {
-            @include linear-gradient(to right, rgba(0,0,255,1) 0%, rgba(0,255,255,1) 25%, rgba(255,255,0,1) 50%, rgba(255,0,0,1) 75%, rgba(255,0,255,1) 100%);
+            background: linear-gradient(to right, rgba(0,0,255,1) 0%, rgba(0,255,255,1) 25%, rgba(255,255,0,1) 50%, rgba(255,0,0,1) 75%, rgba(255,0,255,1) 100%);
         }
 
         .mdl-slider__background-lower {
@@ -65,62 +122,6 @@
     @media only screen and (max-device-width: $responsive-mobile-max-width) {
         width: 100%;
         left: 0px;
-    }
-
-
-    #hud-header {
-        z-index: 99999;
-        height: 24px;
-        margin-bottom: 5px;
-        padding: 5px;
-        outline: none;
-        cursor: pointer;
-
-        @media only screen and (max-device-width: $responsive-mobile-max-width) {
-            height: 42px;
-        }
-
-        &:hover {
-            i, span {
-                opacity: 1.0;
-                @include transition(opacity 0.2s $ease-in-out-cubic);
-            }
-        }
-
-        i, span {
-            opacity: 0.75; 
-            @include transition(opacity 0.2s $ease-in-out-cubic);
-            line-height: 24px;
-        }
-
-        span {
-            padding-left: 5px;
-            font-size: 1.0em;
-            font-weight: bold;
-
-            @media only screen and (max-device-width: $responsive-mobile-max-width) {
-                font-size: 1.2em;
-                line-height: 42px;
-            }
-        }
-
-        i {
-            float: right;
-            font-size: 1.8em;
-
-            transform: rotate(0deg);
-            @include transition(transform 1s $ease-in-out-back);
-
-            &.rotate {
-                transform: rotate(180deg) !important;
-                @include transition(transform 1s $ease-in-out-back);
-            }
-            
-            @media only screen and (max-device-width: $responsive-mobile-max-width) {
-                font-size: 2.2em;
-                line-height: 42px;
-            }
-        }
     }
 }
 
@@ -159,7 +160,18 @@
         left: 5px;
         right: 5px;
         bottom: 10px;
-        color: #ddd;
+        color: rgba(255, 255, 255, 0.75);
+
+        text-transform: uppercase;
+        font-family: 'Roboto Mono', monospace;
+        font-size: 0.8em;
+        line-height: 0.8em;
+
+        i {
+            font-size: 0.75em !important;
+            line-height: 0.75em !important;
+            margin-top: 1px;
+        }
 
         label:first-child {
             margin-left: 5px;
@@ -172,7 +184,25 @@
 }
 
 #select-container {
+    position: relative;
     margin: 0px 5px 0px 5px;
+    padding: 2px;
+    min-height: 50px;
+
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+
+    &:empty {
+        &::after {
+            content: "No Compounds Selected";
+            position: absolute;
+            top: 16px;
+            left: 68px;
+            color: rgba(255, 255, 255, 0.25);
+            font-size: 1em;
+            font-weight: bold;
+        }
+    }
 
     .item {
         position: relative;
@@ -229,11 +259,13 @@
             position: absolute;
             display: block;
             left: 60px;
-            top: 5px;
+            top: 3px;
             text-decoration: none;
             font-size: 0.9em;
             text-align: center;
             color: #bbb;
+
+            font-family: 'Roboto Mono', monospace;
 
             b {
                 color: #eee;
@@ -241,7 +273,7 @@
         }
 
         .id {
-            top: 20px;
+            top: 19px;
         }
 
         .size {
@@ -251,27 +283,48 @@
 }
 
 #layer-container {
+    position: relative;
+    margin: 0px 5px 0px 5px;
+    padding: 2px;
+    min-height: 25px;
+
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+
+    &:empty {
+        &::after {
+            content: "No Layers Loaded";
+            position: absolute;
+            top: 5px;
+            left: 88px;
+            color: rgba(255, 255, 255, 0.25);
+            font-size: 1em;
+            font-weight: bold;
+        }
+    }
+
     .item {
-        @include display(flex);
-        @include flex-direction(row);
-        @include flex-wrap(nowrap);
-        @include justify-content(flex-start);
-        @include align-content(stretch);
-        @include align-items(stretch);
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        align-content: stretch;
+        align-items: stretch;
 
         height: 30px;
         background-color: rgba(0, 0, 0, 0.75);
 
         div {
-            @include align-self(auto);
-            @include order(0);
+            align-self: auto;
+            order: 0;
         }
 
         .color {
             width: 20px;
             height: 20px;
             margin: 5px;
-            @include flex(0 1 auto);
+
+            flex: 0 1 auto;
         }
 
         .name {
@@ -279,12 +332,11 @@
             font-size: 1.2em;
             line-height: 30px;
 
-            @include flex(1 1 auto);
+            flex: 1 1 auto;
         }
 
         .checkbox-container, .radio-container {
-
-            @include flex(0 1 auto);
+            flex: 0 1 auto;
         }
     }
 }
@@ -337,12 +389,12 @@
 }
 
 #faerun-panel {
-    @include display(flex);
-    @include flex-direction(column);
-    @include flex-wrap(nowrap);
-    @include justify-content(flex-start);
-    @include align-content(stretch);
-    @include align-items(stretch);
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-content: stretch;
+    align-items: stretch;
 
     z-index: 999998;
     position: absolute;
@@ -352,7 +404,11 @@
     width: 300px;
 
     background-color: rgba(0, 0, 0, 0.8);
-    border: 1px solid #151515;
+    
+    border-radius: 2px;
+    border: 1px solid rgba(40, 40, 40, 0.8);
+
+    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.75);
 
     cursor: default !important;
 
@@ -360,44 +416,43 @@
         position: relative;
         box-sizing: border-box;
 
-        @include align-self(auto);
-        @include order(0);
+        align-self: auto;
+        order: 0;
 
         &:nth-child(1) {
-            @include flex(0 1 auto);
+            flex: 0 1 auto;
         }
 
         &:nth-child(2) {
-            @include flex(0 1 auto);
+            flex: 0 1 auto;
         }
 
         &:nth-child(3) {
-            @include flex(0 1 auto);
+            flex: 0 1 auto;
         }
 
         &:nth-child(4) {
-            @include flex(0 1 auto);
+            flex: 0 1 auto;
         }
 
         &:nth-child(5) {
-            @include flex(0 1 auto);
+            flex: 0 1 auto;
         }
 
         &:nth-child(6) {
-            @include flex(1 1 auto);
+            flex: 1 1 auto;
             overflow-y: auto;
         }
     }
 
     .title {
-        margin: 5px 5px 0px 5px;
         padding: 10px;
-        color: rgba(255, 255, 255, 0.75);
-        background-color: rgba(0, 0, 0, 0.75);
+        color: rgba(255, 255, 255, 1.0);
         font-weight: bold;
         font-size: 1em;
         line-height: 1em;
         text-align: center;
+        text-shadow: 0px 0px 10px rgba(0, 0, 0, 1.0);
     }
 }
 
@@ -411,7 +466,9 @@
     position: absolute;
     margin: 0;
     padding: 0;
+    font-family: 'Roboto Mono', monospace;
     font-size: 0.5em;
+    text-transform: uppercase;
     opacity: 0.5;
 }
 
@@ -422,7 +479,7 @@
 
 #stats-y-label {
     top: 40px;
-    left: -30px;
+    left: -37px;
     transform: rotate(-90deg);
 }
 
@@ -442,5 +499,3 @@
     border-radius: 50%;
     pointer-events: none;
 }
-
-
