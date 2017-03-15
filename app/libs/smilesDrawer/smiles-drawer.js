@@ -5307,13 +5307,10 @@ var SmilesDrawer = function () {
                 }
 
                 var _vertex4 = this.vertices[vToId[_i30]];
+                positions[_i30] = _vertex4.position.clone();
 
-                if (_vertex4.positioned) {
-                    positions[_i30].x = _vertex4.position.x;
-                    positions[_i30].y = _vertex4.position.y;
-                    if (ring.rings.length === 2) {
-                        positioned[_i30] = true;
-                    }
+                if (_vertex4.positioned && ring.rings.length === 2) {
+                    positioned[_i30] = true;
                 }
             }
 
@@ -5322,7 +5319,7 @@ var SmilesDrawer = function () {
             var maxMove = 0.5;
             var maxDist = 2000.0;
 
-            for (var n = 0; n < 1000; n++) {
+            for (var n = 0; n < 500; n++) {
 
                 for (var _i31 = 0; _i31 < totalLength; _i31++) {
                     forces[_i31].set(0, 0);
