@@ -3983,7 +3983,7 @@ var SmilesDrawer = function () {
             bondSpacing: 4,
             debug: false,
             allowFlips: false,
-            drawingIterations: 10,
+            drawingIterations: 20,
             themes: {
                 dark: {
                     C: '#fff',
