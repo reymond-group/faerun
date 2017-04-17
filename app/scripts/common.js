@@ -213,8 +213,14 @@ Faerun.setTitle = function (title) {
  */
 Faerun.appendOption = function (element, value, text) {
   var option = document.createElement('option');
-  option.value = value;
+  option.value = value === null ? '' : value;
   option.innerHTML = text;
+
+  if (value === null) {
+    option.selected = true;
+    option.disabled = true;
+  }
+
   element.appendChild(option);
 };
 
@@ -515,10 +521,10 @@ Faerun.initFullscreenSwitch = function (switchElement) {
   Faerun.addEventListeners('fullscreenchange webkitfullscreenchange mozfullscreenchange MSFullscreenChange', document, function (event) {
     var isFullscreen = (window.fullScreen) || (window.innerWidth === screen.width && window.innerHeight === screen.height);
 
-    if (isFullscreen)
-      switchElement.parentElement.MaterialSwitch.on();
-    else
-      switchElement.parentElement.MaterialSwitch.off();
+    // if (isFullscreen)
+      // switchElement.parentElement.MaterialSwitch.on();
+    // else
+      // switchElement.parentElement.MaterialSwitch.off();
   });
 };
 
@@ -547,7 +553,7 @@ Faerun.initColorpicker = function (element, colors) {
   indicator.classList.add('indicator');
 
   setTimeout(function () {
-    input.parentElement.MaterialTextfield.change(colors[0]);
+    //input.parentElement.MaterialTextfield.change(colors[0]);
     indicator.style.backgroundColor = initialColor;
   }, 1000);
 
@@ -558,7 +564,7 @@ Faerun.initColorpicker = function (element, colors) {
 
     colorElement.addEventListener('click', function (e) {
       var hex = Faerun.rgb2hex(this.style.backgroundColor);
-      input.parentElement.MaterialTextfield.change(hex);
+      //input.parentElement.MaterialTextfield.change(hex);
       Faerun.triggerEvent(input, 'keyup');
     });
 

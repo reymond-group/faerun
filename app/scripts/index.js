@@ -35,22 +35,22 @@
     }
   }, false);
 
-  bindings.selectDatabase.addEventListener('change', function () {
+  $(bindings.selectDatabase).on('change', function () {
     currentDatabase = config.databases[bindings.selectDatabase.value];
     populateFingerprints(currentDatabase);
-  }, false);
+  });
 
-  bindings.selectFingerprint.addEventListener('change', function () {
+  $(bindings.selectFingerprint).on('change', function () {
     currentFingerprint = currentDatabase.fingerprints[bindings.selectFingerprint.value];
     populateVariants(currentFingerprint);
-  }, false);
+  });
 
-  bindings.selectVariant.addEventListener('change', function () {
+  $(bindings.selectVariant).on('change', function () {
     loadStats(bindings.selectVariant.value);
     loadVariant(bindings.selectVariant.value);
-  }, false);
+  });
 
-  bindings.selectMap.addEventListener('change', function () {
+  $(bindings.selectMap).on('change', function () {
     currentMap = currentVariant.maps[bindings.selectMap.value];
 
     // Block the select elements during loading
@@ -67,8 +67,7 @@
     bindings.selectMap.parentElement.style.pointerEvents = 'none';
     bindings.loadingMessage.innerHTML = 'Loading map ...';
     Faerun.show(bindings.loader);
-  }, false);
-
+  });
 
   bindings.sliderCutoff.addEventListener('input', function () {
     projections[0].pointHelper.setCutoff(bindings.sliderCutoff.value);
@@ -208,13 +207,15 @@
    */
   function populateDatabases() {
     Faerun.removeChildren(bindings.selectDatabase);
-    Faerun.appendEmptyOption(bindings.selectDatabase);
+    Faerun.appendOption(bindings.selectDatabase, null, 'Select a database');
 
     for (let i = 0; i < config.databases.length; i++) {
       let database = config.databases[i];
 
       Faerun.appendOption(bindings.selectDatabase, i, database.name);
     }
+
+    $(bindings.selectDatabase).material_select();
   }
 
   /**
@@ -224,13 +225,15 @@
    */
   function populateFingerprints(database) {
     Faerun.removeChildren(bindings.selectFingerprint);
-    Faerun.appendEmptyOption(bindings.selectFingerprint);
+    Faerun.appendOption(bindings.selectFingerprint, null, 'Select a fingerprint');
 
     for (let i = 0; i < database.fingerprints.length; i++) {
       let fingerprint = database.fingerprints[i];
 
       Faerun.appendOption(bindings.selectFingerprint, i, fingerprint.name);
     }
+
+    $(bindings.selectFingerprint).material_select();
   }
 
   /**
@@ -240,13 +243,15 @@
    */
   function populateVariants(fingerprint) {
     Faerun.removeChildren(bindings.selectVariant);
-    Faerun.appendEmptyOption(bindings.selectVariant);
+    Faerun.appendOption(bindings.selectVariant, null, 'Select a variant');
 
     for (let i = 0; i < fingerprint.variants.length; i++) {
       let variant = fingerprint.variants[i];
 
       Faerun.appendOption(bindings.selectVariant, i, variant.name);
     }
+
+    $(bindings.selectVariant).material_select();
 
     if (fingerprint.variants.length === 1) {
       bindings.selectVariant.value = 0;
@@ -262,13 +267,15 @@
    */
   function populateMaps(variant) {
     Faerun.removeChildren(bindings.selectMap);
-    Faerun.appendEmptyOption(bindings.selectMap);
+    Faerun.appendOption(bindings.selectMap, null, 'Select a map');
 
     for (let i = 0; i < variant.maps.length; i++) {
       let map = variant.maps[i];
 
       Faerun.appendOption(bindings.selectMap, i, map.name);
     }
+
+    $(bindings.selectMap).material_select();
   }
 
   /**
