@@ -41,27 +41,27 @@
     <body>
         <!-- The slide-out menu -->
         <div id="slide-out" class="side-nav">
-            <p class="faerun-controls-header"><i class="material-icons">open_in_browser</i>DATA</p>
+            <p class="faerun-controls-header"><i class="material-icons">open_in_browser</i><span>DATA</span></p>
             <div class="input-field">
-                <select id="select-database" data-binding-id="selectDatabase" name="select-database" class="mdl-selectfield__select"><option value=""></option></select>
+                <select id="select-database" data-binding-id="selectDatabase" name="select-database"><option value=""></option></select>
                 <label for="select-database">Database</label>
             </div>
             <div class="input-field">
-                <select id="select-fingerprint" data-binding-id="selectFingerprint" name="select-fingerprint" class="mdl-selectfield__select"></select>
+                <select id="select-fingerprint" data-binding-id="selectFingerprint" name="select-fingerprint"></select>
                 <label for="select-fingerprint">Fingerprint</label>
             </div>
             <div class="input-field">
-                <select id="select-variant" data-binding-id="selectVariant" name="select-variant" class="mdl-selectfield__select"></select>
+                <select id="select-variant" data-binding-id="selectVariant" name="select-variant"></select>
                 <label for="select-variant">Variant</label>
             </div>
             <div class="input-field">
-                <select id="select-map" data-binding-id="selectMap" name="select-map" class="mdl-selectfield__select"></select>
+                <select id="select-map" data-binding-id="selectMap" name="select-map"></select>
                 <label for="select-map">Map</label>
             </div>
             
-            <p class="faerun-controls-header"><i class="material-icons">brush</i>LOOK</p>
+            <p class="faerun-controls-header"><i class="material-icons">brush</i><span>LOOK</span></p>
             <div class="input-field">
-                <select id="select-view" data-binding-id="selectView" name="select-view" class="mdl-selectfield__select">
+                <select id="select-view" data-binding-id="selectView" name="select-view">
                     <option value="free">Free View</option>
                     <option value="top">Top View</option>
                     <option value="left">Left View</option>
@@ -71,30 +71,30 @@
                 </select>
                 <label for="select-view">View</label>
             </div>
-            <p class="faerun-controls-header"><i class="material-icons">settings</i>SETTINGS</p>
-            <span class="spacer"></span>
-            <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-fullscreen">
-                <input type="checkbox" id="switch-fullscreen" data-binding-id="switchFullscreen" class="mdl-switch__input">
-                <span class="mdl-switch__label">Fullscreen</span>
-            </label>
-            <div class="switch-separator"></div>
-            <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-color">
-                <input type="checkbox" id="switch-color" data-binding-id="switchColor" class="mdl-switch__input">
-                <span id="label-switch-color" data-binding-id="labelSwitchColor" class="mdl-switch__label">Dark Background</span>
-            </label>
+            <p class="faerun-controls-header"><i class="material-icons">settings</i><span>SETTINGS</span></p>
+            <p>
+                <input type="checkbox" id="switch-fullscreen" data-binding-id="switchFullscreen" />
+                <label for="switch-fullscreen">Fullscreen</label>
+            </p>
+            <p>
+                <input type="checkbox" id="switch-color" data-binding-id="switchColor" />
+                <label for="switch-color">Light Background</label>
+            </p>
+
+            <p class="faerun-controls-header" style="margin-top:18px;"><i class="material-icons">build</i><span>TOOLS</span></p>
+            <a href="#" id="button-search" data-binding-id="buttonSearch" class="waves-effect waves-light btn-flat">
+                <i class="material-icons left">search</i>Search
+            </a>
+            <br />
+            <a href="#" id="button-project" data-binding-id="buttonProject" class="waves-effect waves-light btn-flat">
+                <i class="material-icons left">bubble_chart</i>Project
+            </a>
+            <br />
+            <a href="#" id="button-knn" data-binding-id="buttonKNN" class="waves-effect waves-light btn-flat">
+                <i class="material-icons left">location_searching</i>KNN Search 
+            </a>
             
-            <p class="faerun-controls-header" style="margin-top:18px;"><i class="material-icons">build</i>TOOLS</p>
-            <a href="#" id="button-search" data-binding-id="buttonSearch" class="faerun-controls-button">
-                <i class="material-icons">search</i>Search
-            </a>
-            <a href="#" id="button-project" data-binding-id="buttonProject" class="faerun-controls-button">
-                <i class="material-icons">bubble_chart</i>Project
-            </a>
-            <a href="#" id="button-knn" data-binding-id="buttonKNN" class="faerun-controls-button">
-                <i class="material-icons">location_searching</i>KNN Search 
-            </a>
-            
-            <p class="faerun-controls-header">STATISTICS</p>
+            <p class="faerun-controls-header"><i class="material-icons">signal_cellular_4_bar</i><span>STATISTICS</span></p>
             <p class="faerun-controls-small">Number of Compounds:&nbsp;<b id="stats-compounds" data-binding-id="statsCompounds"></b></p>
             <p class="faerun-controls-small">Number of Bins:&nbsp;<b id="stats-bins" data-binding-id="statsBins"></b></p>
             <p class="faerun-controls-small">&nbsp;</p>
@@ -111,15 +111,15 @@
         </div>
         <div class="page">
             <header>
-                <div class="hamburger">
-                    <a href="#" data-activates="slide-out" class="button-toggle-nav white-text"><i class="material-icons">menu</i></a>
-                </div>
                 <div class="title">
                     <span><img src="images/logo.png" />FAERUN</span>
                     <span>&nbsp;</span>
                     <span id="data-title" data-binding-id="dataTitle">No Data Loaded</span>
                 </div>
                 <div class="more">
+                </div>
+                <div class="hamburger">
+                    <a href="#" data-activates="slide-out" class="button-toggle-nav white-text"><i class="material-icons">menu</i></a>
                 </div>
             </header>
             <main>
@@ -128,48 +128,27 @@
             </main>
         </div>
 
-        <!-- The bottom HUD -->
-        <div id="hud-container" data-binding-id="hudContainer" class="hidden-n">
-            <div id="hud-header" data-binding-id="hudHeader" class="mdl-color-text--white">
-                <span id="hud-header-text">Filters & Touch Controls</span>
-                <i id="hud-header-icon" data-binding-id="hudHeaderIcon" class="material-icons">keyboard_arrow_down</i>
-            </div>
-            <label>Depth Cutoff</label>
-            <input id="slider-cutoff" data-binding-id="sliderCutoff" class="mdl-slider mdl-js-slider" type="range" min="0" max="100"
-            value="0" tabindex="0">
-            <span class="spacer"></span>
-            <label>Color</label>
-            <div class="slider-color-container">
-                <input id="slider-color" data-binding-id="sliderColor" class="mdl-slider mdl-js-slider" type="range" min="0.01" max="0.98"
-                step="0.01" value="0.01" tabindex="0">
-            </div>
-            <span class="spacer"></span>
-            <div style="text-align:center">
-                <button id="button-recenter" data-binding-id="buttonRecenter" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab">
-                    <i class="material-icons">all_out</i>
-                </button>
-                <button id="button-zoomin" data-binding-id="buttonZoomIn" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab">
-                    <i class="material-icons">zoom_in</i>
-                </button>
-                <button id="button-zoomout" data-binding-id="buttonZoomOut" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab">
-                    <i class="material-icons">zoom_out</i>
-                </button>
-                <button id="button-toggle-select" data-binding-id="buttonToggleSelect" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab">
-                    <i class="material-icons">touch_app</i>
-                </button>
-                <button id="button-select-hovered" data-binding-id="buttonSelectHovered" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab">
-                    <i class="material-icons">add</i>
-                </button>
-            </div>
+        <!-- Mobile Options -->
+        <div class="fixed-action-btn">
+            <a class="btn-floating btn-large">
+                <i class="large material-icons">toys</i>
+            </a>
+            <ul>
+                <li><a id="button-recenter" data-binding-id="buttonRecenter" class="waves-effect waves-light btn-floating"><i class="material-icons">all_out</i></a></li>
+                <li><a id="button-zoomin" data-binding-id="buttonZoomIn" class="waves-effect waves-light btn-floating"><i class="material-icons">zoom_in</i></a></li>
+                <li><a id="button-zoomout" data-binding-id="buttonZoomOut" class="waves-effect waves-light btn-floating"><i class="material-icons">zoom_out</i></a></li>
+                <li><a id="button-toggle-select" data-binding-id="buttonToggleSelect" class="waves-effect waves-light btn-floating"><i class="material-icons">touch_app</i></a></li>
+                <li><a id="button-select-hovered" data-binding-id="buttonSelectHovered" class="waves-effect waves-light btn-floating"><i class="material-icons">add</i></a></li>
+            </ul>
         </div>
 
         <!-- The left panel HUD -->
-        <div id="faerun-panel" data-binding-id="faerunPanel" class="hidden-mobile"> 
+        <div id="faerun-panel" data-binding-id="faerunPanel" class="faerun-panel hidden-mobile"> 
             <div class="flex-item">
                 <div class="title">Hovered Bin Preview</div>
             </div>
             <div id="hover-structure" data-binding-id="hoverStructure" class="hidden-mobile flex-item">
-                <canvas id="hover-structure-drawing" data-binding-id="hoverStructureDrawing" width="290" height="290"></canvas>
+                <canvas id="hover-structure-drawing" data-binding-id="hoverStructureDrawing" width="190" height="190"></canvas>
                 <div class="hover-bin-size">
                     <i class="material-icons">info_outline</i>
                     <label>Bin Size:</label>
@@ -183,10 +162,34 @@
                 <div id="layer-container" data-binding-id="layerContainer"></div> 
             </div>
             <div class="flex-item">
+                <div class="title">Filters</div>
+            </div>
+            <div class="flex-item">
+                <label>Depth Cutoff</label>
+                <p class="range-field">
+                    <input id="slider-cutoff" data-binding-id="sliderCutoff" type="range" min="0" max="100"
+                value="0" tabindex="0">
+                </p>
+                <label>Color</label>
+                <p class="range-field color-range">
+                    <input id="slider-color" data-binding-id="sliderColor" type="range" min="0.01" max="0.98"
+                    step="0.01" value="0.01" tabindex="0">
+                </p>
+            </div>
+            <div class="flex-item">
                 <div class="title">Selected Bins</div>
             </div>
             <div class="flex-item">
                 <div id="select-container" data-binding-id="selectContainer"></div> 
+            </div>
+        </div>
+
+        <div id="loader" data-binding-id="loader" class="hidden">
+            <div id="loader-inner">
+                <p id="loading-message" data-binding-id="loadingMessage"></p>
+                <div class="progress">
+                    <div class="indeterminate" style="width:200px"></div>
+                </div>
             </div>
         </div>
 
@@ -307,7 +310,13 @@
             // Initialization stuff for materialize.css
             (function($){
                 $(function(){
-                    $('.button-toggle-nav').sideNav();
+                    $('.button-toggle-nav').sideNav({
+                        menuWidth: 300,
+                        edge: 'right',
+                        closeOnClick: true,
+                        draggable: true
+                    });
+
                     $('select').material_select();
                 });
             })(jQuery);

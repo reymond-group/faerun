@@ -1,5 +1,6 @@
 @import "bourbon";
 @import "variables.scss";
+@import "mixins.scss";
 
 /**
  * Elements 
@@ -12,8 +13,48 @@ html, body {
 }
 
 .side-nav {
-    padding: 10px;
-    background-color: rgba(220, 220, 220, 1.0);
+    padding: 0 10px;
+    background-color: rgba(22, 22, 22, 1.0);
+
+    .select-wrapper { 
+        input.select-dropdown {
+            color: rgba(255, 255, 255, 0.75);
+            background-color: rgba(255, 255, 255, 0.025);
+        }
+
+        .caret {
+            color: rgba(255, 255, 255, 0.75);
+        }
+    }
+
+    .btn-flat {
+        color: rgba(255, 255, 255, 0.75);
+
+        &:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        &:focus {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+    }
+
+    .faerun-controls-header {
+        position: relative;
+        color: rgba(255, 255, 255, 0.95);
+
+        span {
+            display: inline-block;
+            margin-left: 24px;
+            line-height: 24px;
+        }
+
+        i {
+            position: absolute;
+            font-size: 16px;
+            line-height: 24px;
+        }
+    }
 }
 
 .page {
@@ -44,10 +85,12 @@ html, body {
         align-content: center;
         align-items: stretch;
 
-        padding: 10px 20px 8px 20px;
+        height: 50px;
+
+        padding: 10px 20px 8px 10px;
 
         background-color: rgba(0, 0, 0, 1.0);
-        border: 0px;
+        border-bottom: 1px solid rgba(32, 32, 32, 1.0);
 
         .hamburger, .title, .more {
             position: relative;
@@ -55,13 +98,6 @@ html, body {
             
             align-self: auto;
             order: 0;
-        }
-
-        .hamburger {
-            flex: 0 1 auto;
-
-            padding-right: 20px;
-            padding-top: 2px;
         }
 
         .title {
@@ -77,7 +113,7 @@ html, body {
                 &:nth-child(1) {
                     padding-left: 32px;
                     font-weight: 400;
-                    color: rgba(255, 255, 255, 0.75);
+                    color: rgba(255, 255, 255, 0.95);
                 }
 
                 &:nth-child(3) {
@@ -96,6 +132,13 @@ html, body {
         .more {
             flex: 0 1 auto;
         }
+
+        .hamburger {
+            flex: 0 1 auto;
+
+            padding-right: 20px;
+            padding-top: 2px;
+        }
     }
 
     main {
@@ -111,9 +154,102 @@ html, body {
     }
 }
 
+.faerun-panel {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-content: stretch;
+    align-items: stretch;
 
+    z-index: 995;
+    position: absolute;
+    top: 49px;
+    left: 0px;
 
+    height: calc(100% - 50px);
+    width: 200px;
 
+    padding: 0 10px;
+
+    background-color: rgba(0, 0, 0, 0.75);
+    transition: background-color 0.2s ease-in-out;
+    
+    border-right: 1px solid rgba(32, 32, 32, 1.0);
+    border-top: 1px solid rgba(20, 20, 20, 1.0);
+
+    cursor: default !important;
+
+    &:hover {
+        transition: background-color 0.2s ease-in-out;
+        background-color: rgba(0, 0, 0, 1.0);
+    }
+
+    .flex-item {
+        position: relative;
+        box-sizing: border-box;
+
+        align-self: auto;
+        order: 0;
+
+        &:nth-child(1) {
+            flex: 0 1 auto;
+        }
+
+        &:nth-child(2) {
+            flex: 0 1 auto;
+        }
+
+        &:nth-child(3) {
+            flex: 0 1 auto;
+        }
+
+        &:nth-child(4) {
+            flex: 0 1 auto;
+        }
+
+        &:nth-child(5) {
+            flex: 0 1 auto;
+        }
+
+        &:nth-child(6) {
+            flex: 0 1 auto;
+        }
+
+        &:nth-child(7) {
+            flex: 0 1 auto;
+        }
+
+        &:nth-child(8) {
+            flex: 1 1 auto;
+            overflow-y: auto;
+        }
+    }
+
+    .title {
+        padding: 10px 0;
+        color: rgba(255, 255, 255, 0.5);
+        font-weight: 500;
+        font-size: 0.9em;
+        line-height: 0.9em;
+    }
+
+    p.range-field {
+        margin-top: 0;
+        margin-bottom: 2px;
+
+         @include custom-slider(rgba(255, 255, 255, 0.75));
+
+        &.color-range {
+            @include custom-slider(linear-gradient(to right, rgba(0,0,255,1) 0%, rgba(0,255,255,1) 25%, rgba(255,255,0,1) 50%, rgba(255,0,0,1) 75%, rgba(255,0,255,1) 100%));
+        }
+
+        input {
+            margin-top: 2px;
+            margin-bottom: 2px;
+        }
+    }
+}
 
 
 
@@ -140,153 +276,6 @@ html, body {
 /**
  *  ID - Elements
  */
-#faerun-layout {
-    .faerun-header {
-        .mdl-textfield {
-            padding: 0px;
-            margin-top: 41px;
-
-            .mdl-textfield__expandable-holder {
-                bottom: 19px;
-            }
-        }
-    }
-
-    .mdl-layout__header {
-        .mdl-layout__drawer-button {
-            color: rgba(255, 255, 255, 0.54);
-        }
-    }
-}
-
-#faerun-drawer {
-    border: none;
-
-    header {
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-        padding: 16px;
-        height: 64px;
-
-        .faerun-title {
-            position: relative;
-            font-size: 30px;
-            font-weight: 300;
-            line-height: 30px;
-            padding: 0;
-            margin: 0;
-            padding-left: 55px;
-            padding-top: 5px;
-
-            img {
-                position: absolute;
-                width: 36px;
-                left: -5px;
-                top: -2px;
-                padding: 5px;
-                background-color: rgba(0, 0, 0, 0);
-                border-radius: 1px;
-            }
-        }
-    }
-
-    /* Start: iOS Safari hacks */
-    .mdl-menu__container {
-        z-index: -1;
-    }
-
-    .faerun-navigation {
-        z-index: -2;
-    }
-    /* End: iOS Safari hacks */
-
-    .mdl-menu {
-        .mdl-menu__item {
-            display: flex;
-            align-items: center;
-        }
-    }
-}
-
-#faerun-controls {
-    padding: 5px 16px 16px 16px;
-    overflow-x: hidden;
-    flex-grow: 1;
-
-    .mdl-slider__container { 
-        margin-left: -25px;
-        margin-right: -25px;
-        margin-bottom: 10px;
-    }
-
-    .spacer {
-        display: block;
-        margin-bottom: 10px;
-    }
-
-    .faerun-controls-header {
-        margin-top: 12px;
-        margin-bottom: 2px;
-        font-size: 14px;
-        font-weight: 700;
-
-        i {
-            display: none;
-            position: absolute;
-            left: 12px;
-        }
-    }
-
-    .faerun-controls-button {
-        position: relative;
-        display: block;
-        padding: 10px 10px 10px 40px;
-        margin-bottom: 5px;
-        text-decoration: none;
-        color: rgba(255, 255, 255, 0.75);
-        font-size: 16px;
-        font-weight: normal;
-        cursor: pointer;
-
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 2px;
-
-        transition: background .1s linear, padding .1s linear;
-
-        &:hover {
-            // padding-left: 20px;
-            background-color: rgba(0, 0, 0, 0.075);
-        }
-
-        &:active {
-            background-color: rgba(0, 0, 0, 0.15);
-        }
-
-        i {
-            position: absolute;
-            top: 8px;
-            left: 10px;
-        }
-    }    
-
-    .faerun-controls-small {
-        font-family: 'Roboto Mono', monospace;
-        font-size: 0.75em;
-        line-height: 1.0em;
-        margin-bottom: 5px;
-        margin-top: 5px;
-        opacity: 0.75;
-
-        b {
-            color: #e040fb;
-        }
-    }
-}
-
-
-
 #loader {
     position: absolute;
     z-index: 999999;
@@ -302,13 +291,14 @@ html, body {
         display: inline-block;
         margin-top: 20px;
         padding: 20px 20px 15px 20px;
-        background-color: #fff;
     
-        .loader-message {
+        .loading-message {
+            color: rgba(255, 255, 255, 0.75);
             margin-top: 10px;
         }
     }
 }
+
 /**
  * Classes 
  */
@@ -447,64 +437,9 @@ html, body {
     line-height: 10px;
 }
 
-
-.checkbox:focus + .checkbox-label, .radio:focus + .radio-label {
-
-}
-
-// Dark theme for selectfield
-.mdl-selectfield__box {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-
-    i {
-        color: #fff;
-    }
-}
-
-.mdl-selectfield__label {
-    color: #888 !important;
-}
-
-.switch-separator {
-    height: 8px;
-}
-
-.mdl-dialog__subtitle {
-    padding-left: 24px;
-    padding-right: 24px;
-    padding-top: 24px;
-}
-
-/* Badge overrides */
-.mdl-badge[data-badge]:after {
-    background-color: #fff !important;
-    color: #000 !important;
-}
-
-/* Snackbar overrides */
-.mdl-snackbar {
-    z-index: 9999999;
-}
-
 .hidden-mobile {
     @media only screen and (max-device-width: $responsive-mobile-max-width) {
         display: none;
-    }
-}
-
-/* Layer overrides */
-.mdl-layout__header-row {
-    @media screen and (max-width: 1024px) {
-        height: 64px !important;
-        padding: 0 40px 0 80px !important;
-    }
-}
-
-.mdl-layout__header {
-    .mdl-layout__drawer-button {
-        @media screen and (max-width: 1024px) {
-            margin: 8px 12px !important;
-        }
     }
 }
 

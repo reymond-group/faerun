@@ -20,11 +20,6 @@
   let bindings = Faerun.getBindings();
 
   // Events
-  bindings.hudHeader.addEventListener('click', function () {
-    Faerun.toggle(bindings.hudContainer);
-    Faerun.toggleClass(bindings.hudHeaderIcon, 'rotate');
-  }, false);
-
   bindings.switchColor.addEventListener('change', function () {
     if (bindings.switchColor.checked) {
       bindings.labelSwitchColor.innerHTML = 'Light Background';
@@ -448,13 +443,6 @@
   }
 
   document.addEventListener('DOMContentLoaded', function () {
-    // Hide the hud with animation (to show a brief glimpse to the user
-    // so that he knows it's there)
-    setTimeout(function () {
-      Faerun.toggle(bindings.hudContainer);
-      Faerun.toggleClass(bindings.hudHeaderIcon, 'rotate');
-    }, 1000);
-
     lore = Lore.init('lore', {
       clearColor: '#121212'
     });

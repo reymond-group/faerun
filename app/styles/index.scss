@@ -8,123 +8,6 @@
 /**
  * ID - Elements 
  */
-
-#hud-container {
-    position: absolute;
-    z-index: 9999999;
-    width: 360px;
-    bottom: -20px;
-    left: calc(50% - 180px);
-    background-color: rgba(0, 0, 0, 0.8);
-    margin: auto;
-    padding-bottom: 25px;
-
-    border-radius: 2px;
-    border: 1px solid rgba(40, 40, 40, 0.8);
-
-    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.75);
-
-    transition: all 0.5s $ease-in-out-back;
-
-    &.hidden {
-        display: block !important;
-        bottom: calc(34px - 190px - 20px);
-    }
-
-    #hud-header {
-        z-index: 99999;
-        height: 24px;
-        margin-bottom: 5px;
-        padding: 5px;
-        outline: none;
-        cursor: pointer;
-        opacity: 0.75;
-
-        transition: all 0.2s ease;
-
-        @media only screen and (max-device-width: $responsive-mobile-max-width) {
-            height: 42px;
-        }
-
-        &:hover {
-            opacity: 1.0;
-        }
-
-        i, span {
-            line-height: 24px;
-        }
-
-        span {
-            padding-left: 5px;
-            font-size: 1.0em;
-            font-weight: bold;
-
-            @media only screen and (max-device-width: $responsive-mobile-max-width) {
-                font-size: 1.2em;
-                line-height: 42px;
-            }
-        }
-
-        i {
-            float: right;
-            font-size: 1.8em;
-
-            transform: rotate(0deg);
-            transition: all 0.5s $ease-in-out-back;
-
-            &.rotate {
-                transform: rotate(180deg);
-            }
-            
-            @media only screen and (max-device-width: $responsive-mobile-max-width) {
-                font-size: 2.2em;
-                line-height: 42px;
-            }
-        }
-    }
-
-    label {
-        color: rgba(255, 255, 255, 0.8);
-        margin-left: 20px;
-    }
-
-    .mdl-button {
-        margin: 5px;
-
-        i {
-            color: rgba(255, 255, 255, 1.0);
-        }
-    }
-
-    @include mdl-slider (rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.2),
-    rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.15));
-
-    // The rainbow
-    .slider-color-container { 
-        .mdl-slider__background-flex {
-            background: linear-gradient(to right, rgba(0,0,255,1) 0%, rgba(0,255,255,1) 25%, rgba(255,255,0,1) 50%, rgba(255,0,0,1) 75%, rgba(255,0,255,1) 100%);
-        }
-
-        .mdl-slider__background-lower {
-            background: rgba(255, 255, 255, 0.5);
-        }
-
-        .mdl-slider__background-upper {
-            background: transparent;
-        }
-    }
-
-    .spacer {
-        display: block;
-        margin-bottom: 10px;
-    }
-
-    @media only screen and (max-device-width: $responsive-mobile-max-width) {
-        width: 100%;
-        left: 0px;
-    }
-}
-
 #hover-indicator {
     z-index: 999;
     position: absolute;
@@ -185,21 +68,15 @@
 
 #select-container {
     position: relative;
-    margin: 0px 5px 0px 5px;
-    padding: 2px;
-    min-height: 50px;
-
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 2px;
 
     &:empty {
         &::after {
             content: "No Compounds Selected";
             position: absolute;
             top: 16px;
-            left: 68px;
+            left: 35px;
             color: rgba(255, 255, 255, 0.25);
-            font-size: 1em;
+            font-size: 0.75em;
             font-weight: bold;
         }
     }
@@ -284,21 +161,16 @@
 
 #layer-container {
     position: relative;
-    margin: 0px 5px 0px 5px;
-    padding: 2px;
     min-height: 25px;
-
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 2px;
 
     &:empty {
         &::after {
             content: "No Layers Loaded";
             position: absolute;
             top: 5px;
-            left: 88px;
+            left: 50px;
             color: rgba(255, 255, 255, 0.25);
-            font-size: 1em;
+            font-size: 0.75em;
             font-weight: bold;
         }
     }
@@ -385,75 +257,6 @@
 
     .name-container {
         padding-left: 34px;
-    }
-}
-
-#faerun-panel {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-content: stretch;
-    align-items: stretch;
-
-    z-index: 999998;
-    position: absolute;
-    top: 60px;
-    right: 10px;
-
-    height: calc(100% - 70px);
-    width: 300px;
-
-    background-color: rgba(0, 0, 0, 0.8);
-    
-    border-radius: 2px;
-    border: 1px solid rgba(40, 40, 40, 0.8);
-
-    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.75);
-
-    cursor: default !important;
-
-    .flex-item {
-        position: relative;
-        box-sizing: border-box;
-
-        align-self: auto;
-        order: 0;
-
-        &:nth-child(1) {
-            flex: 0 1 auto;
-        }
-
-        &:nth-child(2) {
-            flex: 0 1 auto;
-        }
-
-        &:nth-child(3) {
-            flex: 0 1 auto;
-        }
-
-        &:nth-child(4) {
-            flex: 0 1 auto;
-        }
-
-        &:nth-child(5) {
-            flex: 0 1 auto;
-        }
-
-        &:nth-child(6) {
-            flex: 1 1 auto;
-            overflow-y: auto;
-        }
-    }
-
-    .title {
-        padding: 10px;
-        color: rgba(255, 255, 255, 1.0);
-        font-weight: bold;
-        font-size: 1em;
-        line-height: 1em;
-        text-align: center;
-        text-shadow: 0px 0px 10px rgba(0, 0, 0, 1.0);
     }
 }
 
