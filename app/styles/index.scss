@@ -75,7 +75,7 @@
             position: absolute;
             top: 16px;
             left: 35px;
-            color: rgba(255, 255, 255, 0.25);
+            color: darken($main-color-bright, 5%);
             font-size: 0.75em;
             font-weight: bold;
         }
@@ -169,7 +169,7 @@
             position: absolute;
             top: 5px;
             left: 50px;
-            color: rgba(255, 255, 255, 0.25);
+            color: darken($main-color-bright, 5%);
             font-size: 0.75em;
             font-weight: bold;
         }
@@ -184,7 +184,6 @@
         align-items: stretch;
 
         height: 30px;
-        background-color: rgba(0, 0, 0, 0.75);
 
         div {
             align-self: auto;
@@ -285,21 +284,4 @@
     top: 40px;
     left: -37px;
     transform: rotate(-90deg);
-}
-
-/**
- * Classes 
- */
-
-.select-indicator {
-    z-index: 999;
-    position: absolute;
-    display: block;
-    left: 10px;
-    top : 10px;
-    width: 10px;
-    height: 10px;
-    border: 2px solid #fff;
-    border-radius: 50%;
-    pointer-events: none;
 }

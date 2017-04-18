@@ -201,7 +201,7 @@ Faerun.removeChildren = function (element) {
  * @param {String} title - The new title.
  */
 Faerun.setTitle = function (title) {
-  document.getElementById('dataTitle').innerHTML = title;
+  document.getElementById('data-title').innerHTML = title;
 };
 
 /**
@@ -363,8 +363,8 @@ Faerun.resize = function (element, width, height) {
 Faerun.positionIndicator = function (element, pointSize, x, y) {
   element.style.width = pointSize + 'px';
   element.style.height = pointSize + 'px';
-  element.style.left = (x - pointSize / 2.0 - 2) + 'px';
-  element.style.top = (y - pointSize / 2.0 - 2) + 'px';
+  element.style.left = 1 + (x - pointSize / 2.0 - 2) + 'px';
+  element.style.top = 51 + (y - pointSize / 2.0 - 2) + 'px';
 };
 
 /**

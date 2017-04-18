@@ -378,13 +378,13 @@
 
     let indicator = document.createElement('span');
 
-    indicator.classList.add('mdl-badge', 'mdl-badge--overlap', 'select-indicator');
+    indicator.classList.add('select-indicator');
     indicator.setAttribute('id', 'selected-indicator-' + layer + '-' + id);
     indicator.setAttribute('data-badge', idx);
 
     let pointSize = projections[0].pointHelper.getPointSize();
     selectIndicators.push(indicator);
-    bindings.main.appendChild(indicator);
+    document.body.appendChild(indicator);
 
     updateSelected();
   }

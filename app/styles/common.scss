@@ -12,6 +12,34 @@ html, body {
     height: 100%;
 }
 
+.select-indicator {
+    z-index: 900;
+    position: absolute;
+    display: block;
+    left: 10px;
+    top : 10px;
+    width: 10px;
+    height: 10px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    pointer-events: none;
+
+    &[data-badge]:after {
+        content: attr(data-badge);
+        display: inline-block;
+        right: -10px;
+        top: -10px;
+        background-color: #fff;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        font-weight: 600;
+        font-size: 0.87em;
+        line-height: 20px;
+        text-align: center;
+    }
+}
+
 .side-nav {
     padding: 0 10px;
     background-color: rgba(22, 22, 22, 1.0);
@@ -85,12 +113,14 @@ html, body {
         align-content: center;
         align-items: stretch;
 
+        z-index: 995;
+
         height: 50px;
 
         padding: 10px 20px 8px 10px;
 
-        background-color: rgba(0, 0, 0, 1.0);
-        border-bottom: 1px solid rgba(32, 32, 32, 1.0);
+        background-color: $main-color;
+        border-bottom: 1px solid lighten($main-color, 2%);
 
         .hamburger, .title, .more {
             position: relative;
@@ -117,7 +147,7 @@ html, body {
                 }
 
                 &:nth-child(3) {
-                    color: rgba(255, 255, 255, 0.5);
+                    color: #C13B00;
                 }
 
                 img {
@@ -167,22 +197,23 @@ html, body {
     top: 49px;
     left: 0px;
 
-    height: calc(100% - 50px);
+    height: calc(100% - 49px);
     width: 200px;
 
     padding: 0 10px;
 
-    background-color: rgba(0, 0, 0, 0.75);
-    transition: background-color 0.2s ease-in-out;
+    background-color: $main-color;
+    opacity: 0.9;
+    transition: opacity 0.2s ease-in-out;
     
-    border-right: 1px solid rgba(32, 32, 32, 1.0);
-    border-top: 1px solid rgba(20, 20, 20, 1.0);
+    border-right: 1px solid lighten($main-color, 2%);
+    border-top: 1px solid lighten($main-color, 2%);
 
     cursor: default !important;
 
     &:hover {
-        transition: background-color 0.2s ease-in-out;
-        background-color: rgba(0, 0, 0, 1.0);
+        transition: opacity 0.2s ease-in-out;
+        opacity: 1.0;
     }
 
     .flex-item {
@@ -228,20 +259,25 @@ html, body {
 
     .title {
         padding: 10px 0;
-        color: rgba(255, 255, 255, 0.5);
+        color: lighten($main-color-brighter, 35%);
         font-weight: 500;
         font-size: 0.9em;
         line-height: 0.9em;
+        text-transform: uppercase;
+    }
+
+    label {
+        color: lighten($main-color-brighter, 25%);
     }
 
     p.range-field {
         margin-top: 0;
         margin-bottom: 2px;
 
-         @include custom-slider(rgba(255, 255, 255, 0.75));
+         @include custom-slider($main-color-bright);
 
         &.color-range {
-            @include custom-slider(linear-gradient(to right, rgba(0,0,255,1) 0%, rgba(0,255,255,1) 25%, rgba(255,255,0,1) 50%, rgba(255,0,0,1) 75%, rgba(255,0,255,1) 100%));
+            @include custom-slider(linear-gradient(to right, rgba(0,0,255,0.75) 0%, rgba(0,255,255,0.75) 25%, rgba(255,255,0,0.75) 50%, rgba(255,0,0,0.75) 75%, rgba(255,0,255,0.75) 100%));
         }
 
         input {
