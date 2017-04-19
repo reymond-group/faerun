@@ -111,18 +111,6 @@
   });
 
   // Search
-  if (!bindings.dialogSearch.showModal) {
-    dialogPolyfill.registerDialog(bindings.dialogSearch)
-  }
-
-  bindings.buttonSearch.addEventListener('click', function () {
-    bindings.dialogSearch.showModal();
-  });
-
-  bindings.dialogSearch.querySelector('.close').addEventListener('click', function () {
-    bindings.dialogSearch.close();
-  });
-
   bindings.buttonExecSearch.addEventListener('click', function () {
     if (!currentVariant) {
       bindings.toastError.MaterialSnackbar.showSnackbar({
@@ -155,18 +143,6 @@
   });
 
   // Project
-  if (!bindings.dialogProject.showModal) {
-    dialogPolyfill.registerDialog(bindings.dialogProject)
-  }
-
-  bindings.buttonProject.addEventListener('click', function () {
-    bindings.dialogProject.showModal();
-  });
-
-  bindings.dialogProject.querySelector('.close').addEventListener('click', function () {
-    bindings.dialogProject.close();
-  });
-
   bindings.buttonExecProject.addEventListener('click', function () {
     project();
 

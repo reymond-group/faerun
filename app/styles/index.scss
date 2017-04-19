@@ -34,21 +34,17 @@
         background-color: rgba(0, 0, 0, 0.2);
     }
 
-    .hover-bin-size {
-        position: absolute;
-        left: 5px;
-        right: 5px;
-        bottom: 10px;
+    .hover-bin-size {       
         color: rgba(255, 255, 255, 0.75);
 
-        text-transform: uppercase;
         font-family: 'Roboto Mono', monospace;
-        font-size: 0.8em;
-        line-height: 0.8em;
+        font-size: 0.7em;
+        line-height: 0.7em;
 
         i {
-            font-size: 0.75em !important;
-            line-height: 0.75em !important;
+            display: none;
+            font-size: 0.7em !important;
+            line-height: 0.7em !important;
             margin-top: 1px;
         }
 
@@ -66,19 +62,7 @@
     background-color: #c0392b;
 }
 
-#dialog-search, #dialog-project, #dialog-knn {
-    width: 75%;
-    height: 75%;
-
-    &::backdrop {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(0, 0, 0, 0.75);   
-    }
-
+#modal-search, #dialog-project, #dialog-knn {
     textarea {
         position: absolute;
         display: block;
@@ -99,13 +83,15 @@
     }
 }
 
-#dialog-project {
+#modal-project {
     .colorpicker-container, .name-container {
         display: inline-block;
     }
 
-    .name-container {
-        padding-left: 34px;
+    .colorpicker-container {
+        input, label {
+            margin-left: 25px !important;
+        }
     }
 }
 

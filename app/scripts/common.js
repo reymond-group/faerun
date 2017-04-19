@@ -553,7 +553,7 @@ Faerun.initColorpicker = function (element, colors) {
   indicator.classList.add('indicator');
 
   setTimeout(function () {
-    //input.parentElement.MaterialTextfield.change(colors[0]);
+    input.value = colors[0];
     indicator.style.backgroundColor = initialColor;
   }, 1000);
 
@@ -564,7 +564,7 @@ Faerun.initColorpicker = function (element, colors) {
 
     colorElement.addEventListener('click', function (e) {
       var hex = Faerun.rgb2hex(this.style.backgroundColor);
-      //input.parentElement.MaterialTextfield.change(hex);
+      input.value = hex;
       Faerun.triggerEvent(input, 'keyup');
     });
 
