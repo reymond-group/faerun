@@ -376,15 +376,31 @@
     });
 
 
-    let indicator = document.createElement('span');
+    let indicator = document.createElement('div');
 
     indicator.classList.add('select-indicator');
     indicator.setAttribute('id', 'selected-indicator-' + layer + '-' + id);
     indicator.setAttribute('data-badge', idx);
+    indicator.setAttribute('data-item', item.getAttribute('id'));
 
     let pointSize = projections[0].pointHelper.getPointSize();
     selectIndicators.push(indicator);
     document.body.appendChild(indicator);
+
+    item.addEventListener('mouseover', function(e) {
+      $('.select-indicator').removeClass('current');
+      $(indicator).addClass('current');
+    });
+
+    indicator.addEventListener('mouseenter', function(e) {
+      let item = $('#' + $(this).attr('data-item'));
+      let scrollContainer = $('#select-container').parent();
+
+      $('#select-container .item').removeClass('current');
+      item.addClass('current');
+
+      scrollContainer.animate({scrollTop: (item.offset().top - item.offsetParent().offset().top) + 'px'}, 200);
+    });
 
     updateSelected();
   }

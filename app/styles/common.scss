@@ -12,6 +12,29 @@ html, body {
     height: 100%;
 }
 
+// Custom scrollbars
+::-webkit-scrollbar {
+    background: rgba(255, 255, 255, 0.25);
+    height: 8px;
+    width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 1.0); }
+    85% { box-shadow: 0 0 0 20px rgba(255, 255, 255, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+}
+
+@keyframes pulse-border {
+    0% { border: 1px solid rgba(255, 255, 255, 0.1) }
+    50% { border: 1px solid rgba(255, 255, 255, 0.5) }
+    100% { border: 1px solid rgba(255, 255, 255, 0.1) }
+}
+
 .select-indicator {
     z-index: 900;
     position: absolute;
@@ -22,21 +45,10 @@ html, body {
     height: 10px;
     border: 2px solid #fff;
     border-radius: 50%;
-    pointer-events: none;
+    background-color: rgba(255, 255, 255, 0.1);
 
-    &[data-badge]:after {
-        content: attr(data-badge);
-        display: inline-block;
-        right: -10px;
-        top: -10px;
-        background-color: #fff;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        font-weight: 600;
-        font-size: 0.87em;
-        line-height: 20px;
-        text-align: center;
+    &.current {
+        animation: pulse 2s infinite;
     }
 }
 
@@ -79,8 +91,8 @@ html, body {
 
         i {
             position: absolute;
+            top: 3px;
             font-size: 16px;
-            line-height: 24px;
         }
     }
 }
@@ -120,7 +132,7 @@ html, body {
         padding: 10px 20px 8px 10px;
 
         background-color: $main-color;
-        border-bottom: 1px solid lighten($main-color, 2%);
+        border-bottom: 1px solid lighten($main-color, 5%);
 
         .hamburger, .title, .more {
             position: relative;
@@ -147,7 +159,7 @@ html, body {
                 }
 
                 &:nth-child(3) {
-                    color: #C13B00;
+                    color: $accent-color;
                 }
 
                 img {
@@ -194,20 +206,17 @@ html, body {
 
     z-index: 995;
     position: absolute;
-    top: 49px;
+    top: 50px;
     left: 0px;
 
-    height: calc(100% - 49px);
+    height: calc(100% - 50px);
     width: 200px;
 
     padding: 0 10px;
 
-    background-color: $main-color;
+    background-color: $panel-color;
     opacity: 0.9;
     transition: opacity 0.2s ease-in-out;
-    
-    border-right: 1px solid lighten($main-color, 2%);
-    border-top: 1px solid lighten($main-color, 2%);
 
     cursor: default !important;
 
@@ -258,23 +267,32 @@ html, body {
     }
 
     .title {
+        position: relative;
         padding: 10px 0;
-        color: lighten($main-color-brighter, 35%);
+        padding-left: 15px;
+        color: lighten($panel-color, 50%);
         font-weight: 500;
         font-size: 0.9em;
         line-height: 0.9em;
         text-transform: uppercase;
+
+        i {
+            position: absolute;
+            left: 0;
+            top: 10px;
+            font-size: 0.9em;
+        }
     }
 
     label {
-        color: lighten($main-color-brighter, 25%);
+        color: lighten($panel-color, 25%);
     }
 
     p.range-field {
         margin-top: 0;
         margin-bottom: 2px;
 
-         @include custom-slider($main-color-bright);
+        @include custom-slider(lighten($panel-color, 25%));
 
         &.color-range {
             @include custom-slider(linear-gradient(to right, rgba(0,0,255,0.75) 0%, rgba(0,255,255,0.75) 25%, rgba(255,255,0,0.75) 50%, rgba(255,0,0,0.75) 75%, rgba(255,0,255,0.75) 100%));
@@ -285,6 +303,172 @@ html, body {
             margin-bottom: 2px;
         }
     }
+
+    #layer-container {
+        position: relative;
+        min-height: 25px;
+
+        &:empty {
+            &::after {
+                content: "No Layers Loaded";
+                position: absolute;
+                top: 5px;
+                left: 50px;
+                color: lighten($panel-color, 5%);
+                font-size: 0.75em;
+                font-weight: bold;
+            }
+        }
+
+        .item {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            justify-content: flex-start;
+            align-content: stretch;
+            align-items: stretch;
+
+            height: 30px;
+
+            div {
+                align-self: auto;
+                order: 0;
+            }
+
+            .color {
+                width: 20px;
+                height: 20px;
+                margin: 5px;
+                margin-top: 4px;
+                margin-left: 0;
+                border-radius: 50%;
+
+                flex: 0 1 auto;
+            }
+
+            .name {
+                color: lighten($panel-color, 35%);
+                font-size: 0.9em;
+                line-height: 30px;
+
+                flex: 1 1 auto;
+            }
+
+            .checkbox-container, .radio-container {
+                flex: 0 1 auto;
+                display: inline-block; 
+                padding-top: 3px;
+
+                label {
+                    padding-left: 22px !important;
+                }
+            }
+        }
+    }
+
+    #select-container {
+        position: relative;
+
+        &:empty {
+            &::after {
+                content: "No Compounds Selected";
+                position: absolute;
+                top: 16px;
+                left: 35px;
+                color: lighten($panel-color, 5%);
+                font-size: 0.75em;
+                font-weight: bold;
+            }
+        }
+
+        .item {
+            position: relative;
+            height: 54px;
+            padding: 2px;
+            background-color: $panel-color;
+            transition: background-color 0.2s ease-in-out;
+            border: 1px solid transparent;
+
+            &:nth-child(even) {
+                background-color: lighten($panel-color, 2%);
+            }
+
+            &:hover {
+                background-color: lighten($panel-color, 5%);
+                transition: background-color 0.2s ease-in-out;
+            }
+
+            &.current {
+                animation: pulse-border 2s infinite;
+            }
+
+            .closer {
+                position: absolute;
+                display: block;
+                right: 5px;
+                top: 5px;
+                color: #bbb;
+                text-decoration: none;
+                font-weight: bold;
+                text-align: center;
+
+                &:hover {
+                    opacity: 0.75;
+                    color: #f00;
+                }
+
+                i {
+                    font-size: 1.2em;
+                }
+            }
+
+            .center {
+                position: absolute;
+                display: block;
+                right: 25px;
+                top: 5px;
+                color: #bbb;
+                text-decoration: none;
+                font-weight: bold;
+                text-align: center;
+
+                &:hover {
+                    opacity: 0.75;
+                    color: #0f0;
+                }
+
+                i {
+                    font-size: 1.2em;
+                }
+            }
+
+            .id, .idx, .size {
+                position: absolute;
+                display: block;
+                display: none;
+                left: 60px;
+                top: 3px;
+                text-decoration: none;
+                font-size: 0.9em;
+                text-align: center;
+                color: #bbb;
+
+                font-family: 'Roboto Mono', monospace;
+
+                b {
+                    color: #eee;
+                }
+            }
+
+            .id {
+                top: 19px;
+            }
+
+            .size {
+                top: 35px;
+            }
+        }
+    }  
 }
 
 
@@ -319,17 +503,21 @@ html, body {
     left: 0;
     bottom: 0;
     right: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     background-color: rgba(0, 0, 0, 0.8);
     text-align: center;
 
     #loader-inner {
         position: relative;
         display: inline-block;
-        margin-top: 20px;
         padding: 20px 20px 15px 20px;
     
-        .loading-message {
-            color: rgba(255, 255, 255, 0.75);
+        #loading-message {
+            color: lighten($panel-color, 35%);
             margin-top: 10px;
         }
     }
@@ -339,7 +527,7 @@ html, body {
  * Classes 
  */
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 .faerun-info {
@@ -425,52 +613,6 @@ html, body {
         width: 25px;
         height: 25px;
     }
-}
-
-.checkbox-container, .radio-container {
-    display: inline-block; 
-}
-
-.checkbox, .radio {
-    opacity: 0;
-    position: absolute;   
-}
-
-.checkbox, .checkbox-label, .radio, .radio-label {
-    display: inline-block;
-    vertical-align: middle;
-    margin: 5px;
-    cursor: pointer;
-}
-
-.checkbox-label, .radio-label {
-    position: relative;
-}
-
-.checkbox + .checkbox-label:before, .radio + .radio-label:before {
-    content: '';
-    display: inline-block;
-    vertical-align: middle;
-    width: 10px;
-    height: 10px;
-    padding: 2px;
-    margin-right: 10px;
-    text-align: center;
-    background-color: rgba(255, 255, 255, 0.2); 
-}
-
-.checkbox:checked + .checkbox-label:before {
-    content: '\00d7';
-    color: #fff;
-    font-size: 1.5em;
-    line-height: 10px;
-}
-
-.radio:checked + .radio-label:before {
-    content: '\00d7';
-    color: #fff;
-    font-size: 1.5em;
-    line-height: 10px;
 }
 
 .hidden-mobile {

@@ -94,7 +94,7 @@
                 <i class="material-icons left">location_searching</i>KNN Search 
             </a>
             
-            <p class="faerun-controls-header"><i class="material-icons">signal_cellular_4_bar</i><span>STATISTICS</span></p>
+            <p class="faerun-controls-header"><i class="material-icons">poll</i><span>STATISTICS</span></p>
             <p class="faerun-controls-small">Number of Compounds:&nbsp;<b id="stats-compounds" data-binding-id="statsCompounds"></b></p>
             <p class="faerun-controls-small">Number of Bins:&nbsp;<b id="stats-bins" data-binding-id="statsBins"></b></p>
             <p class="faerun-controls-small">&nbsp;</p>
@@ -145,10 +145,10 @@
         <!-- The left panel HUD -->
         <div id="faerun-panel" data-binding-id="faerunPanel" class="faerun-panel hidden-mobile"> 
             <div class="flex-item">
-                <div class="title">Hovered Bin Preview</div>
+                <div class="title"><i class="material-icons">camera</i>Hovered Bin Preview</div>
             </div>
             <div id="hover-structure" data-binding-id="hoverStructure" class="hidden-mobile flex-item">
-                <canvas id="hover-structure-drawing" data-binding-id="hoverStructureDrawing" width="190" height="190"></canvas>
+                <canvas id="hover-structure-drawing" data-binding-id="hoverStructureDrawing" width="180" height="180"></canvas>
                 <div class="hover-bin-size">
                     <i class="material-icons">info_outline</i>
                     <label>Bin Size:</label>
@@ -156,13 +156,13 @@
                 </div>
             </div>
             <div class="flex-item">
-                <div class="title">Layers</div>
+                <div class="title"><i class="material-icons">layers</i>Layers</div>
             </div>
             <div id="layers" data-binding-id="layers" class="flex-item">
                 <div id="layer-container" data-binding-id="layerContainer"></div> 
             </div>
             <div class="flex-item">
-                <div class="title">Filters</div>
+                <div class="title"><i class="material-icons">filter_list</i>Filters</div>
             </div>
             <div class="flex-item">
                 <label>Depth Cutoff</label>
@@ -177,7 +177,7 @@
                 </p>
             </div>
             <div class="flex-item">
-                <div class="title">Selected Bins</div>
+                <div class="title"><i class="material-icons">list</i>Selected Bins</div>
             </div>
             <div class="flex-item">
                 <div id="select-container" data-binding-id="selectContainer"></div> 
@@ -272,7 +272,7 @@
         <!-- Templates -->
         <script id="selected-bin-template" type="text/x-handlebars-template">
             <div id="selected-bin-item-{{layer}}-{{id}}" 
-             class="item" style="border-left: 5px solid {{color}}">
+             class="item" data-color="{{color}}">
                 <canvas id="select-structure-drawing-{{layer}}-{{id}}" width="50" height="50"></canvas>
                 <a href="#" class="closer" id="bin-closer-{{layer}}-{{id}}"><i class="material-icons">close</i></a>
                 <a href="#" class="center" data-layer="{{layer}}" data-id="{{id}}"
@@ -327,4 +327,4 @@
         </script>
     </body>
 
-</html>
+</html>        
