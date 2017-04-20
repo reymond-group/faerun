@@ -74,79 +74,85 @@ function connectSocket(callback) {
 }
 
 function socketComm(cmd, message) {
-    if (cmd === 'load:variant') {
-        // response.msg.databases[0].fingerprints[0].variants[0].id
-        ws.send(JSON.stringify({
-            cmd: 'load:variant',
-            msg: [
-                message.variantId
-            ]
-        }));
-    }
+    if (ws.readyState === 1) {
+        if (cmd === 'load:variant') {
+            // response.msg.databases[0].fingerprints[0].variants[0].id
+            ws.send(JSON.stringify({
+                cmd: 'load:variant',
+                msg: [
+                    message.variantId
+                ]
+            }));
+        }
 
-    if (cmd === 'load:stats') {
-        // response.msg.databases[0].fingerprints[0].variants[0].id
-        ws.send(JSON.stringify({
-            cmd: 'load:stats',
-            msg: [
-                message.variantId
-            ]
-        }));
-    }
+        if (cmd === 'load:stats') {
+            // response.msg.databases[0].fingerprints[0].variants[0].id
+            ws.send(JSON.stringify({
+                cmd: 'load:stats',
+                msg: [
+                    message.variantId
+                ]
+            }));
+        }
 
-    if (cmd === 'load:map') {
-        // response.msg.databases[0].fingerprints[0].variants[0].maps[0].id
-        ws.send(JSON.stringify({
-            cmd: 'load:map',
-            msg: [
-                message.mapId
-            ]
-        }));
-    }
+        if (cmd === 'load:map') {
+            // response.msg.databases[0].fingerprints[0].variants[0].maps[0].id
+            ws.send(JSON.stringify({
+                cmd: 'load:map',
+                msg: [
+                    message.mapId
+                ]
+            }));
+        }
 
-    if (cmd === 'load:binpreview') {
-        // response.msg.databases[0].id,
-        // response.msg.databases[0].fingerprints[0].variants[0].id,
-        // '654321'
-        ws.send(JSON.stringify({
-            cmd: 'load:binpreview',
-            msg: [
-                message.databaseId,
+        if (cmd === 'load:binpreview') {
+            // response.msg.databases[0].id,
+            // response.msg.databases[0].fingerprints[0].variants[0].id,
+            // '654321'
+            ws.send(JSON.stringify({
+                cmd: 'load:binpreview',
+                msg: [
+                    message.databaseId,
+                    message.fingerprintId,
+                    message.variantId,
+                    message.binIndex.toString()
+                ]
+            }));
+        }
+
+        if (cmd === 'load:bin') {
+            // response.msg.databases[0].id,
+            // response.msg.databases[0].fingerprints[0].id,
+            // response.msg.databases[0].fingerprints[0].variants[0].id,
+            // '654321'
+            ws.send(JSON.stringify({
+                cmd: 'load:bin',
+                msg: [
+                    message.databaseId,
+                    message.fingerprintId,
+                    message.variantId,
+                    message.binIndex.toString()
+                ]
+            }));
+        }
+
+        if (cmd === 'search:infos') {
+            msg = [
                 message.fingerprintId,
-                message.variantId,
-                message.binIndex.toString()
-            ]
-        }));
-    }
+                message.variantId
+            ];
 
-    if (cmd === 'load:bin') {
-        // response.msg.databases[0].id,
-        // response.msg.databases[0].fingerprints[0].id,
-        // response.msg.databases[0].fingerprints[0].variants[0].id,
-        // '654321'
-        ws.send(JSON.stringify({
-            cmd: 'load:bin',
-            msg: [
-                message.databaseId,
-                message.fingerprintId,
-                message.variantId,
-                message.binIndex.toString()
-            ]
-        }));
-    }
+            msg.append
 
-    if (cmd === 'search:infos') {
-        msg = [
-            message.fingerprintId,
-            message.variantId
-        ];
-
-        msg.append
-
-        ws.send(JSON.stringify({
-            cmd: 'search:infos',
-            msg: msg.concat(message.searchTerms)
-        }));
+            ws.send(JSON.stringify({
+                cmd: 'search:infos',
+                msg: msg.concat(message.searchTerms)
+            }));
+        }
+    } else {
+        setTimeout(function () {
+            socketComm(cmd, message);
+        }, 1000);
     }
 }
 
