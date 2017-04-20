@@ -14,13 +14,13 @@ html, body {
 
 // Custom scrollbars
 ::-webkit-scrollbar {
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(200, 200, 200, 1.0);
     height: 8px;
     width: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.5);
+    background: rgba(225, 225, 225, 1.0);
 }
 
 @keyframes pulse {
@@ -33,6 +33,42 @@ html, body {
     0% { border: 1px solid rgba(255, 255, 255, 0.1) }
     50% { border: 1px solid rgba(255, 255, 255, 0.5) }
     100% { border: 1px solid rgba(255, 255, 255, 0.1) }
+}
+
+@keyframes pulse-background-color {
+    0% { background-color: rgba(255, 255, 255, 0.05) }
+    50% { background-color: rgba(255, 255, 255, 0.1) }
+    100% { background-color: rgba(255, 255, 255, 0.05) }
+}
+
+.faerun-textarea {
+    position: absolute;
+    width: calc(100% - 20px);
+    height: calc(100% - 20px);
+    margin: 10px;
+    padding: 10px;
+    background-color: rgba(240, 240, 240, 1.0);
+    border: 0px;
+    outline-width: 0px;   
+    box-sizing: border-box;
+    font-family: 'Roboto Mono';
+
+    &:focus {
+        border: 0px;
+    }
+}
+
+.modal {
+    .title {
+        padding-left: 10px;
+        font-size: 1.6em;
+        font-weight: 400;
+        color: rgba(50, 50, 50, 1.0);
+    }
+
+    .row {
+        margin-bottom: 0;
+    }
 }
 
 .select-indicator {
@@ -395,13 +431,14 @@ html, body {
                 background-color: lighten($panel-color, 2%);
             }
 
-            &:hover {
-                background-color: lighten($panel-color, 5%);
-                transition: background-color 0.2s ease-in-out;
+            &:not(.current) {
+                &:hover {
+                    animation: pulse-background-color 2s infinite;
+                }
             }
 
             &.current {
-                animation: pulse-border 2s infinite;
+                animation: pulse-background-color 2s infinite;
             }
 
             .closer {
@@ -537,7 +574,7 @@ html, body {
     background-color: #FFDA77;
 }
 
-.flex-box {
+.flex {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
@@ -553,21 +590,10 @@ html, body {
         
         align-self: auto;
         order: 0;
+        flex: 0 1 auto;
 
-        &:nth-child(1) {
-            flex: 0 1 auto;
-        }
-
-        &:nth-child(2) {
-            flex: 0 1 auto;
-        }
-
-        &:nth-child(3) {
+        &.stretch {
             flex: 1 1 auto;
-        }
-
-        &:nth-child(4) {
-            flex: 0 1 auto;
         }
     }
 }
@@ -609,7 +635,7 @@ html, body {
     .indicator {
         position: absolute;
         
-        left: 0px;
+        right: 10px;
         top: 8px;
 
         width: 25px;

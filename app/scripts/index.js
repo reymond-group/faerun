@@ -363,8 +363,10 @@
     selectIndicators.push(indicator);
     document.body.appendChild(indicator);
 
-    item.addEventListener('mouseover', function(e) {
+    item.addEventListener('mouseenter', function(e) {
       $('.select-indicator').removeClass('current');
+      $('#select-container .item').removeClass('current');
+      $(this).addClass('current');
       $(indicator).addClass('current');
     });
 
@@ -373,8 +375,10 @@
       let scrollContainer = $('#select-container').parent();
 
       $('#select-container .item').removeClass('current');
+      $('.select-indicator').removeClass('current');
+      $(this).addClass('current');
       item.addClass('current');
-
+      
       scrollContainer.animate({scrollTop: (item.offset().top - item.offsetParent().offset().top) + 'px'}, 200);
     });
 
