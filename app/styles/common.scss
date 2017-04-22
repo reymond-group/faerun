@@ -10,17 +10,19 @@ html, body {
     user-select: none;
     overflow: hidden;
     height: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 // Custom scrollbars
 ::-webkit-scrollbar {
-    background: rgba(200, 200, 200, 1.0);
+    background: rgba(120, 120, 120, 0.25);
     height: 8px;
     width: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(225, 225, 225, 1.0);
+    background: rgba(150, 150, 150, 0.25);
 }
 
 @keyframes pulse {
@@ -89,13 +91,14 @@ html, body {
 }
 
 .side-nav {
+    box-sizing: padding-box;
     padding: 0 10px;
     background-color: rgba(22, 22, 22, 1.0);
+    height: 100% !important;
 
     .select-wrapper { 
         input.select-dropdown {
             color: rgba(255, 255, 255, 0.75);
-            background-color: rgba(255, 255, 255, 0.025);
         }
 
         .caret {
@@ -103,7 +106,19 @@ html, body {
         }
     }
 
+    .input-field.select {
+        margin-top: 26px;
+    }
+
+    .spacer {
+        height: 10px;
+    }
+
     .btn-flat {
+        width: 280px;
+        padding-left: 5px;
+        padding-right: 5px;
+        margin-left: -5px;
         color: rgba(255, 255, 255, 0.75);
 
         &:hover {
@@ -117,7 +132,8 @@ html, body {
 
     .faerun-controls-header {
         position: relative;
-        color: rgba(255, 255, 255, 0.95);
+        color: $accent-color;
+        margin-bottom: 0px;
 
         span {
             display: inline-block;
@@ -129,6 +145,47 @@ html, body {
             position: absolute;
             top: 3px;
             font-size: 16px;
+        }
+    }
+
+    .faerun-controls-small {
+        font-size: 0.75em;
+        color: #9e9e9e;
+        margin-bottom: 2px;
+        margin-top: 0px;
+
+        b {
+            color: $accent-color-alt;
+        }
+    }
+
+    .stats {
+        position: relative;
+
+        #stats-canvas {
+            position: relative;
+            border: 1px solid #111;
+            background-color: #111;
+        }
+
+        #stats-x-label, #stats-y-label {
+            position: absolute;
+            margin: 0;
+            padding: 0;
+            font-size: 0.5em;
+            color: #bbb;
+            text-transform: uppercase;
+        }
+
+        #stats-x-label {
+            top: 189px;
+            left: 105px;
+        }
+
+        #stats-y-label {
+            top: 100px;
+            left: -20px;
+            transform: rotate(-90deg);
         }
     }
 }
@@ -250,7 +307,7 @@ html, body {
     height: calc(100% - 50px);
     width: 200px;
 
-    padding: 0 10px;
+    padding: 5px 10px;
 
     background-color: $panel-color;
     opacity: 0.9;

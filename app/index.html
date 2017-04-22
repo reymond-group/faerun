@@ -42,25 +42,25 @@
         <!-- The slide-out menu -->
         <div id="slide-out" class="side-nav">
             <p class="faerun-controls-header"><i class="material-icons">open_in_browser</i><span>DATA</span></p>
-            <div class="input-field">
+            <div class="input-field select">
                 <select id="select-database" data-binding-id="selectDatabase" name="select-database"><option value=""></option></select>
                 <label for="select-database">Database</label>
             </div>
-            <div class="input-field">
+            <div class="input-field select">
                 <select id="select-fingerprint" data-binding-id="selectFingerprint" name="select-fingerprint"></select>
                 <label for="select-fingerprint">Fingerprint</label>
             </div>
-            <div class="input-field">
+            <div class="input-field select">
                 <select id="select-variant" data-binding-id="selectVariant" name="select-variant"></select>
                 <label for="select-variant">Variant</label>
             </div>
-            <div class="input-field">
+            <div class="input-field select">
                 <select id="select-map" data-binding-id="selectMap" name="select-map"></select>
                 <label for="select-map">Map</label>
             </div>
             
             <p class="faerun-controls-header"><i class="material-icons">brush</i><span>LOOK</span></p>
-            <div class="input-field">
+            <div class="input-field select">
                 <select id="select-view" data-binding-id="selectView" name="select-view">
                     <option value="free">Free View</option>
                     <option value="top">Top View</option>
@@ -82,6 +82,7 @@
             </p>
 
             <p class="faerun-controls-header" style="margin-top:18px;"><i class="material-icons">build</i><span>TOOLS</span></p>
+            <div class="spacer"></div>
             <a href="#modal-search" id="button-search" data-binding-id="buttonSearch" class="waves-effect waves-light btn-flat">
                 <i class="material-icons left">search</i>Search
             </a>
@@ -95,16 +96,16 @@
             </a>
             
             <p class="faerun-controls-header"><i class="material-icons">poll</i><span>STATISTICS</span></p>
+            <div class="spacer"></div>
             <p class="faerun-controls-small">Number of Compounds:&nbsp;<b id="stats-compounds" data-binding-id="statsCompounds"></b></p>
             <p class="faerun-controls-small">Number of Bins:&nbsp;<b id="stats-bins" data-binding-id="statsBins"></b></p>
-            <p class="faerun-controls-small">&nbsp;</p>
+            <div class="spacer"></div>
             <p class="faerun-controls-small">Bin Occupancy Histogram</p>
             <p class="faerun-controls-small">
                 Avg:&nbsp;<b id="stats-avg" data-binding-id="statsAvg"></b>&nbsp;&nbsp;Min:&nbsp;<b id="stats-min" data-binding-id="statsMin"></b>&nbsp;&nbsp;Max:&nbsp;<b id="stats-max" data-binding-id="statsMax"></b>
             </p>
-            <div style="position: relative">
-                <canvas id="stats-canvas" data-binding-id="statsCanvas"
-                    width="191" height="100"></canvas>
+            <div class="stats">
+                <canvas id="stats-canvas" data-binding-id="statsCanvas" width="280" height="200"></canvas>
                 <p id="stats-x-label">Compound Count</p>
                 <p id="stats-y-label">Number of Bins</p>
             </div>

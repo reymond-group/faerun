@@ -753,7 +753,7 @@ Faerun.drawHistogram = function (element, values, max) {
 
 
   ctx.clearRect(0, 0, width, height);
-  ctx.fillStyle = '#e040fb';
+  ctx.fillStyle = '#3299BB';
 
   max = Math.sqrt(max);
 
