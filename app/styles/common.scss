@@ -14,6 +14,11 @@ html, body {
     padding: 0;
 }
 
+::selection {
+  background: $accent-color-alt;
+  color: #eee;
+}
+
 // Custom scrollbars
 ::-webkit-scrollbar {
     background: rgba(120, 120, 120, 0.25);
@@ -397,6 +402,23 @@ html, body {
             margin-top: 2px;
             margin-bottom: 2px;
         }
+    }
+
+    p.info-title, p.info {
+        font-size: 0.75em;
+    }
+
+    p.info-title {
+        margin-bottom: 2px;
+        margin-top: 5px;
+        color: lighten($panel-color, 50%);
+    }
+
+    p.info {
+        margin: 0px;
+        color: $accent-color-alt;
+        word-wrap: break-word;
+        user-select: text;
     }
 
     #layer-container {

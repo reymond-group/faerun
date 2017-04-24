@@ -42,22 +42,7 @@
         <!-- The slide-out menu -->
         <div id="slide-out" class="side-nav">
             <p class="faerun-controls-header"><i class="material-icons">open_in_browser</i><span>DATA</span></p>
-            <div class="input-field select">
-                <select id="select-database" data-binding-id="selectDatabase" name="select-database"><option value=""></option></select>
-                <label for="select-database">Database</label>
-            </div>
-            <div class="input-field select">
-                <select id="select-fingerprint" data-binding-id="selectFingerprint" name="select-fingerprint"></select>
-                <label for="select-fingerprint">Fingerprint</label>
-            </div>
-            <div class="input-field select">
-                <select id="select-variant" data-binding-id="selectVariant" name="select-variant"></select>
-                <label for="select-variant">Variant</label>
-            </div>
-            <div class="input-field select">
-                <select id="select-map" data-binding-id="selectMap" name="select-map"></select>
-                <label for="select-map">Map</label>
-            </div>
+
             
             <p class="faerun-controls-header"><i class="material-icons">brush</i><span>LOOK</span></p>
             <div class="input-field select">
@@ -98,17 +83,6 @@
             <p class="faerun-controls-header"><i class="material-icons">poll</i><span>STATISTICS</span></p>
             <div class="spacer"></div>
             <p class="faerun-controls-small">Number of Compounds:&nbsp;<b id="stats-compounds" data-binding-id="statsCompounds"></b></p>
-            <p class="faerun-controls-small">Number of Bins:&nbsp;<b id="stats-bins" data-binding-id="statsBins"></b></p>
-            <div class="spacer"></div>
-            <p class="faerun-controls-small">Bin Occupancy Histogram</p>
-            <p class="faerun-controls-small">
-                Avg:&nbsp;<b id="stats-avg" data-binding-id="statsAvg"></b>&nbsp;&nbsp;Min:&nbsp;<b id="stats-min" data-binding-id="statsMin"></b>&nbsp;&nbsp;Max:&nbsp;<b id="stats-max" data-binding-id="statsMax"></b>
-            </p>
-            <div class="stats">
-                <canvas id="stats-canvas" data-binding-id="statsCanvas" width="280" height="200"></canvas>
-                <p id="stats-x-label">Compound Count</p>
-                <p id="stats-y-label">Number of Bins</p>
-            </div>
         </div>
         <div class="page">
             <header>
@@ -146,42 +120,28 @@
         <!-- The left panel HUD -->
         <div id="faerun-panel" data-binding-id="faerunPanel" class="faerun-panel hidden-mobile"> 
             <div class="flex-item">
-                <div class="title"><i class="material-icons">camera</i>Hovered Bin Preview</div>
+                <div class="title"><i class="material-icons">camera</i>Hovered Compound</div>
             </div>
             <div id="hover-structure" data-binding-id="hoverStructure" class="hidden-mobile flex-item">
-                <div class="hover-bin-size">
-                    <i class="material-icons">info_outline</i>
-                    <label>Bin Size:</label>
-                    <span id="hover-bin-size">-</span>
-                </div>
                 <canvas id="hover-structure-drawing" data-binding-id="hoverStructureDrawing" width="180" height="180"></canvas>
             </div>
             <div class="flex-item">
-                <div class="title"><i class="material-icons">layers</i>Layers</div>
             </div>
             <div id="layers" data-binding-id="layers" class="flex-item">
-                <div id="layer-container" data-binding-id="layerContainer"></div> 
             </div>
             <div class="flex-item">
-                <div class="title"><i class="material-icons">filter_list</i>Filters</div>
             </div>
             <div class="flex-item">
-                <label>Depth Cutoff</label>
-                <p class="range-field">
-                    <input id="slider-cutoff" data-binding-id="sliderCutoff" type="range" min="0" max="100"
-                value="0" tabindex="0">
-                </p>
-                <label>Color</label>
-                <p class="range-field color-range">
-                    <input id="slider-color" data-binding-id="sliderColor" type="range" min="0.01" max="0.98"
-                    step="0.01" value="0.01" tabindex="0">
-                </p>
             </div>
             <div class="flex-item">
-                <div class="title"><i class="material-icons">list</i>Selected Bins</div>
+                <div class="title"><i class="material-icons">info</i>Compound Info</div>
+                <p class="info-title">Databases</p>
+                <p id="info-databases" data-binding-id="infoDatabases" class="info"></p>
+                <p class="info-title">SMILES</p>
+                <p id="info-smiles" data-binding-id="infoSmiles" class="info"></p>
             </div>
             <div class="flex-item">
-                <div id="select-container" data-binding-id="selectContainer"></div> 
+                
             </div>
         </div>
 
