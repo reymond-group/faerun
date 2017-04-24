@@ -17,17 +17,10 @@
   let bindings = Faerun.getBindings();
 
   // Events
-  bindings.hudHeader.addEventListener('click', function () {
-    Faerun.toggle(bindings.hudContainer);
-    Faerun.toggleClass(bindings.hudHeaderIcon, 'rotate');
-  }, false);
-
   bindings.switchColor.addEventListener('change', function () {
     if (bindings.switchColor.checked) {
-      bindings.labelSwitchColor.innerHTML = 'Light Background';
       lore.setClearColor(Lore.Color.fromHex('#DADFE1'));
     } else {
-      bindings.labelSwitchColor.innerHTML = 'Dark Background';
       lore.setClearColor(Lore.Color.fromHex('#121212'));
     }
   }, false);
@@ -107,7 +100,7 @@
         z.push(coords.z[b]);
       }
 
-      treeHelper.setPositionsXYZHSS(x, y, z, 0.8, 0.5, 1.0);
+      treeHelper.setPositionsXYZHSS(x, y, z, 0.8, 0.25, 1.0);
     };
 
     socketWorker.onmessage = function (e) {
@@ -155,7 +148,8 @@
     if (message.binSize > 2) {
       lore = Lore.init('lore', {
         clearColor: '#121212',
-        limitRotationToHorizon: true
+        limitRotationToHorizon: true,
+        antialiasing: true
       });
 
       Faerun.initViewSelect(bindings.selectView, lore);
@@ -176,14 +170,14 @@
 
       treeWorker.postMessage(tmpArr);
 
-      pointHelper = new Lore.PointHelper(lore, 'TestGeometry', 'sphere', {
+      let pointHelper = new Lore.PointHelper(lore, 'TestGeometry', 'sphere', {
         pointScale: 10
       });
 
       pointHelper.setFogDistance(coords.scale * Math.sqrt(3) * 1.5);
-      pointHelper.setPositionsXYZHSS(coords.x, coords.y, coords.z, 0.9, 1.0, 1.0);
+      pointHelper.setPositionsXYZHSS(coords.x, coords.y, coords.z, 0.8, 1.0, 1.0);
 
-      octreeHelper = new Lore.OctreeHelper(lore, 'OctreeGeometry', 'default', pointHelper);
+      let octreeHelper = new Lore.OctreeHelper(lore, 'OctreeGeometry', 'default', pointHelper);
       octreeHelper.addEventListener('hoveredchanged', function (e) {
         if (!e.e) {
           Faerun.hide(bindings.hoverIndicator);
@@ -196,6 +190,13 @@
       octreeHelper.addEventListener('updated', function () {
         if (octreeHelper.hovered) updateHovered();
         // if (octreeHelper.selected) updateSelected();
+      });
+
+      projections.push({
+        name: 'main',
+        color: '#fff',
+        pointHelper: pointHelper,
+        octreeHelper: octreeHelper
       });
     } else {
       Faerun.removeElement(bindings.loreCell);

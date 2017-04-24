@@ -22,10 +22,8 @@
   // Events
   bindings.switchColor.addEventListener('change', function () {
     if (bindings.switchColor.checked) {
-      bindings.labelSwitchColor.innerHTML = 'Light Background';
       lore.setClearColor(Lore.Color.fromHex('#DADFE1'));
     } else {
-      bindings.labelSwitchColor.innerHTML = 'Dark Background';
       lore.setClearColor(Lore.Color.fromHex('#121212'));
     }
   }, false);

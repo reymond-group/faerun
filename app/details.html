@@ -13,7 +13,7 @@
         <!-- Add to homescreen for Safari on iOS -->
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black">
-        <meta name="apple-mobile-web-app-title" content="Material Design Lite">
+        <meta name="apple-mobile-web-app-title" content="Faerun">
         <link rel="apple-touch-icon-precomposed" href="images/ios-desktop.png">
         <!-- Tile icon for Win8 (144x144 + tile color) -->
         <meta name="msapplication-TileImage" content="images/touch/ms-touch-icon-144x144-precomposed.png">
@@ -24,261 +24,267 @@
         <link rel="canonical" href="http://www.example.com/">
         -->
         <script src="libs/socketio/socket.io-1.4.5.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
         <script src="libs/lore/lore.js"></script>
         <script src="libs/smilesDrawer/smiles-drawer.js"></script>
-        <script defer src="libs/mdl-selectified/mdl-selectified.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.4.6/dialog-polyfill.js"></script>
         <script src="libs/handlebars/handlebars-v4.0.5.js"></script>
 
-        <link rel="stylesheet" href="libs/mdl-selectified/mdl-selectified.min.css">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,400,500,700">
-        <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.deep_purple-purple.min.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.4.6/dialog-polyfill.min.css" />
+        
+        <link rel="stylesheet" href="styles/materialize/materialize.css">
         <link rel="stylesheet" href="styles/index.css">
     </head>
 
     <body>
-        <div id="faerun-layout" class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
-            <header class="faerun-header mdl-layout__header mdl-layout__header--seamed mdl-color--black mdl-color-text--grey-300">
-                <div class="mdl-layout__header-row">
-                    <span id="dataTitle" data-binding-id="dataTitle" datatitleclass="mdl-layout-title">No Data Loaded</span>
-                    <div class="mdl-layout-spacer"></div>
-                    <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="hdrbtn">
-                        <i class="material-icons">more_vert</i>
-                    </button>
-                    <ul class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu--bottom-right" for="hdrbtn">
-                        <li class="mdl-menu__item">About</li>
-                        <li class="mdl-menu__item">Contact</li>
-                        <li class="mdl-menu__item">Legal information</li>
-                    </ul>
+        <!-- The slide-out menu -->
+        <div id="slide-out" class="side-nav">
+            <p class="faerun-controls-header"><i class="material-icons">open_in_browser</i><span>DATA</span></p>
+            <div class="input-field select">
+                <select id="select-database" data-binding-id="selectDatabase" name="select-database"><option value=""></option></select>
+                <label for="select-database">Database</label>
+            </div>
+            <div class="input-field select">
+                <select id="select-fingerprint" data-binding-id="selectFingerprint" name="select-fingerprint"></select>
+                <label for="select-fingerprint">Fingerprint</label>
+            </div>
+            <div class="input-field select">
+                <select id="select-variant" data-binding-id="selectVariant" name="select-variant"></select>
+                <label for="select-variant">Variant</label>
+            </div>
+            <div class="input-field select">
+                <select id="select-map" data-binding-id="selectMap" name="select-map"></select>
+                <label for="select-map">Map</label>
+            </div>
+            
+            <p class="faerun-controls-header"><i class="material-icons">brush</i><span>LOOK</span></p>
+            <div class="input-field select">
+                <select id="select-view" data-binding-id="selectView" name="select-view">
+                    <option value="free">Free View</option>
+                    <option value="top">Top View</option>
+                    <option value="left">Left View</option>
+                    <option value="right">Right View</option>
+                    <option value="front">Front View</option>
+                    <option value="back">Back View</option>
+                </select>
+                <label for="select-view">View</label>
+            </div>
+            <p class="faerun-controls-header"><i class="material-icons">settings</i><span>SETTINGS</span></p>
+            <p>
+                <input type="checkbox" id="switch-fullscreen" data-binding-id="switchFullscreen" />
+                <label for="switch-fullscreen">Fullscreen</label>
+            </p>
+            <p>
+                <input type="checkbox" id="switch-color" data-binding-id="switchColor" />
+                <label for="switch-color">Light Background</label>
+            </p>
+
+            <p class="faerun-controls-header" style="margin-top:18px;"><i class="material-icons">build</i><span>TOOLS</span></p>
+            <div class="spacer"></div>
+            <a href="#modal-search" id="button-search" data-binding-id="buttonSearch" class="waves-effect waves-light btn-flat">
+                <i class="material-icons left">search</i>Search
+            </a>
+            <br />
+            <a href="#modal-project" id="button-project" data-binding-id="buttonProject" class="waves-effect waves-light btn-flat">
+                <i class="material-icons left">bubble_chart</i>Project
+            </a>
+            <br />
+            <a href="#" id="button-knn" data-binding-id="buttonKNN" class="waves-effect waves-light btn-flat">
+                <i class="material-icons left">location_searching</i>KNN Search 
+            </a>
+            
+            <p class="faerun-controls-header"><i class="material-icons">poll</i><span>STATISTICS</span></p>
+            <div class="spacer"></div>
+            <p class="faerun-controls-small">Number of Compounds:&nbsp;<b id="stats-compounds" data-binding-id="statsCompounds"></b></p>
+            <p class="faerun-controls-small">Number of Bins:&nbsp;<b id="stats-bins" data-binding-id="statsBins"></b></p>
+            <div class="spacer"></div>
+            <p class="faerun-controls-small">Bin Occupancy Histogram</p>
+            <p class="faerun-controls-small">
+                Avg:&nbsp;<b id="stats-avg" data-binding-id="statsAvg"></b>&nbsp;&nbsp;Min:&nbsp;<b id="stats-min" data-binding-id="statsMin"></b>&nbsp;&nbsp;Max:&nbsp;<b id="stats-max" data-binding-id="statsMax"></b>
+            </p>
+            <div class="stats">
+                <canvas id="stats-canvas" data-binding-id="statsCanvas" width="280" height="200"></canvas>
+                <p id="stats-x-label">Compound Count</p>
+                <p id="stats-y-label">Number of Bins</p>
+            </div>
+        </div>
+        <div class="page">
+            <header>
+                <div class="title">
+                    <span><img src="images/logo.png" />FAERUN</span>
+                    <span>&nbsp;</span>
+                    <span id="data-title" data-binding-id="dataTitle">No Data Loaded</span>
+                </div>
+                <div class="more">
+                </div>
+                <div class="hamburger">
+                    <a href="#" data-activates="slide-out" class="button-toggle-nav white-text"><i class="material-icons">menu</i></a>
                 </div>
             </header>
-            <div id="faerun-drawer" class="mdl-layout__drawer mdl-color--purple-900 mdl-color-text--white">
-                <header>
-                    <p class="faerun-title"><img src="images/logo.png" />FAERUN</p>
-                </header>
-                <div id="faerun-controls" class="mdl-color--grey-900 mdl-color-text--white">
-                    <p class="faerun-controls-header"><i class="material-icons">open_in_browser</i>DATA</p>
-                    <div class="mdl-selectfield mdl-js-selectfield mdl-selectfield--floating-label">
-                        <select id="select-database" data-binding-id="selectDatabase" name="select-database" class="mdl-selectfield__select"><option value=""></option></select>
-                        <label class="mdl-selectfield__label" for="select-database">Database</label>
-                    </div>
-                    <div class="mdl-selectfield mdl-js-selectfield mdl-selectfield--floating-label">
-                        <select id="select-fingerprint" data-binding-id="selectFingerprint" name="select-fingerprint" class="mdl-selectfield__select"></select>
-                        <label class="mdl-selectfield__label" for="select-fingerprint">Fingerprint</label>
-                    </div>
-                    <div class="mdl-selectfield mdl-js-selectfield mdl-selectfield--floating-label">
-                        <select id="select-variant" data-binding-id="selectVariant" name="select-variant" class="mdl-selectfield__select"></select>
-                        <label class="mdl-selectfield__label" for="select-variant">Variant</label>
-                    </div>
-                    <div class="mdl-selectfield mdl-js-selectfield mdl-selectfield--floating-label">
-                        <select id="select-map" data-binding-id="selectMap" name="select-map" class="mdl-selectfield__select"></select>
-                        <label class="mdl-selectfield__label" for="select-map">Map</label>
-                    </div>
-                    
-                    <p class="faerun-controls-header"><i class="material-icons">brush</i>LOOK</p>
-                    <div class="mdl-selectfield mdl-js-selectfield mdl-selectfield--floating-label">
-                        <select id="select-view" data-binding-id="selectView" name="select-view" class="mdl-selectfield__select">
-                            <option value="free">Free View</option>
-                            <option value="top">Top View</option>
-                            <option value="left">Left View</option>
-                            <option value="right">Right View</option>
-                            <option value="front">Front View</option>
-                            <option value="back">Back View</option>
-                        </select>
-                        <label class="mdl-selectfield__label" for="select-view">View</label>
-                    </div>
-                    <p class="faerun-controls-header"><i class="material-icons">settings</i>SETTINGS</p>
-                    <span class="spacer"></span>
-                    <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-fullscreen">
-                        <input type="checkbox" id="switch-fullscreen" data-binding-id="switchFullscreen" class="mdl-switch__input">
-                        <span class="mdl-switch__label">Fullscreen</span>
-                    </label>
-                    <div class="switch-separator"></div>
-                    <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-color">
-                        <input type="checkbox" id="switch-color" data-binding-id="switchColor" class="mdl-switch__input">
-                        <span id="label-switch-color" data-binding-id="labelSwitchColor" class="mdl-switch__label">Dark Background</span>
-                    </label>
-                    
-                    <p class="faerun-controls-header" style="margin-top:18px;"><i class="material-icons">build</i>TOOLS</p>
-                    <a href="#" id="button-search" data-binding-id="buttonSearch" class="faerun-controls-button">
-                        <i class="material-icons">search</i>Search
-                    </a>
-                    <a href="#" id="button-project" data-binding-id="buttonProject" class="faerun-controls-button">
-                        <i class="material-icons">bubble_chart</i>Project
-                    </a>
-                    <a href="#" id="button-knn" data-binding-id="buttonKNN" class="faerun-controls-button">
-                        <i class="material-icons">location_searching</i>KNN Search 
-                    </a>
-                    
-                    <p class="faerun-controls-header">STATISTICS</p>
-                    <p class="faerun-controls-small">Number of Compounds:&nbsp;<b id="stats-compounds" data-binding-id="statsCompounds"></b></p>
-                    <p class="faerun-controls-small">Number of Bins:&nbsp;<b id="stats-bins" data-binding-id="statsBins"></b></p>
-                    <p class="faerun-controls-small">&nbsp;</p>
-                    <p class="faerun-controls-small">Bin Occupancy Histogram</p>
-                    <p class="faerun-controls-small">
-                        Avg:&nbsp;<b id="stats-avg" data-binding-id="statsAvg"></b>&nbsp;&nbsp;Min:&nbsp;<b id="stats-min" data-binding-id="statsMin"></b>&nbsp;&nbsp;Max:&nbsp;<b id="stats-max" data-binding-id="statsMax"></b>
-                    </p>
-                    <div style="position: relative">
-                        <canvas id="stats-canvas" data-binding-id="statsCanvas"
-                            width="191" height="100"></canvas>
-                        <p id="stats-x-label">Compound Count</p>
-                        <p id="stats-y-label">Number of Bins</p>
-                    </div>
-                    <br />
-                </div>
-            </div>
-
-            <main id="main" data-binding-id="main" class="mdl-layout__content mdl-color--grey-900">
+            <main>
+                <!-- The 3D canvas -->
                 <canvas id="lore" data-binding-id="lore"></canvas>
-                <div id="loader" data-binding-id="loader" class="hidden">
-                    <div id="loader-inner" data-binding-id="loaderInner">
-                        <div class="mdl-spinner mdl-js-spinner is-active"></div>
-                        <div id="loading-message" data-binding-id="loadingMessage" class="loader-message"></div>
-                    </div>
-                </div>
-                <span id="hover-indicator" data-binding-id="hoverIndicator" class="hidden"></span>
-                
-                <div id="faerun-panel" data-binding-id="faerunPanel" class="hidden-mobile"> 
-                    <div class="flex-item">
-                        <div class="title">Hovered Bin Preview</div>
-                    </div>
-                    <div id="hover-structure" data-binding-id="hoverStructure" class="hidden-mobile flex-item">
-                        <canvas id="hover-structure-drawing" data-binding-id="hoverStructureDrawing" width="290" height="290"></canvas>
-                        <div class="hover-bin-size">
-                            <i class="material-icons">info_outline</i>
-                            <label>Bin Size:</label>
-                            <span id="hover-bin-size">-</span>
-                        </div>
-                    </div>
-                    <div class="flex-item">
-                        <div class="title">Layers</div>
-                    </div>
-                    <div id="layers" data-binding-id="layers" class="flex-item">
-                        <div id="layer-container" data-binding-id="layerContainer"></div> 
-                    </div>
-                    <div class="flex-item">
-                        <div class="title">Selected Bins</div>
-                    </div>
-                    <div class="flex-item">
-                        <div id="select-container" data-binding-id="selectContainer"></div> 
-                    </div>
-                </div>
-
-                <div id="hud-container" data-binding-id="hudContainer" class="hidden-n">
-                    <div id="hud-header" data-binding-id="hudHeader" class="mdl-color-text--white">
-                        <span id="hud-header-text">Filters & Touch Controls</span>
-                        <i id="hud-header-icon" data-binding-id="hudHeaderIcon" class="material-icons">keyboard_arrow_down</i>
-                    </div>
-                    <label>Depth Cutoff</label>
-                    <input id="slider-cutoff" data-binding-id="sliderCutoff" class="mdl-slider mdl-js-slider" type="range" min="0" max="100"
-                    value="0" tabindex="0">
-                    <span class="spacer"></span>
-                    <label>Color</label>
-                    <div class="slider-color-container">
-                        <input id="slider-color" data-binding-id="sliderColor" class="mdl-slider mdl-js-slider" type="range" min="0.01" max="0.98"
-                        step="0.01" value="0.01" tabindex="0">
-                    </div>
-                    <span class="spacer"></span>
-                    <div style="text-align:center">
-                        <button id="button-recenter" data-binding-id="buttonRecenter" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab">
-                            <i class="material-icons">all_out</i>
-                        </button>
-                        <button id="button-zoomin" data-binding-id="buttonZoomIn" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab">
-                            <i class="material-icons">zoom_in</i>
-                        </button>
-                        <button id="button-zoomout" data-binding-id="buttonZoomOut" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab">
-                            <i class="material-icons">zoom_out</i>
-                        </button>
-                        <button id="button-toggle-select" data-binding-id="buttonToggleSelect" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab">
-                            <i class="material-icons">touch_app</i>
-                        </button>
-                        <button id="button-select-hovered" data-binding-id="buttonSelectHovered" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab">
-                            <i class="material-icons">add</i>
-                        </button>
-                    </div>
-                </div>
             </main>
-
-            <!-- Toasts -->
-            <div id="toast-error" data-binding-id="toastError" class="mdl-js-snackbar mdl-snackbar">
-                <div class="mdl-snackbar__text"></div>
-                <button class="mdl-snackbar__action" type="button"></button>
-            </div>
-
-            <!-- Dialogs -->
-            <dialog id="dialog-search" data-binding-id="dialogSearch" class="mdl-dialog">
-                <div class="flex-box">
-                    <h4 class="mdl-dialog__title flex-item"><i class="material-icons">search</i>&nbsp;Search Compounds</h4>
-                    <div class="mdl-dialog__subtitle flex-item">
-                        <p class="faerun-info">You may enter one search query per line. A search query might include the ID, the SMILES or the fingerprint of
-                            a compound. Each query can return multiple matches. The search is case-sensitive (ABC is not equal to abc).</p>
-                    </div>
-                    <div class="mdl-dialog__content flex-item">
-                        <textarea id="textarea-search" data-binding-id="textareaSearch" type="text"></textarea>
-                    </div>
-                    <div class="mdl-dialog__actions flex-item">
-                        <button id="button-exec-search" data-binding-id="buttonExecSearch" type="button" class="mdl-button">Search</button>
-                        <button type="button" class="mdl-button close">Cancel</button>
-                    </div>
-                </div>
-            </dialog>
-
-            <dialog id="dialog-project" data-binding-id="dialogProject" class="mdl-dialog">
-                <div class="flex-box">
-                    <h4 class="mdl-dialog__title flex-item"><i class="material-icons">bubble_chart</i>&nbsp;Project Compounds</h4>
-                    <div class="mdl-dialog__subtitle flex-item">
-                        <p class="faerun-info">You may enter one compund per line. A compound has to be a valid SMILES string.</p>
-                        <div id="colorpicker-dialog-project" data-binding-id="colorpickerDialogProject" class="colorpicker-container">
-                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                                <input class="mdl-textfield__input" type="text" id="colorpicker-dialog-project-input" data-binding-id="colorpickerDialogProjectInput">
-                                <label class="mdl-textfield__label" for="sample1">Pick Color ...</label>
-                            </div>
-                        </div>
-                        <div class="name-container">
-                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                                <input class="mdl-textfield__input" type="text" id="name-dialog-project-input" data-binding-id="nameDialogProjectInput">
-                                <label class="mdl-textfield__label" for="nameDialogProjectInput">Name</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mdl-dialog__content flex-item">
-                        <textarea id="textarea-project" data-binding-id="textareaProject" type="text" autofocus="autofocus"></textarea>
-                    </div>
-                    <div class="mdl-dialog__actions flex-item">
-                        <button id="button-exec-project" data-binding-id="buttonExecProject" type="button" class="mdl-button">Project</button>
-                        <button type="button" class="mdl-button close">Cancel</button>
-                    </div>
-                </div>
-            </dialog>
-
-            <dialog id="dialog-knn" data-binding-id="dialogKNN" class="mdl-dialog">
-                <div class="flex-box">
-                    <h4 class="mdl-dialog__title flex-item"><i class="material-icons">location_searching</i>&nbsp;K-Nearest-Neighbour Search</h4>
-                    <div class="mdl-dialog__subtitle flex-item">
-                        <p class="faerun-info">Use this tool to search the k closest neighbours in the loaded database for each data point in the selected layer.</p>
-                    </div>
-                    <div class="mdl-dialog__content flex-item">
-                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                            <input class="mdl-textfield__input" type="text" pattern="-?[0-9]*(\.[0-9]+)?" id="kKNN" data-binding-id="kKNN">
-                            <label class="mdl-textfield__label" for="kKNN">Number of Neighbours (k)</label>
-                            <span class="mdl-textfield__error">Input is not a number!</span>
-                        </div>
-                    </div>
-                    <div class="mdl-dialog__actions flex-item">
-                        <button id="button-exec-knn" data-binding-id="buttonExecKNN" type="button" class="mdl-button">Search</button>
-                        <button type="button" class="mdl-button close">Cancel</button>
-                    </div>
-                </div>
-            </dialog>
         </div>
+
+        <!-- Mobile Options -->
+        <div class="fixed-action-btn">
+            <a class="btn-floating btn-large">
+                <i class="large material-icons">toys</i>
+            </a>
+            <ul>
+                <li><a id="button-recenter" data-binding-id="buttonRecenter" class="waves-effect waves-light btn-floating"><i class="material-icons">all_out</i></a></li>
+                <li><a id="button-zoomin" data-binding-id="buttonZoomIn" class="waves-effect waves-light btn-floating"><i class="material-icons">zoom_in</i></a></li>
+                <li><a id="button-zoomout" data-binding-id="buttonZoomOut" class="waves-effect waves-light btn-floating"><i class="material-icons">zoom_out</i></a></li>
+                <li><a id="button-toggle-select" data-binding-id="buttonToggleSelect" class="waves-effect waves-light btn-floating"><i class="material-icons">touch_app</i></a></li>
+                <li><a id="button-select-hovered" data-binding-id="buttonSelectHovered" class="waves-effect waves-light btn-floating"><i class="material-icons">add</i></a></li>
+            </ul>
+        </div>
+
+        <!-- The left panel HUD -->
+        <div id="faerun-panel" data-binding-id="faerunPanel" class="faerun-panel hidden-mobile"> 
+            <div class="flex-item">
+                <div class="title"><i class="material-icons">camera</i>Hovered Bin Preview</div>
+            </div>
+            <div id="hover-structure" data-binding-id="hoverStructure" class="hidden-mobile flex-item">
+                <div class="hover-bin-size">
+                    <i class="material-icons">info_outline</i>
+                    <label>Bin Size:</label>
+                    <span id="hover-bin-size">-</span>
+                </div>
+                <canvas id="hover-structure-drawing" data-binding-id="hoverStructureDrawing" width="180" height="180"></canvas>
+            </div>
+            <div class="flex-item">
+                <div class="title"><i class="material-icons">layers</i>Layers</div>
+            </div>
+            <div id="layers" data-binding-id="layers" class="flex-item">
+                <div id="layer-container" data-binding-id="layerContainer"></div> 
+            </div>
+            <div class="flex-item">
+                <div class="title"><i class="material-icons">filter_list</i>Filters</div>
+            </div>
+            <div class="flex-item">
+                <label>Depth Cutoff</label>
+                <p class="range-field">
+                    <input id="slider-cutoff" data-binding-id="sliderCutoff" type="range" min="0" max="100"
+                value="0" tabindex="0">
+                </p>
+                <label>Color</label>
+                <p class="range-field color-range">
+                    <input id="slider-color" data-binding-id="sliderColor" type="range" min="0.01" max="0.98"
+                    step="0.01" value="0.01" tabindex="0">
+                </p>
+            </div>
+            <div class="flex-item">
+                <div class="title"><i class="material-icons">list</i>Selected Bins</div>
+            </div>
+            <div class="flex-item">
+                <div id="select-container" data-binding-id="selectContainer"></div> 
+            </div>
+        </div>
+
+        <!-- The loader that is shown when data is transferred -->
+        <div id="loader" data-binding-id="loader" class="hidden">
+            <div id="loader-inner">
+                <p id="loading-message" data-binding-id="loadingMessage"></p>
+                <div class="progress">
+                    <div class="indeterminate" style="width:200px"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data overlays -->
+        <span id="hover-indicator" data-binding-id="hoverIndicator" class="hidden"></span>
+
+        <!-- Toasts -->
+        <div id="toast-error" data-binding-id="toastError" class="mdl-js-snackbar mdl-snackbar">
+            <div class="mdl-snackbar__text"></div>
+            <button class="mdl-snackbar__action" type="button"></button>
+        </div>
+
+        <!-- Dialogs -->
+        <div id="modal-search" class="modal modal-fixed-footer">
+            <div class="modal-content">
+                <h4 class="flex-item"><i class="material-icons">search</i>&nbsp;Search Compounds</h4>
+                <div class="flex-item">
+                    <p class="faerun-info">You may enter one search query per line. A search query might include the ID, the SMILES or the fingerprint of
+                        a compound. Each query can return multiple matches. The search is case-sensitive (ABC is not equal to abc).</p>
+                </div>
+                <div class="flex-item">
+                    <textarea id="textarea-search" data-binding-id="textareaSearch" type="text"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#!" id="button-exec-search" data-binding-id="buttonExecSearch" class="modal-action modal-close waves-effect waves-green btn-flat">Search</a>
+                <a href="#!" class="modal-action modal-close waves-effect waves-red btn-flat ">Cancel</a>
+            </div>
+        </div>
+
+        <div id="modal-project" class="modal modal-fixed-footer" style="height:90%;max-height:90%">
+            <div class="modal-content flex">
+                <div class="title flex-item">Project Compounds</div>
+                <div class="flex-item">
+                    <div class="row">
+                        <div class="col s12">
+                            <p class="faerun-info">
+                                You may enter one compound per line. A compound has to be a valid SMILES string.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div id="colorpicker-dialog-project" data-binding-id="colorpickerDialogProject" class="colorpicker-container input-field col s6">
+                            <input type="text" id="colorpicker-dialog-project-input" data-binding-id="colorpickerDialogProjectInput">
+                            <label for="colorpicker-dialog-project-input">Pick Color ...</label>
+                        </div>
+                        <div class="name-container input-field col s6">
+                            <input type="text" id="name-dialog-project-input" data-binding-id="nameDialogProjectInput">
+                            <label for="nameDialogProjectInput">Name</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-item">
+                    <div class="row">
+                        <div class="col s12">
+                            <label for="textarea-project">SMILES to be projected</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-item stretch">
+                    <textarea id="textarea-project" data-binding-id="textareaProject" class="faerun-textarea" autofocus="autofocus"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#!" id="button-exec-project" data-binding-id="buttonExecProject" class="modal-action modal-close waves-effect waves-green btn-flat">Project</a>
+                <a href="#!" class="modal-action modal-close waves-effect waves-red btn-flat ">Cancel</a>
+            </div>
+        </div>
+
+        <dialog id="dialog-knn" data-binding-id="dialogKNN" class="mdl-dialog">
+            <div class="flex-box">
+                <h4 class="mdl-dialog__title flex-item"><i class="material-icons">location_searching</i>&nbsp;K-Nearest-Neighbour Search</h4>
+                <div class="mdl-dialog__subtitle flex-item">
+                    <p class="faerun-info">Use this tool to search the k closest neighbours in the loaded database for each data point in the selected layer.</p>
+                </div>
+                <div class="mdl-dialog__content flex-item">
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                        <input class="mdl-textfield__input" type="text" pattern="-?[0-9]*(\.[0-9]+)?" id="kKNN" data-binding-id="kKNN">
+                        <label class="mdl-textfield__label" for="kKNN">Number of Neighbours (k)</label>
+                        <span class="mdl-textfield__error">Input is not a number!</span>
+                    </div>
+                </div>
+                <div class="mdl-dialog__actions flex-item">
+                    <button id="button-exec-knn" data-binding-id="buttonExecKNN" type="button" class="mdl-button">Search</button>
+                    <button type="button" class="mdl-button close">Cancel</button>
+                </div>
+            </div>
+        </dialog>
 
         <!-- Templates -->
         <script id="selected-bin-template" type="text/x-handlebars-template">
             <div id="selected-bin-item-{{layer}}-{{id}}" 
-             class="item" style="border-left: 5px solid {{color}}">
+             class="item" data-color="{{color}}">
                 <canvas id="select-structure-drawing-{{layer}}-{{id}}" width="50" height="50"></canvas>
                 <a href="#" class="closer" id="bin-closer-{{layer}}-{{id}}"><i class="material-icons">close</i></a>
                 <a href="#" class="center" data-layer="{{layer}}" data-id="{{id}}"
@@ -310,11 +316,32 @@
             </div>
         </script>
 
-        <script src="https://code.getmdl.io/1.2.1/material.min.js"></script>
         <script src="config.js"></script>
         <script src="scripts/jsonp.js"></script>
         <script src="scripts/common.js"></script>
         <script src="scripts/details.js"></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js"></script>
+        <script>
+            // Initialization stuff for materialize.css
+            (function($){
+                $(function(){
+                    $('.button-toggle-nav').sideNav({
+                        menuWidth: 300,
+                        edge: 'right',
+                        closeOnClick: true,
+                        draggable: true
+                    });
+
+                    $('select').material_select();
+
+                    $('.modal').modal({
+                        startingTop: '2%',
+                        endingTop: '5%'
+                    });
+                });
+            })(jQuery);
+        </script>
     </body>
 
-</html>
+</html>        
