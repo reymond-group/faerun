@@ -539,7 +539,7 @@ Faerun.initViewSelect = function (selectElement, lore) {
     if (val === 'front') lore.controls.setFrontView();
     if (val === 'back') lore.controls.setBackView();
   });
-}
+};
 
 Faerun.initColorpicker = function (element, colors) {
   var input = element.getElementsByTagName('input')[0];
