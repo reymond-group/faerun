@@ -91,7 +91,7 @@
                 <i class="material-icons left">bubble_chart</i>Project
             </a>
             <br />
-            <a href="#" id="button-knn" data-binding-id="buttonKNN" class="waves-effect waves-light btn-flat">
+            <a href="#modal-knn" id="button-knn" data-binding-id="buttonKNN" class="waves-effect waves-light btn-flat">
                 <i class="material-icons left">location_searching</i>KNN Search 
             </a>
             
@@ -224,7 +224,7 @@
 
         <div id="modal-project" class="modal modal-fixed-footer" style="height:90%;max-height:90%">
             <div class="modal-content flex">
-                <div class="title flex-item">Project Compounds</div>
+                <div class="title flex-item">Project Coaaampounds</div>
                 <div class="flex-item">
                     <div class="row">
                         <div class="col s12">
@@ -261,25 +261,26 @@
             </div>
         </div>
 
-        <dialog id="dialog-knn" data-binding-id="dialogKNN" class="mdl-dialog">
-            <div class="flex-box">
-                <h4 class="mdl-dialog__title flex-item"><i class="material-icons">location_searching</i>&nbsp;K-Nearest-Neighbour Search</h4>
-                <div class="mdl-dialog__subtitle flex-item">
+        <div id="modal-knn" class="modal modal-fixed-footer">
+            <div class="modal-content">
+                <h4 class="flex-item"><i class="material-icons">location_searching</i>&nbsp;K-Nearest-Neighbour Search</h4>
+                <div class="flex-item">
                     <p class="faerun-info">Use this tool to search the k closest neighbours in the loaded database for each data point in the selected layer.</p>
                 </div>
-                <div class="mdl-dialog__content flex-item">
-                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                        <input class="mdl-textfield__input" type="text" pattern="-?[0-9]*(\.[0-9]+)?" id="kKNN" data-binding-id="kKNN">
-                        <label class="mdl-textfield__label" for="kKNN">Number of Neighbours (k)</label>
-                        <span class="mdl-textfield__error">Input is not a number!</span>
+                <div class="flex-item">
+                    <div class="row">
+                        <div class="name-container input-field col 12">
+                            <input type="text" id="kKNN" data-binding-id="kKNN" class="validate">
+                            <label for="kKNN">Number of Neighbours (k)</label>
+                        </div>
                     </div>
                 </div>
-                <div class="mdl-dialog__actions flex-item">
-                    <button id="button-exec-knn" data-binding-id="buttonExecKNN" type="button" class="mdl-button">Search</button>
-                    <button type="button" class="mdl-button close">Cancel</button>
-                </div>
             </div>
-        </dialog>
+            <div class="modal-footer">
+                <a href="#!" id="button-exec-knn" data-binding-id="buttonExecKNN" class="modal-action modal-close waves-effect waves-green btn-flat">Search</a>
+                <a href="#!" class="modal-action modal-close waves-effect waves-red btn-flat ">Cancel</a>
+            </div>
+        </div>
 
         <!-- Templates -->
         <script id="selected-bin-template" type="text/x-handlebars-template">

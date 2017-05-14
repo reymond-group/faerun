@@ -650,7 +650,7 @@ html, body {
 
 .faerun-info {
     padding: 10px;
-    background-color: #FFDA77;
+    background-color: $info-color;
 }
 
 .flex {
@@ -728,3 +728,15 @@ html, body {
     }
 }
 
+// Materialize toast position
+#toast-container {
+  top: 50px;
+  right: 10px;
+  bottom:  auto !important;
+  left:  auto !important;  
+}
+
+// Materialize toast classes
+.toast-error {
+    background-color: $error-color;
+}

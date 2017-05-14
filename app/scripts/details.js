@@ -134,6 +134,8 @@
     idsData = message.ids;
     fpsData = message.fps;
 
+    console.log(message);
+
     lore = Lore.init('lore', {
       clearColor: '#121212',
       limitRotationToHorizon: true,

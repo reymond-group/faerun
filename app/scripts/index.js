@@ -114,6 +114,7 @@
       bindings.toastError.MaterialSnackbar.showSnackbar({
         message: 'Please select a variant before searching ...'
       });
+      
       return;
     }
 
@@ -123,6 +124,7 @@
       bindings.toastError.MaterialSnackbar.showSnackbar({
         message: 'Please enter at least one query ...'
       });
+
       return;
     }
 
@@ -135,40 +137,23 @@
       }
     });
 
-    bindings.dialogSearch.close();
     bindings.loadingMessage.innerHTML = 'Searching ...';
     Faerun.show(bindings.loader);
   });
 
   // Project
   bindings.buttonExecProject.addEventListener('click', function () {
+    bindings.loadingMessage.innerHTML = 'Projecting ...';
+    Faerun.hide(bindings.loader);
+
     project();
 
-    bindings.dialogProject.close();
-    bindings.loadingMessage.innerHTML = 'Projecting ...';
-    Faerun.show(bindings.loader);
+    Faerun.hide(bindings.loader);
   });
 
   // KNN
-  if (!bindings.dialogKNN.showModal) {
-    dialogPolyfill.registerDialog(bindings.dialogKNN);
-  }
-
-  bindings.buttonKNN.addEventListener('click', function () {
-    bindings.dialogKNN.showModal();
-  });
-
-  bindings.dialogKNN.querySelector('.close').addEventListener('click', function () {
-    bindings.dialogKNN.close();
-  });
-
   bindings.buttonExecKNN.addEventListener('click', function () {
     knn();
-    bindings.dialogProject.close();
-  });
-
-  bindings.buttonKNN.addEventListener('click', function () {
-
   });
 
   /**
@@ -288,6 +273,7 @@
    *
    * @param {Number} idx - The index for the selected element
    * @param {Number} id - The id of the bin / point
+   * @param {Number} layer - A layer id.
    */
   function createSelected(idx, id, layer) {
     let selected = projections[0].octreeHelper.selected[idx];
@@ -322,6 +308,7 @@
     item.addEventListener('click', function (e) {
       let nCompounds = parseFloat(document.getElementById('select-bin-size-0-' + id).innerHTML);
       let indices = id;
+
       if (nCompounds < 10) {
         let nearestNeighbours = binKnn(id, 26);
 
@@ -330,9 +317,10 @@
         }
       }
 
-      window.open('details.html?binIndex=' + indices + '&databaseId=' + currentDatabase.id +
-        '&fingerprintId=' + currentFingerprint.id + '&variantId=' +
-        currentVariant.id, '_blank');
+      window.open('details.html?binIndex=' + indices +
+                  '&databaseId=' + currentDatabase.id +
+                  '&fingerprintId=' + currentFingerprint.id +
+                  '&variantId=' + currentVariant.id, '_blank');
     });
 
     closer.addEventListener('click', function (e) {
@@ -358,6 +346,7 @@
     indicator.setAttribute('data-item', item.getAttribute('id'));
 
     let pointSize = projections[0].pointHelper.getPointSize();
+
     selectIndicators.push(indicator);
     document.body.appendChild(indicator);
 
@@ -376,7 +365,6 @@
       $('.select-indicator').removeClass('current');
       $(this).addClass('current');
       item.addClass('current');
-      
       scrollContainer.animate({scrollTop: (item.offset().top - item.offsetParent().offset().top) + 'px'}, 200);
     });
 
@@ -416,6 +404,8 @@
 
   /**
    * Update the hover indicators.
+   *
+   * @param {Number} layer - A layer ID.
    */
   function updateHovered(layer) {
     layer = layer || 0;
@@ -494,6 +484,7 @@
 
 
     let ph = new Lore.PointHelper(lore, 'TestGeometry', 'sphere');
+
     ph.setFogDistance(currentVariant.resolution * Math.sqrt(3) + 250);
     ph.setPositionsXYZHSS(message.data[0], message.data[1], message.data[2], 0.6, 1.0, 1.0);
     ph.addFilter('hueRange', new Lore.InRangeFilter('color', 0, 0.22, 0.25));
@@ -680,9 +671,7 @@
 
   function project() {
     if (!currentVariant) {
-      bindings.toastError.MaterialSnackbar.showSnackbar({
-        message: 'Please select a variant before projecting ...'
-      });
+      Materialize.toast('Projection failed: No variant selected.', 5000, 'toast-error');
       return;
     }
 
@@ -692,9 +681,7 @@
     let fingerprintSmiles = [];
 
     if (smilesData.length < 1 || smilesData[0] === '') {
-      bindings.toastError.MaterialSnackbar.showSnackbar({
-        message: 'Please enter at least one molecule in SMILES form ...'
-      });
+      Materialize.toast('Projection failed: No SMILES were provided.', 5000, 'toast-error');
       return;
     }
 
@@ -704,7 +691,7 @@
     // Split smiles into chunks to not overload the fingerprint server
     let chunks = [];
 
-    let chunkSize = 250;
+    let chunkSize = 25;
     for (let i = 0, j = smilesData.length; i < j; i += chunkSize) {
       chunks.push(smilesData.slice(i, i + chunkSize));
     }
@@ -717,20 +704,26 @@
 
     let loadChunk = function (callback) {
       let chunk = chunks[chunkIndex];
+      let done = 0;
 
       for (let i = 0; i < chunk.length; i++) {
         chunk[i] = chunk[i].trim();
-        if (chunk[i] === '') continue;
+
+        if (chunk[i] === '') {
+          continue;
+        }
 
         let url = Faerun.format(baseUrl, [encodeURIComponent(chunk[i])]);
-        let done = 0;
 
         Faerun.loadFingerprint(url, function (fpRaw, smi) {
           let fp = fpRaw.split(';');
 
           // Something is wrong when the fp is of length 1
           if (fp.length > 1) {
-            for (let j = 0; j < fp.length; j++) fp[j] = parseInt(fp[j]);
+            for (let j = 0; j < fp.length; j++) {
+              fp[j] = parseInt(fp[j], 10);
+            }
+
             fingerprints.push(fp);
             fingerprintSmiles.push(smi);
           }
@@ -747,9 +740,7 @@
               data: fingerprints
             }, function (projections) {
               if (!projections.success) {
-                bindings.toastError.MaterialSnackbar.showSnackbar({
-                  message: 'Oops, something went wrong, please try projecting again ...'
-                });
+                Materialize.toast('Projection failed: Unknown server error.', 5000, 'toast-error');
                 return;
               }
 
