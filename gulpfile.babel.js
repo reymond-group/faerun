@@ -39,7 +39,7 @@ const reload = browserSync.reload;
 
 // Lint JavaScript
 gulp.task('lint', () =>
-  gulp.src(['app/scripts/**/*.js','!node_modules/**'])
+  gulp.src(['app/scripts/**/*.js', '!node_modules/**'])
     .pipe($.eslint())
     .pipe($.eslint.format())
     .pipe($.if(!browserSync.active, $.eslint.failAfterError()))
@@ -82,6 +82,12 @@ gulp.task('copyscripts', () =>
   ]).pipe(gulp.dest('dist/scripts'))
 );
 
+// Copy the fonts
+gulp.task('copyfonts', () =>
+  gulp.src([
+    'app/styles/fonts/roboto/*'
+  ]).pipe(gulp.dest('dist/styles/fonts/roboto'))
+);
 
 // Compile and automatically prefix stylesheets
 gulp.task('styles', () => {
@@ -248,7 +254,7 @@ gulp.task('default', ['clean'], cb =>
 gulp.task('nolint', ['clean'], cb =>
   runSequence(
     'styles',
-    ['html', 'scripts', 'images', 'copy', 'copylibs', 'copyscripts'],
+    ['html', 'scripts', 'images', 'copy', 'copylibs', 'copyscripts', 'copyfonts'],
     'generate-service-worker',
     cb
   )

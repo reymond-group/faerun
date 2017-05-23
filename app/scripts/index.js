@@ -312,8 +312,8 @@
       if (nCompounds < 10) {
         let nearestNeighbours = binKnn(id, 26);
 
-        for (const index of nearestNeighbours) {
-          indices += ',' + index;
+        for (var i = 1; i < nearestNeighbours.length; i++) {
+          indices += ',' + nearestNeighbours[i];
         }
       }
 

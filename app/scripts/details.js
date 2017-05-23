@@ -2,7 +2,6 @@
   // Globals
   let lore = null;
   let smilesDrawer = null;
-  let smallSmilesDrawer = null;
   let coordinatesHelper = null;
   let config = null;
   let coords = [];
@@ -11,7 +10,9 @@
   let fpsData = [];
   let sourceInfos = {};
   let sources = {};
+  let databaseLinks = {};
   let schemblIdToId = {};
+  let idToSchemblId = {};
   let center = null;
   let projections = [];
   let selectIndicators = [];
@@ -148,8 +149,16 @@
     var cs = Faerun.updateCoordinatesHelper(lore, coords.scale);
     coordinatesHelper = cs.helper;
 
+    // Add a bit of randomness to the coords to resolve overlaps
+    for (var i = 0; i < coords.x.length; i++) {
+      coords.x[i] += (Math.random() - 0.5) * 10;
+      coords.y[i] += (Math.random() - 0.5) * 10;
+      coords.z[i] += (Math.random() - 0.5) * 10;
+    }
+
     // The tree
     var tmpArr = [];
+
     for (var i = 0; i < coords.x.length; i++) {
       tmpArr.push([coords.x[i], coords.y[i], coords.z[i]]);
     }
@@ -161,7 +170,14 @@
     });
 
     pointHelper.setFogDistance(coords.scale * Math.sqrt(3) * 1.5);
-    pointHelper.setPositionsXYZHSS(coords.x, coords.y, coords.z, 0.8, 1.0, 1.0);
+    pointHelper.setPositionsXYZHSS(coords.x, coords.y, coords.z, 0.8, 0.3, 1.0);
+
+    let firstBinIndex = parseInt(params.binIndex.split(',')[0], 10);
+    for (var i = 0; i < coords.x.length; i++) {
+      if (message.binIndices[i] === firstBinIndex) {
+        pointHelper.updateColor(i, new Lore.Color(0.8, 1.0, 1.0));
+      }
+    }
 
     let octreeHelper = new Lore.OctreeHelper(lore, 'OctreeGeometry', 'default', pointHelper);
 
@@ -207,7 +223,7 @@
   function initMoleculeList() {
     let length = smilesData.length;
 
-    for (let i = 0; i < smilesData.length; i++) {
+    for (var i = 0; i < smilesData.length; i++) {
       let smile = smilesData[i].trim();
       let schemblIds = idsData[i].trim();
 
@@ -217,13 +233,14 @@
       let structureViewId = 'structure-view' + i;
 
       schemblIdToId[schemblId] = i;
+      idToSchemblId[i] = schemblId;
       sources[schemblId] = [];
 
       JSONP.get(Faerun.schemblIdsUrl(schemblId), function (data) {
         // Recover schembl id
         let id = '';
 
-        for (let k = 0; k < data.length; k++) {
+        for (var k = 0; k < data.length; k++) {
           if (parseInt(data[k].src_id, 10) === 15) {
             id = data[k].src_compound_id;
             break;
@@ -232,7 +249,7 @@
 
         let items = [];
 
-        for (let k = 0; k < data.length; k++) {
+        for (var k = 0; k < data.length; k++) {
           let srcId = data[k].src_id;
           let srcInfo = sourceInfos[srcId];
 
@@ -243,6 +260,8 @@
             url: srcInfo.base_id_url + data[k].src_compound_id
           });
         }
+
+        databaseLinks[id] = items;
 
         if (--length === 0) {
           // Hide loader here, since this is the closest to fully
@@ -375,12 +394,23 @@
     let index = projections[layer].octreeHelper.hovered.index;
     let smiles = smilesData[index];
     let data = SmilesDrawer.parse(smiles);
+    let schemblId = idToSchemblId[index];
 
     smilesDrawer.draw(data, 'hover-structure-drawing', 'dark');
 
     bindings.infoSmiles.innerHTML = smiles;
 
-    bindings.infoDatabases.innerHtml = '';
-    
+    $(bindings.infoDatabases).empty();
+
+    let databases = databaseLinks[schemblId];
+
+    for (var database of databases) {
+      let a = document.createElement('a');
+
+      a.innerHTML = database.name;
+      a.setAttribute('href', database.url);
+
+      bindings.infoDatabases.appendChild(a);
+    }
   }
 })();

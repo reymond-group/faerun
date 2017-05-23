@@ -65,6 +65,7 @@ Faerun.csvToArray = function (str, dataTypes) {
 
   for (i = 0; i < lines.length; i++) {
     var values = lines[i].split(',');
+
     for (var j = 0; j < values.length; j++) {
       if (Faerun.isTypeFloat(dataTypes[j]))
         arrays[j][i] = parseFloat(values[j]);

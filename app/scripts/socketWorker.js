@@ -226,6 +226,7 @@ function onLoadBin(data) {
             ids: data.ids,
             fps: data.fps,
             coordinates: data.coordinates,
+            binIndices: data.binIndices,
             index: parseInt(data.index, 10),
             binSize: parseInt(data.binSize, 10)
         }

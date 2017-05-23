@@ -419,6 +419,10 @@ html, body {
         color: $accent-color-alt;
         word-wrap: break-word;
         user-select: text;
+
+        a {
+            display: block;
+        }
     }
 
     #layer-container {
