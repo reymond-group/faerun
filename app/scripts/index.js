@@ -114,7 +114,7 @@
       bindings.toastError.MaterialSnackbar.showSnackbar({
         message: 'Please select a variant before searching ...'
       });
-      
+
       return;
     }
 
@@ -265,6 +265,11 @@
    */
   function addProjection(projection) {
     projections.push(projection);
+    updateLayers();
+  }
+
+  function setMainProjection(projection) {
+    projections[0] = projection;
     updateLayers();
   }
 
@@ -481,9 +486,7 @@
     center = cs.center;
     coordinatesHelper = cs.helper;
 
-
-
-    let ph = new Lore.PointHelper(lore, 'TestGeometry', 'sphere');
+    let ph = new Lore.PointHelper(lore, 'MainGeometry', 'sphere');
 
     ph.setFogDistance(currentVariant.resolution * Math.sqrt(3) + 250);
     ph.setPositionsXYZHSS(message.data[0], message.data[1], message.data[2], 0.6, 1.0, 1.0);
@@ -496,10 +499,12 @@
     oh.addEventListener('hoveredchanged', function (e) {
       if (currentLayer !== 0) return;
 
-      if (!e.e) {
+      if (!e.e || projections[currentLayer].octreeHelper.hovered === null) {
         Faerun.hide(bindings.hoverIndicator);
         return;
       }
+
+      console.log('called', e.e.index);
 
       updateHovered();
 
@@ -545,7 +550,7 @@
       }
     });
 
-    addProjection({
+    setMainProjection({
       name: currentDatabase.name,
       color: '#fff',
       pointHelper: ph,
