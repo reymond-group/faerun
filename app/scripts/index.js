@@ -269,6 +269,10 @@
   }
 
   function setMainProjection(projection) {
+    if (projections[0]) {
+      projections[0].pointHelper.destruct();
+    }
+
     projections[0] = projection;
     updateLayers();
   }
@@ -363,8 +367,8 @@
     });
 
     indicator.addEventListener('mouseenter', function(e) {
-      let item = $('#' + $(this).attr('data-item'));
-      let scrollContainer = $('#select-container').parent();
+      var item = $('#' + $(this).attr('data-item'));
+      var scrollContainer = $('#select-container').parent();
 
       $('#select-container .item').removeClass('current');
       $('.select-indicator').removeClass('current');
@@ -556,6 +560,8 @@
       pointHelper: ph,
       octreeHelper: oh
     });
+
+    console.log(lore);
 
     bindings.dataTitle.innerHTML = currentDatabase.name;
     bindings.selectDatabase.parentElement.style.pointerEvents = 'auto';
