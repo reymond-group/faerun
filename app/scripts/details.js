@@ -21,6 +21,7 @@
   let treeWorker = new Worker('libs/kmst/kmst-worker.js');
   let socketWorker = new Worker('scripts/socketWorker.js');
   let params = Faerun.parseUrlParams();
+  let binColor = params.hue ? parseFloat(params.hue, 10) : 0.8;
 
   let bindings = Faerun.getBindings();
 
@@ -63,7 +64,6 @@
   // Socket.IO communication
   document.addEventListener('DOMContentLoaded', function (event) {
     Faerun.initFullscreenSwitch(bindings.switchFullscreen);
-    console.log('params');
     smilesDrawer = new SmilesDrawer();
 
     // Show the loader from the beginning until everything is loaded
@@ -135,8 +135,6 @@
     idsData = message.ids;
     fpsData = message.fps;
 
-    console.log(message);
-
     lore = Lore.init('lore', {
       clearColor: '#121212',
       limitRotationToHorizon: true,
@@ -146,7 +144,7 @@
     Faerun.initViewSelect(bindings.selectView, lore);
 
     // Setup the coordinate system
-    var cs = Faerun.updateCoordinatesHelper(lore, coords.scale);
+    var cs = Faerun.updateCoordinatesHelper(lore, coords.scale, 0, true, false);
     coordinatesHelper = cs.helper;
 
     // Add a bit of randomness to the coords to resolve overlaps
@@ -170,12 +168,12 @@
     });
 
     pointHelper.setFogDistance(coords.scale * Math.sqrt(3) * 1.5);
-    pointHelper.setPositionsXYZHSS(coords.x, coords.y, coords.z, 0.8, 0.3, 1.0);
+    pointHelper.setPositionsXYZHSS(coords.x, coords.y, coords.z, binColor, 0.3, 1.0);
 
     let firstBinIndex = parseInt(params.binIndex.split(',')[0], 10);
     for (var i = 0; i < coords.x.length; i++) {
       if (message.binIndices[i] === firstBinIndex) {
-        pointHelper.updateColor(i, new Lore.Color(0.8, 1.0, 1.0));
+        pointHelper.updateColor(i, new Lore.Color(binColor, 1.0, 1.0));
       }
     }
 
@@ -191,8 +189,9 @@
     });
 
     octreeHelper.addEventListener('updated', function () {
-      if (octreeHelper.hovered) updateHovered();
-      // if (octreeHelper.selected) updateSelected();
+      if (octreeHelper.hovered) {
+        updateHovered();
+      }
     });
 
     projections.push({
@@ -202,17 +201,36 @@
       octreeHelper: octreeHelper
     });
 
-    JSONP.get(Faerun.sourceIdsUrl, function (srcIds) {
-      let length = srcIds.length;
+    $.ajax({
+      url: Faerun.sourceIdsUrl,
+      jsonp: 'callback',
+      dataType: 'jsonp',
+      data: {},
+      success: function(response) {
+        JSONP.get(Faerun.sourceIdsUrl, function (srcIds) {
+          let length = srcIds.length;
 
-      for (let i = 0; i < srcIds.length; i++) {
-        JSONP.get(Faerun.sourceInformationUrl(srcIds[i].src_id), function (sourceData) {
-          sourceInfos[sourceData[0].src_id] = sourceData[0];
-          if (--length === 0) {
-            bindings.loadingMessage.innerHTML = 'Loading remote info ...';
-            initMoleculeList();
+          for (let i = 0; i < srcIds.length; i++) {
+            $.ajax({
+              url: Faerun.sourceInformationUrl(srcIds[i].src_id),
+              jsonp: 'callback',
+              dataType: 'jsonp',
+              data: {},
+              success: function(response) {
+                sourceInfos[response[0].src_id] = response[0];
+              },
+              complete: function() {
+                if (--length === 0) {
+                  bindings.loadingMessage.innerHTML = 'Loading remote info ...';
+                  initMoleculeList();
+                }
+              }
+            });
           }
         });
+      },
+      error: function() {
+
       }
     });
   }
@@ -236,37 +254,44 @@
       idToSchemblId[i] = schemblId;
       sources[schemblId] = [];
 
-      JSONP.get(Faerun.schemblIdsUrl(schemblId), function (data) {
-        // Recover schembl id
-        let id = '';
+      $.ajax({
+        url: Faerun.schemblIdsUrl(schemblId),
+        jsonp: 'callback',
+        dataType: 'jsonp',
+        data: {},
+        success: function(response) {
+          // Recover schembl id
+          let id = '';
 
-        for (var k = 0; k < data.length; k++) {
-          if (parseInt(data[k].src_id, 10) === 15) {
-            id = data[k].src_compound_id;
-            break;
+          for (var k = 0; k < response.length; k++) {
+            if (parseInt(response[k].src_id, 10) === 15) {
+              id = response[k].src_compound_id;
+              break;
+            }
           }
-        }
 
-        let items = [];
+          let items = [];
 
-        for (var k = 0; k < data.length; k++) {
-          let srcId = data[k].src_id;
-          let srcInfo = sourceInfos[srcId];
+          for (var k = 0; k < response.length; k++) {
+            let srcId = response[k].src_id;
+            let srcInfo = sourceInfos[srcId];
 
-          sources[id].push(srcId);
-          items.push({
-            id: data[k].src_compound_id,
-            name: srcInfo.name_label,
-            url: srcInfo.base_id_url + data[k].src_compound_id
-          });
-        }
+            sources[id].push(srcId);
+            items.push({
+              id: response[k].src_compound_id,
+              name: srcInfo.name_label,
+              url: srcInfo.base_id_url + response[k].src_compound_id
+            });
+          }
 
-        databaseLinks[id] = items;
-
-        if (--length === 0) {
-          // Hide loader here, since this is the closest to fully
-          // loaded we get :-)
-          Faerun.hide(bindings.loader);
+          databaseLinks[id] = items;
+        },
+        complete: function() {
+          if (--length === 0) {
+            // Hide loader here, since this is the closest to fully
+            // loaded we get :-)
+            Faerun.hide(bindings.loader);
+          }
         }
       });
     }

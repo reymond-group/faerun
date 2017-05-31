@@ -593,30 +593,6 @@ Lore.Renderer = function () {
         value: function getDevicePixelRatio() {
             return window.devicePixelRatio || 1;
         }
-
-        /* not working right now */
-
-    }, {
-        key: 'reset',
-        value: function reset() {
-            var center = this.controls.getLookAt().clone();
-            var radius = this.controls.radius;
-
-            // This is a very, very ugly hack. However, it's not done often so its fine for now.
-            // TODO: In OctreeHelpers, upon deleting it, remove the event listeners
-            //       from the controls.
-
-            var canvasClone = this.canvas.cloneNode(true);
-            this.parent.replaceChild(this.canvas, canvasClone);
-
-            // Delete stuff to prevent memory leaks due to event handlers in canvas.
-            delete this.controls;
-            this.controls = new Lore.OrbitalControls(this, radius, center);
-
-            Object.keys(this.geometries).forEach(function (key) {
-                delete this.geometries[key];
-            });
-        }
     }]);
 
     return Renderer;
@@ -2016,8 +1992,16 @@ Lore.ControlsBase = function () {
     }, {
         key: 'removeEventListener',
         value: function removeEventListener(eventName, callback) {
+            console.log('remove event listener called');
+
             if (!this._eventListeners.hasOwnProperty(eventName)) {
                 return;
+            }
+
+            console.log('removing event listeners ...');
+
+            for (var i = 0; i < this._eventListeners[eventName].length; i++) {
+                console.log(eventName, this._eventListeners[eventName][i], callback, this._eventListeners[eventName] == callback);
             }
 
             var index = this._eventListeners[eventName].indexOf(callback);
@@ -2085,20 +2069,6 @@ Lore.ControlsBase = function () {
     }, {
         key: 'update',
         value: function update(e, source) {
-            return this;
-        }
-
-        /**
-         * Removes all event listeners.
-         * 
-         * @returns {Lore.ControlsBase} Itself.
-         */
-
-    }, {
-        key: 'resetEventListeners',
-        value: function resetEventListeners() {
-            this._eventListeners = {};
-
             return this;
         }
     }]);

@@ -413,7 +413,7 @@ Faerun.getBindings = function () {
  * @param {Number} size - The size of the x, y and z coordinate axis
  * @return {any} Retruns an object containing the center (.center) of the CoordinatesHelper and the CoordiantesHelper itself (.helper)
  */
-Faerun.updateCoordinatesHelper = function (lore, size) {
+Faerun.updateCoordinatesHelper = function (lore, size, ticks = 10, box = true, y = true) {
   var coordinatesHelper = new Lore.CoordinatesHelper(lore, 'Coordinates', 'coordinates', {
     position: new Lore.Vector3f(0, 0, 0),
     axis: {
@@ -421,7 +421,7 @@ Faerun.updateCoordinatesHelper = function (lore, size) {
         length: size
       },
       y: {
-        length: size
+        length: y ? size : 0
       },
       z: {
         length: size
@@ -429,17 +429,17 @@ Faerun.updateCoordinatesHelper = function (lore, size) {
     },
     ticks: {
       x: {
-        length: 10
+        length: ticks
       },
       y: {
-        length: 10
+        length: ticks
       },
       z: {
-        length: 10
+        length: ticks
       }
     },
     box: {
-      enabled: true
+      enabled: box
     }
   });
 
@@ -589,7 +589,7 @@ Faerun.initColorpicker = function (element, colors) {
   input.addEventListener('keyup', function (e) {
     indicator.style.backgroundColor = Faerun.hex2rgb(this.value, true);
   });
-}
+};
 
 Faerun.addEventListeners = function (eventNames, element, callback) {
   var names = eventNames.split(' ');

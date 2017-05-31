@@ -509,6 +509,7 @@ html, body {
             background-color: $panel-color;
             transition: background-color 0.2s ease-in-out;
             border: 1px solid transparent;
+            margin-bottom: 5px;
 
             &:nth-child(even) {
                 background-color: lighten($panel-color, 2%);
@@ -547,8 +548,8 @@ html, body {
             .center {
                 position: absolute;
                 display: block;
-                right: 25px;
-                top: 5px;
+                right: 5px;
+                top: 25px;
                 color: #bbb;
                 text-decoration: none;
                 font-weight: bold;
@@ -564,14 +565,13 @@ html, body {
                 }
             }
 
-            .id, .idx, .size {
+            .size {
                 position: absolute;
                 display: block;
-                display: none;
                 left: 60px;
-                top: 3px;
+                top: 5px;
                 text-decoration: none;
-                font-size: 0.9em;
+                font-size: 0.75em;
                 text-align: center;
                 color: #bbb;
 
@@ -580,14 +580,6 @@ html, body {
                 b {
                     color: #eee;
                 }
-            }
-
-            .id {
-                top: 19px;
-            }
-
-            .size {
-                top: 35px;
             }
         }
     }  

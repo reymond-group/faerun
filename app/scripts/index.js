@@ -212,6 +212,11 @@
       loadStats(0);
       loadVariant(0);
     }
+
+    // Also clear maps
+    Faerun.removeChildren(bindings.selectMap);
+    Faerun.appendOption(bindings.selectMap, null, 'Select a map');
+    $(bindings.selectMap).material_select();
   }
 
   /**
@@ -270,7 +275,7 @@
 
   function setMainProjection(projection) {
     if (projections[0]) {
-      projections[0].pointHelper.destruct();
+      projections[0].octreeHelper.destruct();
     }
 
     projections[0] = projection;
@@ -297,6 +302,7 @@
       id: id,
       idx: idx,
       layer: layer,
+      hue: hue,
       color: 'rgba(' + rgb[0] + ', ' + rgb[1] + ', ' + rgb[2] + ', 0.5)'
     });
 
@@ -329,7 +335,8 @@
       window.open('details.html?binIndex=' + indices +
                   '&databaseId=' + currentDatabase.id +
                   '&fingerprintId=' + currentFingerprint.id +
-                  '&variantId=' + currentVariant.id, '_blank');
+                  '&variantId=' + currentVariant.id +
+                  '&hue=' + item.getAttribute('data-hue'), '_blank');
     });
 
     closer.addEventListener('click', function (e) {
@@ -508,8 +515,6 @@
         return;
       }
 
-      console.log('called', e.e.index);
-
       updateHovered();
 
       socketWorker.postMessage({
@@ -601,6 +606,9 @@
     // Unblock the select elements after loading
     Faerun.unblockElements(bindings.selectDatabase.parentElement, bindings.selectFingerprint.parentElement,
       bindings.selectVariant.parentElement, bindings.selectMap.parentElement);
+
+    // Hide the sidenav once the map is loaded
+    $('.button-toggle-nav').sideNav('hide');
   }
 
   /**
@@ -615,10 +623,10 @@
       // Smiles are only loaded from 0 layer (the one loaded from the server)
       target = 'select-structure-drawing-0-' + message.index;
       selectSmiles['0-' + message.index] = message.smiles;
-      document.getElementById('select-bin-size-0-' + message.index).innerHTML = message.binSize;
+      $('#select-bin-size-0-' + message.index).html(message.binSize);
       sd = smallSmilesDrawer;
     } else {
-      document.getElementById('hover-bin-size').innerHTML = message.binSize;
+      $('#hover-bin-size').html(message.binSize);
     }
 
     let data = SmilesDrawer.parse(message.smiles);
