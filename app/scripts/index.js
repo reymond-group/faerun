@@ -314,16 +314,20 @@
     selectCanvas[layer + '-' + id] = structure;
 
     Faerun.hover(item, function () {
-      let data = SmilesDrawer.parse(selectSmiles[layer + '-' + id]);
-      smilesDrawer.draw(data, 'hover-structure-drawing', 'dark');
+      SmilesDrawer.parse(selectSmiles[layer + '-' + id], function(tree) {
+        smilesDrawer.draw(tree, 'hover-structure-drawing', 'dark');
+      });
+
+      document.getElementById('hover-bin-size').innerHTML = document.getElementById('select-bin-size-0-' + id).innerHTML;
     }, function () {
       Faerun.clearCanvas('hover-structure-drawing');
+      document.getElementById('hover-bin-size').innerHTML = '-';
     });
 
     item.addEventListener('click', function (e) {
-      let nCompounds = parseFloat(document.getElementById('select-bin-size-0-' + id).innerHTML);
       let indices = id;
 
+      let nCompounds = parseFloat(document.getElementById('select-bin-size-0-' + id).innerHTML);
       if (nCompounds < 10) {
         let nearestNeighbours = binKnn(id, 26);
 
@@ -447,8 +451,8 @@
       clearColor: '#121212'
     });
 
-    smilesDrawer = new SmilesDrawer({bondLength: 20});
-    smallSmilesDrawer = new SmilesDrawer({atomVisualization: 'balls'});
+    smilesDrawer = new SmilesDrawer.Drawer({width: 180, height: 180});
+    smallSmilesDrawer = new SmilesDrawer.Drawer({width: 48, height: 48, atomVisualization: 'balls'});
 
     Faerun.initFullscreenSwitch(bindings.switchFullscreen);
     Faerun.initViewSelect(bindings.selectView, lore);
@@ -629,8 +633,9 @@
       $('#hover-bin-size').html(message.binSize);
     }
 
-    let data = SmilesDrawer.parse(message.smiles);
-    sd.draw(data, target, 'dark');
+    SmilesDrawer.parse(message.smiles, function(tree) {
+      sd.draw(tree, target, 'dark');
+    });
   }
 
   function onInfosSearched(message) {
@@ -802,8 +807,10 @@
         }
 
         let target = 'hover-structure-drawing';
-        var data = SmilesDrawer.parse(projections[layer].smiles[e.e.index]);
-        smilesDrawer.draw(data, target, 'dark');
+
+        SmilesDrawer.parse(projections[layer].smiles[e.e.index], function(tree) {
+          smilesDrawer.draw(tree, target, 'dark');
+        });
 
         updateHovered(layer);
       });

@@ -64,7 +64,7 @@
   // Socket.IO communication
   document.addEventListener('DOMContentLoaded', function (event) {
     Faerun.initFullscreenSwitch(bindings.switchFullscreen);
-    smilesDrawer = new SmilesDrawer();
+    smilesDrawer = new SmilesDrawer.Drawer({width: 180, height: 180});
 
     // Show the loader from the beginning until everything is loaded
     bindings.loadingMessage.innerHTML = 'Loading geometry ...';
@@ -298,9 +298,9 @@
 
     Faerun.hover(item, function () {
       let smiles = selectSmiles[layer + '-' + id];
-      let data = SmilesDrawer.parse(smiles);
-
-      smilesDrawer.draw(data, 'hover-structure-drawing', 'dark');
+      SmilesDrawer.parse(smiles, function(tree) {
+        smilesDrawer.draw(tree, 'hover-structure-drawing', 'dark');
+      });
     }, function () {
       Faerun.clearCanvas('hover-structure-drawing');
     });
@@ -388,10 +388,11 @@
 
     let index = projections[layer].octreeHelper.hovered.index;
     let smiles = smilesData[index];
-    let data = SmilesDrawer.parse(smiles);
     let schemblId = idToSchemblId[index];
 
-    smilesDrawer.draw(data, 'hover-structure-drawing', 'dark');
+    SmilesDrawer.parse(smiles, function(tree) {
+      smilesDrawer.draw(tree, 'hover-structure-drawing', 'dark');
+    });
 
     bindings.infoSmiles.innerHTML = smiles;
 
