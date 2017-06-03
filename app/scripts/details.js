@@ -72,7 +72,7 @@
 
     treeWorker.onmessage = function (e) {
       treeHelper = new Lore.TreeHelper(lore, 'TreeGeometry', 'tree');
-      treeHelper.setFogDistance(coords.scale * Math.sqrt(3) * 1.5);
+      treeHelper.setFogDistance(0, coords.scale * Math.sqrt(3));
       var x = new Array(e.data.length * 2);
       var y = new Array(e.data.length * 2);
       var z = new Array(e.data.length * 2);
@@ -90,7 +90,7 @@
         z.push(coords.z[b]);
       }
 
-      treeHelper.setPositionsXYZHSS(x, y, z, 0.8, 0.25, 1.0);
+      treeHelper.setPositionsXYZHSS(x, y, z, binColor, 0.25, 1.0);
     };
 
     socketWorker.onmessage = function (e) {
@@ -167,7 +167,7 @@
       pointScale: 10
     });
 
-    pointHelper.setFogDistance(coords.scale * Math.sqrt(3) * 1.5);
+    pointHelper.setFogDistance(0, coords.scale * Math.sqrt(3));
     pointHelper.setPositionsXYZHSS(coords.x, coords.y, coords.z, binColor, 0.3, 1.0);
 
     let firstBinIndex = parseInt(params.binIndex.split(',')[0], 10);
@@ -201,38 +201,8 @@
       octreeHelper: octreeHelper
     });
 
-    $.ajax({
-      url: Faerun.sourceIdsUrl,
-      jsonp: 'callback',
-      dataType: 'jsonp',
-      data: {},
-      success: function(response) {
-        JSONP.get(Faerun.sourceIdsUrl, function (srcIds) {
-          let length = srcIds.length;
-
-          for (let i = 0; i < srcIds.length; i++) {
-            $.ajax({
-              url: Faerun.sourceInformationUrl(srcIds[i].src_id),
-              jsonp: 'callback',
-              dataType: 'jsonp',
-              data: {},
-              success: function(response) {
-                sourceInfos[response[0].src_id] = response[0];
-              },
-              complete: function() {
-                if (--length === 0) {
-                  bindings.loadingMessage.innerHTML = 'Loading remote info ...';
-                  initMoleculeList();
-                }
-              }
-            });
-          }
-        });
-      },
-      error: function() {
-
-      }
-    });
+    bindings.loadingMessage.innerHTML = 'Loading remote info ...';
+    initMoleculeList();
   }
 
   /**
@@ -274,7 +244,7 @@
 
           for (var k = 0; k < response.length; k++) {
             let srcId = response[k].src_id;
-            let srcInfo = sourceInfos[srcId];
+            let srcInfo = FaerunConfig.schembl.sources[srcId];
 
             sources[id].push(srcId);
             items.push({
@@ -429,13 +399,20 @@
 
     let databases = databaseLinks[schemblId];
 
-    for (var database of databases) {
-      let a = document.createElement('a');
+    if (databases) {
+      for (var database of databases) {
+        let a = document.createElement('a');
 
-      a.innerHTML = database.name;
-      a.setAttribute('href', database.url);
+        a.innerHTML = database.name;
+        a.setAttribute('href', database.url);
 
-      bindings.infoDatabases.appendChild(a);
+        bindings.infoDatabases.appendChild(a);
+      }
+    } else {
+      let info = document.createElement('p');
+
+      info.classList.add('info');
+      info.innerHTML('Could not load remote info for ' + schemblId);
     }
   }
 })();

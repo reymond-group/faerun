@@ -499,7 +499,7 @@
 
     let ph = new Lore.PointHelper(lore, 'MainGeometry', 'sphere');
 
-    ph.setFogDistance(currentVariant.resolution * Math.sqrt(3) + 250);
+    ph.setFogDistance(0, currentVariant.resolution * Math.sqrt(3));
     ph.setPositionsXYZHSS(message.data[0], message.data[1], message.data[2], 0.6, 1.0, 1.0);
     ph.addFilter('hueRange', new Lore.InRangeFilter('color', 0, 0.22, 0.25));
 
@@ -786,7 +786,7 @@
 
     loadChunk(function () {
       let ph = new Lore.PointHelper(lore, 'ProjectionGeometry' + projections.length, 'defaultAnimated');
-      ph.setFogDistance(currentVariant.resolution * Math.sqrt(3) + 500);
+      ph.setFogDistance(0, currentVariant.resolution * Math.sqrt(3));
       ph.setPositionsXYZHSS(x, y, z, hsl.h, hsl.s, 1.0);
 
       let oh = new Lore.OctreeHelper(lore, 'ProjectionOctreeGeometry' + projections.length, 'default', ph);

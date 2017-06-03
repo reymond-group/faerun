@@ -530,7 +530,7 @@ Faerun.initFullscreenSwitch = function (switchElement) {
 };
 
 Faerun.initViewSelect = function (selectElement, lore) {
-  selectElement.addEventListener('change', function () {
+  $(selectElement).on('change', function () {
     var val = selectElement.value;
 
     if (val === 'free') lore.controls.setFreeView();
