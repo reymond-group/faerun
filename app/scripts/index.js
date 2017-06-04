@@ -729,21 +729,19 @@
     let loadChunk = function (callback) {
       let chunk = chunks[chunkIndex];
       let done = 0;
+      let smis = '';
 
       for (let i = 0; i < chunk.length; i++) {
-        chunk[i] = chunk[i].trim();
+        smis += chunk[i].trim() + ';';
+      }
 
-        if (chunk[i] === '') {
-          continue;
-        }
+      smis = smis.substring(0, smis.length - 1);
 
-        console.log(chunk[i]);
+      let url = Faerun.format(baseUrl, [encodeURIComponent('dummy')]);
 
-        let url = Faerun.format(baseUrl, [encodeURIComponent(chunk[i])]);
-
-        Faerun.loadFingerprint(url, function (fpRaw, smi) {
-          console.log(fpRaw, smi);
-          let fp = fpRaw.split(';');
+      Faerun.loadFingerprint(url.split('?')[0], baseUrl.split('=')[2], smis, function (fpsRaw, smi) {
+        for (var i = 0; i < fpsRaw.length; i++) {
+          let fp = fpsRaw[i].split(';');
 
           // Something is wrong when the fp is of length 1
           if (fp.length > 1) {
@@ -752,48 +750,43 @@
             }
 
             fingerprints.push(fp);
-            fingerprintSmiles.push(smi);
+            fingerprintSmiles.push(smi[i]);
+          }
+        }
+
+        Faerun.loadProjection(FaerunConfig.services.pcaUrl, {
+          database: currentDatabase.id,
+          fingerprint: fingerprintId,
+          dimensions: 3,
+          binning: true,
+          resolution: currentVariant.resolution,
+          data: fingerprints
+        }, function (projections) {
+          if (!projections.success) {
+            Materialize.toast('Projection failed: Unknown server error.', 5000, 'toast-error');
+            return;
           }
 
-          done++;
+          let data = projections.data;
 
-          if (done === chunk.length) {
-            Faerun.loadProjection(FaerunConfig.services.pcaUrl, {
-              database: currentDatabase.id,
-              fingerprint: fingerprintId,
-              dimensions: 3,
-              binning: true,
-              resolution: currentVariant.resolution,
-              data: fingerprints
-            }, function (projections) {
-              if (!projections.success) {
-                Materialize.toast('Projection failed: Unknown server error.', 5000, 'toast-error');
-                return;
-              }
-
-              let data = projections.data;
-
-              for (let j = 0; j < data.length; j++) {
-                x.push(data[j][0]);
-                y.push(data[j][1]);
-                z.push(data[j][2]);
-              }
-
-              // To the next chunk
-              bindings.loadingMessage.innerHTML = 'Projecting chunk ' + (chunkIndex + 1) + ' of ' + chunks.length + ' ...';
-              if (chunkIndex < chunks.length - 1) {
-                chunkIndex++;
-                loadChunk(callback);
-              } else
-                callback();
-            });
+          for (let j = 0; j < data.length; j++) {
+            x.push(data[j][0]);
+            y.push(data[j][1]);
+            z.push(data[j][2]);
           }
+
+          // To the next chunk
+          bindings.loadingMessage.innerHTML = 'Projecting chunk ' + (chunkIndex + 1) + ' of ' + chunks.length + ' ...';
+          if (chunkIndex < chunks.length - 1) {
+            chunkIndex++;
+            loadChunk(callback);
+          } else
+            callback();
         });
-      }
+      });
     };
 
     loadChunk(function () {
-      console.log(x, y, z);
       let ph = new Lore.PointHelper(lore, 'ProjectionGeometry' + projections.length, 'defaultAnimated');
       ph.setFogDistance(0, currentVariant.resolution * Math.sqrt(3));
       ph.setPositionsXYZHSS(x, y, z, hsl.h, hsl.s, 1.0);

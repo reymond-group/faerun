@@ -616,24 +616,27 @@ Faerun.unblockElements = function () {
 
 Faerun.format = function (str, args) {
   return str.replace(/{(\d+)}/g, function (match, number) {
-    return !(typeof args[number] === 'undefined') ?
+    return (typeof args[number] !== 'undefined') ?
       args[number] :
       match;
   });
 };
 
-Faerun.loadFingerprint = function (url, callback) {
-  var xhr = new XMLHttpRequest();
+Faerun.loadFingerprint = function (url, fp, smi, callback) {
+  $.post(url, {fp: fp, smi: smi}, function(response) {
+    let data = response.split('|');
+    let smis = [];
+    let fps = [];
 
-  xhr.onreadystatechange = function () {
-    if (xhr.readyState === 4 && xhr.status === 200) {
-      var data = xhr.responseText.split(':');
-      callback(data[1].trim(), data[2].trim());
+    for (var i = 0; i < data.length; i++) {
+      let item = data[i].split('_');
+
+      fps.push(item[1].trim());
+      smis.push(item[2].trim());
     }
-  };
 
-  xhr.open('GET', url, true);
-  xhr.send();
+    callback(fps, smis);
+  });
 };
 
 Faerun.loadProjection = function (url, data, callback) {
