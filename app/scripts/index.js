@@ -737,9 +737,12 @@
           continue;
         }
 
+        console.log(chunk[i]);
+
         let url = Faerun.format(baseUrl, [encodeURIComponent(chunk[i])]);
 
         Faerun.loadFingerprint(url, function (fpRaw, smi) {
+          console.log(fpRaw, smi);
           let fp = fpRaw.split(';');
 
           // Something is wrong when the fp is of length 1
@@ -790,6 +793,7 @@
     };
 
     loadChunk(function () {
+      console.log(x, y, z);
       let ph = new Lore.PointHelper(lore, 'ProjectionGeometry' + projections.length, 'defaultAnimated');
       ph.setFogDistance(0, currentVariant.resolution * Math.sqrt(3));
       ph.setPositionsXYZHSS(x, y, z, hsl.h, hsl.s, 1.0);
