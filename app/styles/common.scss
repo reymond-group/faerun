@@ -332,8 +332,19 @@ html, body {
     background-color: $panel-color;
     opacity: 0.9;
     transition: opacity 0.2s ease-in-out;
+    overflow: hidden;
 
     cursor: default !important;
+
+    @media only screen and (max-device-width: $responsive-mobile-max-width) {
+        height: 238px;
+        overflow: auto;
+        direction: rtl;
+
+        * {
+            direction: ltr;
+        }
+    }
 
     &:hover {
         transition: opacity 0.2s ease-in-out;
