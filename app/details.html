@@ -25,6 +25,7 @@
         -->
         <script src="libs/socketio/socket.io-1.4.5.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script src="libs/saveAsPolyfill/FileSaver.min.js"></script>
         <script src="libs/lore/lore.js"></script>
         <script src="libs/smilesDrawer/smiles-drawer.js"></script>
         <script src="libs/handlebars/handlebars-v4.0.5.js"></script>
@@ -68,21 +69,13 @@
 
             <p class="faerun-controls-header" style="margin-top:18px;"><i class="material-icons">build</i><span>TOOLS</span></p>
             <div class="spacer"></div>
-            <a href="#modal-search" id="button-search" data-binding-id="buttonSearch" class="waves-effect waves-light btn-flat">
-                <i class="material-icons left">search</i>Search
+            <a href="#all-compounds" id="button-all-compounds" class="waves-effect waves-light btn-flat">
+                <i class="material-icons left">view_module</i>Show All Compounds
             </a>
             <br />
-            <a href="#modal-project" id="button-project" data-binding-id="buttonProject" class="waves-effect waves-light btn-flat">
-                <i class="material-icons left">bubble_chart</i>Project
+            <a id="download-csv" class="waves-effect waves-light btn-flat">
+                <i class="material-icons left">file_download</i>Download As CSV
             </a>
-            <br />
-            <a href="#" id="button-knn" data-binding-id="buttonKNN" class="waves-effect waves-light btn-flat">
-                <i class="material-icons left">location_searching</i>KNN Search 
-            </a>
-            
-            <p class="faerun-controls-header"><i class="material-icons">poll</i><span>STATISTICS</span></p>
-            <div class="spacer"></div>
-            <p class="faerun-controls-small">Number of Compounds:&nbsp;<b id="stats-compounds" data-binding-id="statsCompounds"></b></p>
         </div>
         <div class="page">
             <header>
@@ -165,116 +158,14 @@
         </div>
 
         <!-- Dialogs -->
-        <div id="modal-search" class="modal modal-fixed-footer">
-            <div class="modal-content">
-                <h4 class="flex-item"><i class="material-icons">search</i>&nbsp;Search Compounds</h4>
-                <div class="flex-item">
-                    <p class="faerun-info">You may enter one search query per line. A search query might include the ID, the SMILES or the fingerprint of
-                        a compound. Each query can return multiple matches. The search is case-sensitive (ABC is not equal to abc).</p>
-                </div>
-                <div class="flex-item">
-                    <textarea id="textarea-search" data-binding-id="textareaSearch" type="text"></textarea>
-                </div>
+        <div id="all-compounds" class="modal modal-fixed-footer">
+            <div id="compounds-container" class="modal-content">
+                
             </div>
             <div class="modal-footer">
-                <a href="#!" id="button-exec-search" data-binding-id="buttonExecSearch" class="modal-action modal-close waves-effect waves-green btn-flat">Search</a>
-                <a href="#!" class="modal-action modal-close waves-effect waves-red btn-flat ">Cancel</a>
+                <a href="#!" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
             </div>
         </div>
-
-        <div id="modal-project" class="modal modal-fixed-footer" style="height:90%;max-height:90%">
-            <div class="modal-content flex">
-                <div class="title flex-item">Project Compounds</div>
-                <div class="flex-item">
-                    <div class="row">
-                        <div class="col s12">
-                            <p class="faerun-info">
-                                You may enter one compound per line. A compound has to be a valid SMILES string.
-                            </p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div id="colorpicker-dialog-project" data-binding-id="colorpickerDialogProject" class="colorpicker-container input-field col s6">
-                            <input type="text" id="colorpicker-dialog-project-input" data-binding-id="colorpickerDialogProjectInput">
-                            <label for="colorpicker-dialog-project-input">Pick Color ...</label>
-                        </div>
-                        <div class="name-container input-field col s6">
-                            <input type="text" id="name-dialog-project-input" data-binding-id="nameDialogProjectInput">
-                            <label for="nameDialogProjectInput">Name</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex-item">
-                    <div class="row">
-                        <div class="col s12">
-                            <label for="textarea-project">SMILES to be projected</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex-item stretch">
-                    <textarea id="textarea-project" data-binding-id="textareaProject" class="faerun-textarea" autofocus="autofocus"></textarea>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <a href="#!" id="button-exec-project" data-binding-id="buttonExecProject" class="modal-action modal-close waves-effect waves-green btn-flat">Project</a>
-                <a href="#!" class="modal-action modal-close waves-effect waves-red btn-flat ">Cancel</a>
-            </div>
-        </div>
-
-        <dialog id="dialog-knn" data-binding-id="dialogKNN" class="mdl-dialog">
-            <div class="flex-box">
-                <h4 class="mdl-dialog__title flex-item"><i class="material-icons">location_searching</i>&nbsp;K-Nearest-Neighbour Search</h4>
-                <div class="mdl-dialog__subtitle flex-item">
-                    <p class="faerun-info">Use this tool to search the k closest neighbours in the loaded database for each data point in the selected layer.</p>
-                </div>
-                <div class="mdl-dialog__content flex-item">
-                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                        <input class="mdl-textfield__input" type="text" pattern="-?[0-9]*(\.[0-9]+)?" id="kKNN" data-binding-id="kKNN">
-                        <label class="mdl-textfield__label" for="kKNN">Number of Neighbours (k)</label>
-                        <span class="mdl-textfield__error">Input is not a number!</span>
-                    </div>
-                </div>
-                <div class="mdl-dialog__actions flex-item">
-                    <button id="button-exec-knn" data-binding-id="buttonExecKNN" type="button" class="mdl-button">Search</button>
-                    <button type="button" class="mdl-button close">Cancel</button>
-                </div>
-            </div>
-        </dialog>
-
-        <!-- Templates -->
-        <script id="selected-bin-template" type="text/x-handlebars-template">
-            <div id="selected-bin-item-{{layer}}-{{id}}" 
-             class="item" data-color="{{color}}">
-                <canvas id="select-structure-drawing-{{layer}}-{{id}}" width="50" height="50"></canvas>
-                <a href="#" class="closer" id="bin-closer-{{layer}}-{{id}}"><i class="material-icons">close</i></a>
-                <a href="#" class="center" data-layer="{{layer}}" data-id="{{id}}"
-                   id="bin-center-{{layer}}-{{id}}">
-                    <i class="material-icons">all_out</i>
-                </a>
-                <span class="idx">Id: <b>{{idx}}</b></span>
-                <span class="id">Database Id: <b>{{id}}</b></span>
-                <span class="size">Bin Size: <b id="select-bin-size-{{layer}}-{{id}}"></b></span>
-            </div>
-        </script>
-
-        <script id="layer-template" type="text/x-handlebars-template">
-            <div id="layer-{{id}}" class="item">
-                <div class="color" style="background-color: {{color}}"></div>
-                <div class="name">{{name}}</div>
-                <div class="checkbox-container">
-                    <input id="checkbox-visible-{{id}}" class="checkbox" name="checkbox-visible-{{id}}" type="checkbox">
-                    <label for="checkbox-visible-{{id}}" class="checkbox-label"></label>
-                </div>
-                <div class="radio-container">
-                    {{#if current}}
-                        <input id="radio-current-{{id}}" value="{{id}}" class="radio radio-current-layer" name="radio-current-layer" type="radio" checked="checked">
-                    {{else}}
-                        <input id="radio-current-{{id}}" value="{{id}}" class="radio radio-current-layer" name="radio-current-layer" type="radio"> 
-                    {{/if}}
-                    <label for="radio-current-{{id}}" class="radio-label"></label>
-                </div>
-            </div>
-        </script>
 
         <script src="config.js"></script>
         <script src="scripts/jsonp.js"></script>
@@ -294,6 +185,8 @@
                     });
 
                     $('select').material_select();
+
+                    $('.tooltipped').tooltip({delay: 50});
 
                     $('.modal').modal({
                         startingTop: '2%',

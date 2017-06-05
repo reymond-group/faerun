@@ -25,6 +25,7 @@
         -->
         <script src="libs/socketio/socket.io-1.4.5.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script src="libs/saveAsPolyfill/FileSaver.min.js"></script>
         <script src="libs/lore/lore.js"></script>
         <script src="libs/smilesDrawer/smiles-drawer.js"></script>
         <script src="libs/handlebars/handlebars-v4.0.5.js"></script>
@@ -168,17 +169,16 @@
             <div class="flex-item">
                 <label>Depth Cutoff</label>
                 <p class="range-field">
-                    <input id="slider-cutoff" data-binding-id="sliderCutoff" type="range" min="0" max="100"
-                value="0" tabindex="0">
+                    <input id="slider-cutoff" data-binding-id="sliderCutoff" type="range" min="0" max="100" value="0" tabindex="0">
                 </p>
                 <label>Color</label>
                 <p class="range-field color-range">
-                    <input id="slider-color" data-binding-id="sliderColor" type="range" min="0.01" max="0.98"
-                    step="0.01" value="0.01" tabindex="0">
+                    <input id="slider-color" data-binding-id="sliderColor" type="range" min="0.01" max="0.98" step="0.01" value="0.01" tabindex="0">
                 </p>
             </div>
             <div class="flex-item">
                 <div class="title"><i class="material-icons">list</i>Selected Bins</div>
+                <a id="download-bins" class="title-button tooltipped" data-tooltip="Download as CSV"><i class="material-icons">file_download</i></a>
             </div>
             <div class="flex-item">
                 <div id="select-container" data-binding-id="selectContainer"></div> 
@@ -333,6 +333,8 @@
                     });
 
                     $('select').material_select();
+
+                    $('.tooltipped').tooltip({delay: 50});
 
                     $('.modal').modal({
                         startingTop: '2%',

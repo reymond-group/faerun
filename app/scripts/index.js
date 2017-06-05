@@ -15,6 +15,7 @@
   let selectIndicators = [];
   let selectCanvas = {};
   let selectSmiles = {};
+  let selectedBins = [];
   let socketWorker = new Worker('scripts/socketWorker.js');
 
   let bindings = Faerun.getBindings();
@@ -60,6 +61,18 @@
     bindings.selectMap.parentElement.style.pointerEvents = 'none';
     bindings.loadingMessage.innerHTML = 'Loading map ...';
     Faerun.show(bindings.loader);
+  });
+
+  $('#download-bins').click(function() {
+    socketWorker.postMessage({
+      cmd: 'load:bin',
+      msg: {
+        databaseId: currentDatabase.id,
+        fingerprintId: currentFingerprint.id,
+        variantId: currentVariant.id,
+        binIndex: selectedBins.join()
+      }
+    });
   });
 
   bindings.sliderCutoff.addEventListener('input', function () {
@@ -471,6 +484,8 @@
         onInfosSearched(e.data.msg);
       else if (e.data.cmd === 'load:stats')
         onStatsLoaded(e.data.msg);
+      else if (e.data.cmd === 'load:bin')
+        onBinLoaded(e.data.msg);
     };
   });
 
@@ -536,10 +551,13 @@
       if (currentLayer !== 0) return;
 
       clearSelected();
+      selectedBins = [];
 
       for (let i = 0; i < oh.selected.length; i++) {
         let selected = oh.selected[i];
+
         createSelected(i, selected.index, 0);
+        selectedBins.push(selected.index);
 
         socketWorker.postMessage({
           cmd: 'load:binpreview',
@@ -589,6 +607,22 @@
     bindings.statsMax.innerHTML = Faerun.formatNumber(message.histMax);
     bindings.statsCompounds.innerHTML = Faerun.formatNumber(message.compoundCount);
     bindings.statsBins.innerHTML = Faerun.formatNumber(message.binCount);
+  }
+
+  function onBinLoaded(message) {
+    let output = 'binIndex;id;smiles;x;y;z\n';
+
+    for (var i = 0; i < message.smiles.length; i++) {
+      let coords = message.coordinates[i].split(',');
+
+      output += message.binIndices[i] + ';' + message.ids[i] + ';' +
+        message.smiles[i] + ';' + coords[0] + ';' + coords[1] + ';' + coords[2] + '\n';
+    }
+
+    output = output.substring(0, output.length);
+
+    let blob = new Blob([output], {type: 'text/plain;charset=utf-8'});
+    saveAs(blob, 'faerun_export_' + currentVariant.id + '.csv');
   }
 
   /**

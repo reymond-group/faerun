@@ -22,6 +22,8 @@
   let socketWorker = new Worker('scripts/socketWorker.js');
   let params = Faerun.parseUrlParams();
   let binColor = params.hue ? parseFloat(params.hue, 10) : 0.8;
+  let csv = '';
+  let viewAllInitialized = false;
 
   let bindings = Faerun.getBindings();
 
@@ -33,6 +35,32 @@
       lore.setClearColor(Lore.Color.fromHex('#121212'));
     }
   }, false);
+
+  $('#download-csv').click(function() {
+    let blob = new Blob([csv], {type: 'text/plain;charset=utf-8'});
+    saveAs(blob, 'faerun_export_' + params.variantId + '.csv');
+  });
+
+  $('#button-all-compounds').click(function() {
+    if (!viewAllInitialized) {
+      setTimeout(function() {
+        for (var i = 0; i < smilesData.length; i++) {
+          let smiles = smilesData[i];
+          let canvas = document.createElement('canvas');
+          let container = $('#compounds-container');
+
+          canvas.setAttribute('id', 'canvas-' + i);
+          container.append(canvas);
+
+          SmilesDrawer.parse(smiles, function(tree) {
+            smilesDrawer.draw(tree, 'canvas-' + i, 'light');
+          });
+        }
+      }, 1000);
+    }
+
+    viewAllInitialized = true;
+  });
 
   bindings.buttonRecenter.addEventListener('click', function () {
     lore.controls.setLookAt(center);
@@ -134,6 +162,18 @@
     smilesData = message.smiles;
     idsData = message.ids;
     fpsData = message.fps;
+
+    // Create the csv
+    csv = 'binIndex;id;smiles;x;y;z\n';
+
+    for (var i = 0; i < message.smiles.length; i++) {
+      let xyz = message.coordinates[i].split(',');
+
+      csv += message.binIndices[i] + ';' + message.ids[i] + ';' +
+        message.smiles[i] + ';' + xyz[0] + ';' + xyz[1] + ';' + xyz[2] + '\n';
+    }
+
+    csv = csv.substring(0, csv.length);
 
     lore = Lore.init('lore', {
       clearColor: '#121212',
@@ -413,7 +453,7 @@
       let info = document.createElement('p');
 
       info.classList.add('info');
-      info.innerHTML('Could not load remote info for ' + schemblId);
+      info.innerHTML = 'Could not load remote info for ' + schemblId;
     }
   }
 })();
