@@ -287,7 +287,7 @@
         updateHovered();
       }
 
-      if (octreeHelper.selected) {
+      if (selected) {
         updateSelected();
       }
     });
