@@ -21,6 +21,19 @@
     pointer-events: none;
 }
 
+#select-indicator {
+    z-index: 999;
+    position: absolute;
+    display: block;
+    left: 10px;
+    top : 10px;
+    width: 10px;
+    height: 10px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    pointer-events: none;
+}
+
 #hover-structure {
     pointer-events: none;
 

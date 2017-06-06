@@ -74,26 +74,6 @@ Lore.init = function (canvas, options) {
 
     renderer.controls.limitRotationToHorizon(this.opts.limitRotationToHorizon);
 
-    var coordinatesHelper = new Lore.CoordinatesHelper(renderer, 'Coordinates', 'coordinates', {
-        position: new Lore.Vector3f(0, 0, 0),
-        axis: {
-            x: { length: 250, color: Lore.Color.fromHex('#222222') },
-            y: { length: 250, color: Lore.Color.fromHex('#222222') },
-            z: { length: 250, color: Lore.Color.fromHex('#222222') }
-        },
-        ticks: {
-            x: { length: 10, color: Lore.Color.fromHex('#1f1f1f') },
-            y: { length: 10, color: Lore.Color.fromHex('#1f1f1f') },
-            z: { length: 10, color: Lore.Color.fromHex('#1f1f1f') }
-        },
-        box: {
-            enabled: true,
-            x: { color: Lore.Color.fromHex('#222222') },
-            y: { color: Lore.Color.fromHex('#222222') },
-            z: { color: Lore.Color.fromHex('#222222') }
-        }
-    });
-
     renderer.render = function (camera, geometries) {
         for (var key in geometries) {
             geometries[key].draw(renderer);
@@ -119,9 +99,13 @@ Lore.getGrakaInfo = function (targetId) {
         info.vendor = gl.getParameter(dbgRenderInfo.UNMASKED_VENDOR_WEBGL);
     }
 
-    console.log(info);
-
     return info;
+};
+
+Lore.supportsHighQuality = function (targetId) {
+    var info = Lore.getGrakaInfo(targetId);
+
+    return false;
 };
 
 Lore.defaults = {
@@ -6648,7 +6632,8 @@ Lore.OctreeHelper = function (_Lore$HelperBase4) {
         var _this13 = _possibleConstructorReturn(this, (OctreeHelper.__proto__ || Object.getPrototypeOf(OctreeHelper)).call(this, renderer, geometryName, shaderName));
 
         _this13.defaults = {
-            visualize: false
+            visualize: false,
+            multiSelect: true
         };
 
         _this13.opts = Lore.Utils.extend(true, _this13.defaults, options);
@@ -6809,7 +6794,14 @@ Lore.OctreeHelper = function (_Lore$HelperBase4) {
             }
 
             var index = this.selected.length;
-            this.selected.push(item);
+
+            if (this.opts.multiSelect) {
+                this.selected.push(item);
+            } else {
+                this.selected[0] = item;
+                index = 0;
+            }
+
             this.selected[index].screenPosition = this.renderer.camera.sceneToScreen(item.position, this.renderer);
             this.raiseEvent('selectedchanged', {
                 e: this.selected

@@ -2,14 +2,10 @@
   // Globals
   let lore = null;
   let smilesDrawer = null;
-  let coordinatesHelper = null;
-  let config = null;
+  let smilesDrawerBig = null;
   let coords = [];
   let smilesData = [];
   let idsData = [];
-  let fpsData = [];
-  let sourceInfos = {};
-  let sources = {};
   let databaseLinks = {};
   let schemblIdToId = {};
   let idToSchemblId = {};
@@ -24,6 +20,7 @@
   let binColor = params.hue ? parseFloat(params.hue, 10) : 0.8;
   let csv = '';
   let viewAllInitialized = false;
+  let selected = null;
 
   let bindings = Faerun.getBindings();
 
@@ -36,24 +33,60 @@
     }
   }, false);
 
-  $('#download-csv').click(function() {
-    let blob = new Blob([csv], {type: 'text/plain;charset=utf-8'});
+  $('#download-csv').click(function () {
+    let blob = new Blob([csv], {
+      type: 'text/plain;charset=utf-8'
+    });
+
     saveAs(blob, 'faerun_export_' + params.variantId + '.csv');
   });
 
-  $('#button-all-compounds').click(function() {
+  $('#button-all-compounds').click(function () {
     if (!viewAllInitialized) {
-      setTimeout(function() {
+      setTimeout(function () {
         for (var i = 0; i < smilesData.length; i++) {
           let smiles = smilesData[i];
+          let compoundWrapper = document.createElement('div');
+          let compoundInfo = document.createElement('div');
           let canvas = document.createElement('canvas');
           let container = $('#compounds-container');
 
+          compoundWrapper.classList.add('compound-wrapper');
+          compoundInfo.classList.add('compound-info');
+          compoundInfo.setAttribute('data-schemblid', idToSchemblId[i]);
           canvas.setAttribute('id', 'canvas-' + i);
-          container.append(canvas);
+          compoundWrapper.appendChild(canvas);
+          compoundWrapper.appendChild(compoundInfo);
+          container.append(compoundWrapper);
 
-          SmilesDrawer.parse(smiles, function(tree) {
-            smilesDrawer.draw(tree, 'canvas-' + i, 'light');
+          Faerun.hover(compoundInfo, function () {
+            $(compoundInfo).empty();
+
+            let schemblId = compoundInfo.getAttribute('data-schemblid');
+            let databases = databaseLinks[schemblId];
+
+            compoundInfo.innerHTML += '<p>' + schemblId + '</p>';
+
+            if (databases) {
+              for (var database of databases) {
+                let a = document.createElement('a');
+
+                a.innerHTML = database.name;
+                a.setAttribute('href', database.url);
+
+                compoundInfo.appendChild(a);
+              }
+            } else {
+              compoundInfo.innerHTML = 'Could not load remote info for ' + schemblId;
+            }
+
+            compoundInfo.classList.add('visible');
+          }, function () {
+            compoundInfo.classList.remove('visible');
+          });
+
+          SmilesDrawer.parse(smiles, function (tree) {
+            smilesDrawerBig.draw(tree, 'canvas-' + i, 'light');
           });
         }
       }, 1000);
@@ -92,7 +125,16 @@
   // Socket.IO communication
   document.addEventListener('DOMContentLoaded', function (event) {
     Faerun.initFullscreenSwitch(bindings.switchFullscreen);
-    smilesDrawer = new SmilesDrawer.Drawer({width: 180, height: 180});
+    smilesDrawer = new SmilesDrawer.Drawer({
+      width: 180,
+      height: 180
+    });
+
+    smilesDrawerBig = new SmilesDrawer.Drawer({
+      width: 250,
+      height: 250
+    });
+
 
     // Show the loader from the beginning until everything is loaded
     bindings.loadingMessage.innerHTML = 'Loading geometry ...';
@@ -139,7 +181,6 @@
    * @param {any} message - The server message containing the init information
    */
   function onInit(message) {
-    config = message;
     socketWorker.postMessage({
       cmd: 'load:bin',
       msg: {
@@ -151,7 +192,6 @@
     });
   }
 
-
   /**
    * Initialize the 3d map as well as the compound cards.
    *
@@ -161,7 +201,6 @@
     coords = Faerun.getCoords(message.coordinates, 250);
     smilesData = message.smiles;
     idsData = message.ids;
-    fpsData = message.fps;
 
     // Create the csv
     csv = 'binIndex;id;smiles;x;y;z\n';
@@ -185,7 +224,6 @@
 
     // Setup the coordinate system
     var cs = Faerun.updateCoordinatesHelper(lore, coords.scale, 0, true, false);
-    coordinatesHelper = cs.helper;
 
     // Add a bit of randomness to the coords to resolve overlaps
     for (var i = 0; i < coords.x.length; i++) {
@@ -217,20 +255,40 @@
       }
     }
 
-    let octreeHelper = new Lore.OctreeHelper(lore, 'OctreeGeometry', 'default', pointHelper);
+    let octreeHelper = new Lore.OctreeHelper(lore, 'OctreeGeometry', 'default', pointHelper, {multiSelect: false});
 
     octreeHelper.addEventListener('hoveredchanged', function (e) {
       if (!e.e) {
         Faerun.hide(bindings.hoverIndicator);
+
+        if (selected) {
+          updatePanel(selected.index);
+        }
+
         return;
       }
 
       updateHovered();
     });
 
+    octreeHelper.addEventListener('selectedchanged', function (e) {
+      if (!e.e) {
+        Faerun.hide(bindings.hoverIndicator);
+        return;
+      }
+
+      selected = e.e[0];
+
+      updateSelected();
+    });
+
     octreeHelper.addEventListener('updated', function () {
       if (octreeHelper.hovered) {
         updateHovered();
+      }
+
+      if (octreeHelper.selected) {
+        updateSelected();
       }
     });
 
@@ -262,14 +320,13 @@
 
       schemblIdToId[schemblId] = i;
       idToSchemblId[i] = schemblId;
-      sources[schemblId] = [];
 
       $.ajax({
         url: Faerun.schemblIdsUrl(schemblId),
         jsonp: 'callback',
         dataType: 'jsonp',
         data: {},
-        success: function(response) {
+        success: function (response) {
           // Recover schembl id
           let id = '';
 
@@ -286,7 +343,6 @@
             let srcId = response[k].src_id;
             let srcInfo = FaerunConfig.schembl.sources[srcId];
 
-            sources[id].push(srcId);
             items.push({
               id: response[k].src_compound_id,
               name: srcInfo.name_label,
@@ -296,7 +352,7 @@
 
           databaseLinks[id] = items;
         },
-        complete: function() {
+        complete: function () {
           if (--length === 0) {
             // Hide loader here, since this is the closest to fully
             // loaded we get :-)
@@ -308,112 +364,15 @@
   }
 
   /**
-   * Create an HTML element with index 'idx' representing the bin specified by 'id'.
-   *
-   * @param {Number} idx - The index for the selected element
-   * @param {Number} id - The id of the bin / point
-   */
-  function createSelected(idx, id, layer) {
-    let selected = projections[0].octreeHelper.selected[idx];
-    let hue = projections[0].pointHelper.getHue(id);
-    let rgb = Lore.Color.hslToRgb(hue, 1.0, 0.5);
-
-    for (let i = 0; i < rgb.length; i++) {
-      rgb[i] = Math.round(rgb[i] * 255);
-    }
-
-    Faerun.appendTemplate(bindings.selectContainer, 'selected-bin-template', {
-      id: id,
-      idx: idx,
-      layer: layer,
-      color: 'rgba(' + rgb[0] + ', ' + rgb[1] + ', ' + rgb[2] + ', 0.5)'
-    });
-
-    let structure = document.getElementById('selected-structure-' + layer + '-' + id);
-    let item = document.getElementById('selected-bin-item-' + layer + '-' + id);
-    let closer = document.getElementById('bin-closer-' + layer + '-' + id);
-    let center = document.getElementById('bin-center-' + layer + '-' + id);
-
-    selectCanvas[layer + '-' + id] = structure;
-
-    Faerun.hover(item, function () {
-      let smiles = selectSmiles[layer + '-' + id];
-      SmilesDrawer.parse(smiles, function(tree) {
-        smilesDrawer.draw(tree, 'hover-structure-drawing', 'dark');
-      });
-    }, function () {
-      Faerun.clearCanvas('hover-structure-drawing');
-    });
-
-    item.addEventListener('click', function (e) {
-      let nCompounds = parseFloat(document.getElementById('select-bin-size-0-' + id).innerHTML);
-      let indices = id;
-      if (nCompounds < 10) {
-        let nearestNeighbours = binKnn(id, 26);
-
-        for (const index of nearestNeighbours) {
-          indices += ',' + index;
-        }
-      }
-    });
-
-    closer.addEventListener('click', function (e) {
-      projections[layer].octreeHelper.removeSelected(idx);
-      e.stopPropagation();
-      e.preventDefault();
-    });
-
-    center.addEventListener('click', function (e) {
-      let vec = projections[layer].pointHelper.getPosition(id);
-
-      lore.controls.setLookAt(vec);
-      e.stopPropagation();
-      e.preventDefault();
-    });
-
-
-    let indicator = document.createElement('span');
-
-    indicator.classList.add('mdl-badge', 'mdl-badge--overlap', 'select-indicator');
-    indicator.setAttribute('id', 'selected-indicator-' + layer + '-' + id);
-    indicator.setAttribute('data-badge', idx);
-
-    let pointSize = projections[0].pointHelper.getPointSize();
-    selectIndicators.push(indicator);
-    bindings.main.appendChild(indicator);
-
-    updateSelected();
-  }
-
-  /**
-   * Remove all HTML elements representing selected bins.
-   */
-  function clearSelected() {
-    selectCanvas = {};
-    selectSmiles = {};
-    Faerun.removeChildren(bindings.selectContainer);
-
-    selectIndicators = [];
-    let indicators = document.getElementsByClassName('select-indicator');
-
-    for (let i = indicators.length - 1; i >= 0; i--) {
-      indicators[i].parentNode.removeChild(indicators[i]);
-    }
-  }
-
-  /**
    * Update all HTML elements representing selected bins.
    */
   function updateSelected() {
     let pointSize = projections[0].pointHelper.getPointSize();
+    let screenPosition = projections[0].octreeHelper.getScreenPosition(selected.index);
 
-    for (let i = 0; i < selectIndicators.length; i++) {
-      let selected = projections[0].octreeHelper.selected[i];
-      let indicator = selectIndicators[i];
-      let screenPosition = projections[0].octreeHelper.getScreenPosition(selected.index);
+    Faerun.positionIndicator(bindings.selectIndicator, pointSize, screenPosition[0], screenPosition[1]);
 
-      Faerun.positionIndicator(indicator, pointSize, screenPosition[0], screenPosition[1]);
-    }
+    Faerun.show(bindings.selectIndicator);
   }
 
   /**
@@ -427,10 +386,15 @@
       projections[layer].octreeHelper.hovered.screenPosition[1]);
 
     let index = projections[layer].octreeHelper.hovered.index;
+
+    updatePanel(index);
+  }
+
+  function updatePanel(index) {
     let smiles = smilesData[index];
     let schemblId = idToSchemblId[index];
 
-    SmilesDrawer.parse(smiles, function(tree) {
+    SmilesDrawer.parse(smiles, function (tree) {
       smilesDrawer.draw(tree, 'hover-structure-drawing', 'dark');
     });
 
