@@ -59,7 +59,7 @@ Lore.init = function (canvas, options) {
     Lore.getGrakaInfo(canvas);
 
     // Init UI
-    var ui = new Lore.UI(canvas);
+    // var ui = new Lore.UI(canvas);
 
     // Start the 3D stuff
     var cc = Lore.Color.fromHex(this.opts.clearColor);
@@ -5359,22 +5359,23 @@ Lore.Statistics = function () {
     }, {
         key: 'normalize',
         value: function normalize(arr) {
-            var max = Number.MIN_VALUE;
-            var min = Number.MAX_VALUE;
+            var newArr = arr.slice();
+            var max = Number.NEGATIVE_INFINITY;
+            var min = Number.POSITIVE_INFINITY;
 
-            for (var i = 0; i < arr.length; i++) {
-                var val = arr[i];
+            for (var i = 0; i < newArr.length; i++) {
+                var val = newArr[i];
                 if (val > max) max = val;
                 if (val < min) min = val;
             }
 
             var diff = max - min;
 
-            for (var _i = 0; _i < arr.length; _i++) {
-                arr[_i] = (arr[_i] - min) / diff;
+            for (var _i = 0; _i < newArr.length; _i++) {
+                newArr[_i] = (newArr[_i] - min) / diff;
             }
 
-            return [min, max];
+            return newArr;
         }
 
         /**
@@ -5843,7 +5844,9 @@ Lore.HelperBase = function (_Lore$Node3) {
  * @property {Number[]} indices Indices associated with the data.
  * @property {Lore.Octree} octree The octree associated with the point cloud.
  * @property {Object} filters A map mapping filter names to Lore.Filter instances associated with this helper class.
- * @property {Number} pointSize The default point size of this data.
+ * @property {Number} pointSize The scaled and constrained point size of this data.
+ * @property {Number} pointScale The scale of the point size.
+ * @property {Number} rawPointSize The point size before scaling and constraints.
  * @property {Object} dimensions An object with the properties min and max, each a 3D vector containing the extremes.
  */
 Lore.PointHelper = function (_Lore$HelperBase) {
@@ -5875,7 +5878,9 @@ Lore.PointHelper = function (_Lore$HelperBase) {
         _this10.geometry.setMode(Lore.DrawModes.points);
         _this10.initPointSize();
         _this10.filters = {};
-        _this10.pointSize = 1.0 * _this10.opts.pointScale;
+        _this10.pointScale = _this10.opts.pointScale;
+        _this10.rawPointSize = 1.0;
+        _this10.pointSize = _this10.rawPointSize * _this10.pointScale;
 
         _this10.dimensions = {
             min: new Lore.Vector3f(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY),
@@ -6088,8 +6093,8 @@ Lore.PointHelper = function (_Lore$HelperBase) {
                 var _b = c[_i3 + 2];
 
                 c[_i3] = Lore.Color.rgbToHsl(_r, _g, _b)[0];
-                c[_i3 + 1] = colors[1];
-                c[_i3 + 2] = colors[2];
+                c[_i3 + 1] = colors[_i3 + 1];
+                c[_i3 + 2] = colors[_i3 + 2];
             }
 
             this.updateColors(c);
@@ -6143,12 +6148,37 @@ Lore.PointHelper = function (_Lore$HelperBase) {
             return this;
         }
 
-        // Returns the threshold for the raycaster
+        /**
+         * Set the global point size.
+         * 
+         * @param {Number} size The global point size.
+         * @returns {Number} The threshold for the raycaster.
+         */
 
     }, {
         key: 'setPointSize',
         value: function setPointSize(size) {
-            var pointSize = size * this.opts.pointScale;
+            this.rawPointSize = size;
+
+            this.updatePointSize();
+
+            var pointSize = this.rawPointSize * this.opts.pointScale;
+
+            if (pointSize > this.opts.maxPointSize) {
+                return 0.5 * (this.opts.maxPointSize / pointSize);
+            } else {
+                return 0.5;
+            }
+        }
+
+        /**
+         * Updates the displayed point size.
+         */
+
+    }, {
+        key: 'updatePointSize',
+        value: function updatePointSize() {
+            var pointSize = this.rawPointSize * this.opts.pointScale;
 
             if (pointSize > this.opts.maxPointSize) {
                 this.pointSize = this.opts.maxPointSize;
@@ -6157,23 +6187,56 @@ Lore.PointHelper = function (_Lore$HelperBase) {
             }
 
             this.geometry.shader.uniforms.size.value = this.pointSize;
-
-            if (pointSize > this.opts.maxPointSize) {
-                return 0.5 * (this.opts.maxPointSize / pointSize);
-            } else {
-                return 0.5;
-            }
         }
+
+        /**
+         * Get the global point size.
+         * 
+         * @returns {Number} The global point size.
+         */
+
     }, {
         key: 'getPointSize',
         value: function getPointSize() {
             return this.geometry.shader.uniforms.size.value;
         }
+
+        /**
+         * Get the global point scale.
+         * 
+         * @returns {Number} The global point size.
+         */
+
     }, {
         key: 'getPointScale',
         value: function getPointScale() {
             return this.opts.pointScale;
         }
+
+        /**
+         * Sets the global point scale.
+         * 
+         * @param {Number} pointScale The global point size.
+         * @returns {Lore.PointHelper} Itself.
+         */
+
+    }, {
+        key: 'setPointScale',
+        value: function setPointScale(pointScale) {
+            this.opts.pointScale = pointScale;
+            this.updatePointSize();
+
+            return this;
+        }
+
+        /**
+         * Sets the fog start and end distances, as seen from the camera.
+         * 
+         * @param {Number} fogStart The start distance of the fog.
+         * @param {Number} fogEnd The end distance of the fog.
+         * @returns {Lore.PointHelper} Itself.
+         */
+
     }, {
         key: 'setFogDistance',
         value: function setFogDistance(fogStart, fogEnd) {
@@ -6182,6 +6245,13 @@ Lore.PointHelper = function (_Lore$HelperBase) {
 
             return this;
         }
+
+        /**
+         * Initialize the point size based on the current zoom.
+         * 
+         * @returns {Lore.PointHelper} Itself.
+         */
+
     }, {
         key: 'initPointSize',
         value: function initPointSize() {
@@ -6189,11 +6259,26 @@ Lore.PointHelper = function (_Lore$HelperBase) {
 
             return this;
         }
+
+        /**
+         * Get the current cutoff value.
+         * 
+         * @returns {Number} The current cutoff value.
+         */
+
     }, {
         key: 'getCutoff',
         value: function getCutoff() {
             return this.geometry.shader.uniforms.cutoff.value;
         }
+
+        /**
+         * Set the cutoff value.
+         * 
+         * @param {Number} cutoff A cutoff value.
+         * @returns {Lore.PointHelper} Itself.
+         */
+
     }, {
         key: 'setCutoff',
         value: function setCutoff(cutoff) {
@@ -6201,6 +6286,14 @@ Lore.PointHelper = function (_Lore$HelperBase) {
 
             return this;
         }
+
+        /**
+         * Get the hue for a given index.
+         * 
+         * @param {Number} index An index.
+         * @returns {Number} The hue of the specified index.
+         */
+
     }, {
         key: 'getHue',
         value: function getHue(index) {
@@ -6208,6 +6301,44 @@ Lore.PointHelper = function (_Lore$HelperBase) {
 
             return colors[index * 3];
         }
+
+        /**
+         * Get the saturation for a given index.
+         * 
+         * @param {Number} index An index.
+         * @returns {Number} The saturation of the specified index.
+         */
+
+    }, {
+        key: 'getSaturation',
+        value: function getSaturation(index) {
+            var colors = this.getAttribute('color');
+
+            return colors[index * 3 + 1];
+        }
+
+        /**
+         * Get the size for a given index.
+         * 
+         * @param {Number} index An index.
+         * @returns {Number} The size of the specified index.
+         */
+
+    }, {
+        key: 'getSize',
+        value: function getSize(index) {
+            var colors = this.getAttribute('color');
+
+            return colors[index * 3 + 2];
+        }
+
+        /**
+         * Get the position for a given index.
+         * 
+         * @param {Number} index An index.
+         * @returns {Number} The position of the specified index.
+         */
+
     }, {
         key: 'getPosition',
         value: function getPosition(index) {
@@ -6215,6 +6346,130 @@ Lore.PointHelper = function (_Lore$HelperBase) {
 
             return new Lore.Vector3f(positions[index * 3], positions[index * 3 + 1], positions[index * 3 + 2]);
         }
+
+        /**
+         * Set the hue. If a number is supplied, all the hues are set to the supplied number.
+         * 
+         * @param {TypedArray|Number} hue The hue to be set. If a number is supplied, all hues are set to its value.
+         */
+
+    }, {
+        key: 'setHue',
+        value: function setHue(hue) {
+            var colors = this.getAttribute('color');
+            var c = null;
+            var index = 0;
+
+            if (typeof hue === 'number') {
+                var length = colors.length;
+
+                c = new Float32Array(length * 3);
+
+                for (var i = 0; i < length * 3; i += 3) {
+                    c[i] = hue;
+                    c[i + 1] = colors[i + 1];
+                    c[i + 2] = colors[i + 2];
+                }
+            } else {
+                var _length = hue.length;
+
+                c = new Float32Array(_length * 3);
+
+                for (var _i4 = 0; _i4 < _length * 3; _i4 += 3) {
+                    c[_i4] = hue[index++];
+                    c[_i4 + 1] = colors[_i4 + 1];
+                    c[_i4 + 2] = colors[_i4 + 2];
+                }
+            }
+
+            this.setColors(c);
+        }
+
+        /**
+         * Set the saturation. If a number is supplied, all the saturations are set to the supplied number.
+         * 
+         * @param {TypedArray|Number} hue The saturation to be set. If a number is supplied, all saturations are set to its value.
+         */
+
+    }, {
+        key: 'setSaturation',
+        value: function setSaturation(saturation) {
+            var colors = this.getAttribute('color');
+            var c = null;
+            var index = 0;
+
+            if (typeof saturation === 'number') {
+                var length = colors.length;
+
+                c = new Float32Array(length * 3);
+
+                for (var i = 0; i < length * 3; i += 3) {
+                    c[i] = colors[i];
+                    c[i + 1] = saturation;
+                    c[i + 2] = colors[i + 2];
+                }
+            } else {
+                var _length2 = saturation.length;
+
+                c = new Float32Array(_length2 * 3);
+
+                for (var _i5 = 0; _i5 < _length2 * 3; _i5 += 3) {
+                    c[_i5] = colors[_i5];
+                    c[_i5 + 1] = saturation[index++];
+                    c[_i5 + 2] = colors[_i5 + 2];
+                }
+            }
+
+            this.setColors(c);
+        }
+
+        /**
+         * Set the size. If a number is supplied, all the sizes are set to the supplied number.
+         * 
+         * @param {TypedArray|Number} hue The size to be set. If a number is supplied, all sizes are set to its value.
+         */
+
+    }, {
+        key: 'setSize',
+        value: function setSize(size) {
+            var colors = this.getAttribute('color');
+            var c = null;
+            var index = 0;
+
+            if (typeof size === 'number') {
+                var length = colors.length;
+
+                c = new Float32Array(length * 3);
+
+                for (var i = 0; i < length * 3; i += 3) {
+                    c[i] = colors[i];
+                    c[i + 1] = colors[i + 1];
+                    c[i + 2] = size;
+                }
+            } else {
+                var _length3 = size.length;
+
+                c = new Float32Array(_length3 * 3);
+
+                for (var _i6 = 0; _i6 < _length3 * 3; _i6 += 3) {
+                    c[_i6] = colors[_i6];
+                    c[_i6 + 1] = colors[_i6 + 1];
+                    c[_i6 + 2] = size[index++];
+                }
+            }
+
+            this.setColors(c);
+        }
+
+        /**
+         * Set the HSS values. Sets all indices to the same values.
+         * 
+         * @param {Number} hue A hue value.
+         * @param {Number} saturation A saturation value.
+         * @param {Number} size A size value.
+         * @param {Number} length The length of the arrays.
+         */
+
     }, {
         key: 'setHSS',
         value: function setHSS(hue, saturation, size, length) {
@@ -6228,6 +6483,16 @@ Lore.PointHelper = function (_Lore$HelperBase) {
 
             this.setColors(c);
         }
+
+        /**
+         * Set the HSS values.
+         * 
+         * @param {TypedArray} hue An array of hue values.
+         * @param {TypedArray} saturation An array of saturation values.
+         * @param {TypedArray} size An array of size values.
+         * @param {Number} length The length of the arrays.
+         */
+
     }, {
         key: 'setHSSFromArrays',
         value: function setHSSFromArrays(hue, saturation, size, length) {
@@ -6248,6 +6513,15 @@ Lore.PointHelper = function (_Lore$HelperBase) {
 
             this.setColors(c);
         }
+
+        /**
+         * Add a filter to this point helper.
+         * 
+         * @param {String} name The name of the filter.
+         * @param {Lore.FilterBase} filter A filter instance.
+         * @returns {Lore.PointHelper} Itself.
+         */
+
     }, {
         key: 'addFilter',
         value: function addFilter(name, filter) {
@@ -6256,6 +6530,14 @@ Lore.PointHelper = function (_Lore$HelperBase) {
 
             return this;
         }
+
+        /**
+         * Remove a filter by name.
+         * 
+         * @param {String} name The name of the filter to be removed.
+         * @returns {Lore.PointHelper} Itself.
+         */
+
     }, {
         key: 'removeFilter',
         value: function removeFilter(name) {
@@ -6263,6 +6545,14 @@ Lore.PointHelper = function (_Lore$HelperBase) {
 
             return this;
         }
+
+        /**
+         * Get a filter by name.
+         * 
+         * @param {String} name The name of a filter.
+         * @returns {Lore.FilterBase} A filter instance.
+         */
+
     }, {
         key: 'getFilter',
         value: function getFilter(name) {
@@ -6547,7 +6837,7 @@ Lore.CoordinatesHelper = function (_Lore$HelperBase3) {
 
                 pos = p[0];
 
-                for (var _i4 = 0; _i4 < xTicks.count - 1; _i4++) {
+                for (var _i7 = 0; _i7 < xTicks.count - 1; _i7++) {
                     pos += xTickOffset;
                     // From
                     positions.push(pos + xTicks.offset.components[0], p[1] + xTicks.offset.components[1], p[2] + xTicks.offset.components[2], pos + xTicks.offset.components[0], p[1] + xTicks.offset.components[1], p[2] + xTicks.offset.components[2] + xTicks.length);
@@ -6558,7 +6848,7 @@ Lore.CoordinatesHelper = function (_Lore$HelperBase3) {
                 pos = p[1];
                 col = yTicks.color.components;
 
-                for (var _i5 = 0; _i5 < yTicks.count - 1; _i5++) {
+                for (var _i8 = 0; _i8 < yTicks.count - 1; _i8++) {
                     pos += yTickOffset;
                     // From
                     positions.push(p[0] + xTicks.offset.components[0], pos + xTicks.offset.components[1], p[2] + xTicks.offset.components[2], p[0] + xTicks.offset.components[0] + xTicks.length, pos + xTicks.offset.components[1], p[2] + xTicks.offset.components[2]);
@@ -6567,7 +6857,7 @@ Lore.CoordinatesHelper = function (_Lore$HelperBase3) {
 
                 pos = p[1];
 
-                for (var _i6 = 0; _i6 < yTicks.count - 1; _i6++) {
+                for (var _i9 = 0; _i9 < yTicks.count - 1; _i9++) {
                     pos += yTickOffset;
                     // From
                     positions.push(p[0] + xTicks.offset.components[0], pos + xTicks.offset.components[1], p[2] + xTicks.offset.components[2], p[0] + xTicks.offset.components[0], pos + xTicks.offset.components[1], p[2] + xTicks.offset.components[2] + xTicks.length);
@@ -6578,7 +6868,7 @@ Lore.CoordinatesHelper = function (_Lore$HelperBase3) {
                 pos = p[2];
                 col = zTicks.color.components;
 
-                for (var _i7 = 0; _i7 < zTicks.count - 1; _i7++) {
+                for (var _i10 = 0; _i10 < zTicks.count - 1; _i10++) {
                     pos += zTickOffset;
                     // From
                     positions.push(p[0] + xTicks.offset.components[0], p[1] + xTicks.offset.components[1], pos + xTicks.offset.components[2], p[0] + xTicks.offset.components[0], p[1] + xTicks.offset.components[1] + xTicks.length, pos + xTicks.offset.components[2]);
@@ -6587,7 +6877,7 @@ Lore.CoordinatesHelper = function (_Lore$HelperBase3) {
 
                 pos = p[2];
 
-                for (var _i8 = 0; _i8 < zTicks.count - 1; _i8++) {
+                for (var _i11 = 0; _i11 < zTicks.count - 1; _i11++) {
                     pos += zTickOffset;
                     // From
                     positions.push(p[0] + xTicks.offset.components[0], p[1] + xTicks.offset.components[1], pos + xTicks.offset.components[2], p[0] + xTicks.offset.components[0] + xTicks.length, p[1] + xTicks.offset.components[1], pos + xTicks.offset.components[2]);
@@ -7022,7 +7312,7 @@ Lore.OctreeHelper = function (_Lore$HelperBase4) {
 
             var i = 0;
 
-            for (key in aabbs) {
+            for (var key in aabbs) {
                 var c = aabbs[key].center.components;
                 var k = i * 3;
 
@@ -7061,7 +7351,7 @@ Lore.OctreeHelper = function (_Lore$HelperBase4) {
 
             var index = 0;
 
-            for (key in aabbs) {
+            for (var key in aabbs) {
                 var corners = Lore.AABB.getCorners(aabbs[key]);
 
                 p[index++] = corners[0][0];
@@ -7435,51 +7725,94 @@ Lore.InRangeFilter = function (_Lore$FilterBase) {
     return InRangeFilter;
 }(Lore.FilterBase);
 
+/** 
+ * An abstract class representing the base for file reader implementations. 
+ * 
+ * @property {String} source The source of the file. This is either a input element (type=file) or a URL. If it is a URL, set local to true.
+ * */
 Lore.FileReaderBase = function () {
-    function FileReaderBase(elementId) {
+    /**
+     * Creates an instance of FileReaderBase.
+     * 
+     * @param {String} source The source of the file. This is either a input element (type=file) or a URL. If it is a URL, set local to true.
+     * @param {Boolean} [local=true] A boolean indicating whether or not the source is local (a file input) or remote (a url).
+     */
+    function FileReaderBase(source) {
+        var local = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
         _classCallCheck(this, FileReaderBase);
 
-        this.elementId = elementId;
-        this.element = document.getElementById(this.elementId);
-        this.eventListeners = {};
+        this.source = source;
+        this._eventListeners = {};
 
         var that = this;
 
-        this.element.addEventListener('click', function () {
-            this.value = null;
-        });
+        if (local) {
+            this.element = document.getElementById(this.source);
 
-        this.element.addEventListener('change', function () {
-            var fileReader = new FileReader();
+            this.element.addEventListener('click', function () {
+                this.value = null;
+            });
 
-            fileReader.onload = function () {
-                that.loaded(fileReader.result);
-            };
+            this.element.addEventListener('change', function () {
+                var fileReader = new FileReader();
 
-            fileReader.readAsBinaryString(this.files[0]);
-        });
+                fileReader.onload = function () {
+                    that.loaded(fileReader.result);
+                };
+
+                fileReader.readAsBinaryString(this.files[0]);
+            });
+        } else {
+            Lore.Utils.jsonp(source, function (response) {
+                that.loaded(response);
+            });
+        }
     }
+
+    /**
+     * Add an event listener.
+     * 
+     * @param {String} eventName The name of the event.
+     * @param {Function} callback A callback function associated with the event name.
+     */
+
 
     _createClass(FileReaderBase, [{
         key: 'addEventListener',
         value: function addEventListener(eventName, callback) {
-            if (!this.eventListeners[eventName]) {
-                this.eventListeners[eventName] = [];
+            if (!this._eventListeners[eventName]) {
+                this._eventListeners[eventName] = [];
             }
 
-            this.eventListeners[eventName].push(callback);
+            this._eventListeners[eventName].push(callback);
         }
+
+        /**
+         * Raise an event. To be called by inheriting classes.
+         * 
+         * @param {String} eventName The name of the event.
+         * @param {any} data Data to be passed to the handler.
+         */
+
     }, {
         key: 'raiseEvent',
         value: function raiseEvent(eventName, data) {
-            if (!this.eventListeners[eventName]) {
+            if (!this._eventListeners[eventName]) {
                 return;
             }
 
-            for (var i = 0; i < this.eventListeners[eventName].length; i++) {
-                this.eventListeners[eventName][i](data);
+            for (var i = 0; i < this._eventListeners[eventName].length; i++) {
+                this._eventListeners[eventName][i](data);
             }
         }
+
+        /**
+         * To be overwritten by inheriting classes.
+         * 
+         * @param {any} data 
+         */
+
     }, {
         key: 'loaded',
         value: function loaded(data) {}
@@ -7488,13 +7821,22 @@ Lore.FileReaderBase = function () {
     return FileReaderBase;
 }();
 
+/** A class representing a CSV file reader. */
 Lore.CsvFileReader = function (_Lore$FileReaderBase) {
     _inherits(CsvFileReader, _Lore$FileReaderBase);
 
-    function CsvFileReader(elementId, options) {
+    /**
+     * Creates an instance of CsvFileReader.
+     * @param {String} source The source of the file. This is either a input element (type=file) or a URL. If it is a URL, set local to true.
+     * @param {any} options Options. See documentation for details.
+     * @param {boolean} [local=true] A boolean indicating whether or not the source is local (a file input) or remote (a url).
+     */
+    function CsvFileReader(source, options) {
+        var local = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+
         _classCallCheck(this, CsvFileReader);
 
-        var _this15 = _possibleConstructorReturn(this, (CsvFileReader.__proto__ || Object.getPrototypeOf(CsvFileReader)).call(this, elementId));
+        var _this15 = _possibleConstructorReturn(this, (CsvFileReader.__proto__ || Object.getPrototypeOf(CsvFileReader)).call(this, source, local));
 
         _this15.defaults = {
             separator: ',',
@@ -7510,6 +7852,14 @@ Lore.CsvFileReader = function (_Lore$FileReaderBase) {
         _this15.cols = _this15.opts.cols;
         return _this15;
     }
+
+    /**
+     * Called when the data is loaded, will raise the "loaded" event.
+     * 
+     * @param {any} data The data loaded from the file or url.
+     * @returns {Lore.CsvFileReader} Itself.
+     */
+
 
     _createClass(CsvFileReader, [{
         key: 'loaded',
@@ -7527,7 +7877,7 @@ Lore.CsvFileReader = function (_Lore$FileReaderBase) {
                     throw 'Types and cols must have the same number of elements.';
                 }
             } else {
-                if (this.types.length !== this.cols.length) {
+                if (this.types.length !== this.cols.length || this.types.length + this.cols.length === 0) {
                     var values = lines[h].split(this.opts.separator);
 
                     this.types = [];
@@ -7546,25 +7896,25 @@ Lore.CsvFileReader = function (_Lore$FileReaderBase) {
             if (this.cols.length === 0) {
                 var _values = lines[0].split(this.opts.separator);
 
-                for (var _i9 = 0; _i9 < _values.length; _i9++) {
-                    this.cols.push(_i9);
+                for (var _i12 = 0; _i12 < _values.length; _i12++) {
+                    this.cols.push(_i12);
                 }
             }
 
             if (h) {
                 var headerNames = lines[0].split(this.opts.separator);
 
-                for (var _i10 = 0; _i10 < this.cols.length; _i10++) {
-                    this.headers[_i10] = headerNames[this.cols[_i10]];
+                for (var _i13 = 0; _i13 < this.cols.length; _i13++) {
+                    this.headers[_i13] = headerNames[this.cols[_i13]];
                 }
             } else {
-                for (var _i11 = 0; _i11 < this.cols.length; _i11++) {
-                    this.headers[_i11] = _i11;
+                for (var _i14 = 0; _i14 < this.cols.length; _i14++) {
+                    this.headers[_i14] = _i14;
                 }
             }
 
-            for (var _i12 = h; _i12 < length; _i12++) {
-                var _values2 = lines[_i12].split(this.opts.separator);
+            for (var _i15 = h; _i15 < length; _i15++) {
+                var _values2 = lines[_i15].split(this.opts.separator);
 
                 if (this.cols.length == 0) for (var j = 0; j < _values2.length; j++) {
                     this.cols.push[j];
@@ -7572,24 +7922,25 @@ Lore.CsvFileReader = function (_Lore$FileReaderBase) {
 
                 if (init) {
                     for (var _j = 0; _j < this.cols.length; _j++) {
-                        this.createArray(this.headers[_j], this.types[_j], length - h);
+                        this._createArray(this.headers[_j], this.types[_j], length - h);
                     }
 
                     init = false;
                 }
 
                 for (var _j2 = 0; _j2 < this.cols.length; _j2++) {
-                    this.columns[this.headers[_j2]][_i12 - h] = _values2[this.cols[_j2]];
+                    this.columns[this.headers[_j2]][_i15 - h] = _values2[this.cols[_j2]];
                 }
             }
 
             this.raiseEvent('loaded', this.columns);
-
+            console.log(this.columns);
+            console.log(this.types);
             return this;
         }
     }, {
-        key: 'createArray',
-        value: function createArray(index, type, length) {
+        key: '_createArray',
+        value: function _createArray(index, type, length) {
             if (type == 'Int8Array') {
                 this.columns[index] = new Int8Array(length);
             } else if (type == 'Uint8Array') {
@@ -7761,6 +8112,28 @@ Lore.Utils = function () {
         value: function isFloat(n) {
             return Number(n) === n && n % 1 !== 0;
         }
+
+        /**
+         * A helper method enabling JSONP requests to an url.
+         * 
+         * @param {String} url An url.
+         * @param {Function} callback The callback to be called when the data is loaded.
+         */
+
+    }, {
+        key: 'jsonp',
+        value: function jsonp(url, callback) {
+            var callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
+            window[callbackName] = function (response) {
+                delete window[callbackName];
+                document.body.removeChild(script);
+                callback(response);
+            };
+
+            var script = document.createElement('script');
+            script.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'callback=' + callbackName;
+            document.body.appendChild(script);
+        }
     }]);
 
     return Utils;
@@ -7771,7 +8144,7 @@ Lore.Shaders['default'] = new Lore.Shader('Default', { size: new Lore.Uniform('s
     type: new Lore.Uniform('type', 0.0, 'float'),
     fogStart: new Lore.Uniform('fogStart', 0.0, 'float'),
     fogEnd: new Lore.Uniform('fogEnd', 0.0, 'float'),
-    cutoff: new Lore.Uniform('cutoff', 0.0, 'float') }, ['uniform float size;', 'uniform float fogStart;', 'uniform float fogEnd;', 'uniform float cutoff;', 'attribute vec3 position;', 'attribute vec3 color;', 'varying vec3 vColor;', 'varying float vDiscard;', 'vec3 rgb2hsv(vec3 c) {', 'vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);', 'vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));', 'vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));', 'float d = q.x - min(q.w, q.y);', 'float e = 1.0e-10;', 'return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);', '}', 'vec3 hsv2rgb(vec3 c) {', 'vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);', 'vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);', 'return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);', '}', 'float rand(vec2 co) {', 'return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);', '}', 'void main() {', 'vec3 hsv = vec3(color.r, color.g, 1.0);', 'float saturation = color.g;', 'float point_size = color.b;', 'gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);', 'vec4 mv_pos = modelViewMatrix * vec4(position, 1.0);', 'vDiscard = 0.0;', 'if(-mv_pos.z < cutoff || point_size <= 0.0) {', 'vDiscard = 1.0;', 'return;', '}', 'float dist = abs(mv_pos.z - fogStart);', 'gl_PointSize = size;', 'if(fogEnd > 0.0) {', 'hsv.b = clamp((fogEnd - dist) / (fogEnd - fogStart), 0.0, 1.0);', '}', 'hsv.g = 0.5 + 0.4 * rand(position.xy);', 'vColor = hsv2rgb(hsv);', '}'], ['varying vec3 vColor;', 'varying float vDiscard;', 'void main() {', 'if(vDiscard > 0.5) discard;', 'gl_FragColor = vec4(vColor, 1.0);', '}']);
+    cutoff: new Lore.Uniform('cutoff', 0.0, 'float') }, ['uniform float size;', 'uniform float fogStart;', 'uniform float fogEnd;', 'uniform float cutoff;', 'attribute vec3 position;', 'attribute vec3 color;', 'varying vec3 vColor;', 'varying float vDiscard;', 'vec3 rgb2hsv(vec3 c) {', 'vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);', 'vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));', 'vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));', 'float d = q.x - min(q.w, q.y);', 'float e = 1.0e-10;', 'return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);', '}', 'vec3 hsv2rgb(vec3 c) {', 'vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);', 'vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);', 'return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);', '}', 'float rand(vec2 co) {', 'return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);', '}', 'void main() {', 'vec3 hsv = vec3(color.r, color.g, 1.0);', 'float saturation = color.g;', 'float point_size = color.b;', 'gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);', 'vec4 mv_pos = modelViewMatrix * vec4(position, 1.0);', 'vDiscard = 0.0;', 'if(-mv_pos.z < cutoff || point_size <= 0.0) {', 'vDiscard = 1.0;', 'return;', '}', 'gl_PointSize = point_size * size;', 'if(fogEnd == 0.0) {', 'vColor = hsv2rgb(hsv);', 'return;', '}', 'float dist = abs(mv_pos.z);', 'if(dist >= fogEnd) {', 'hsv.b = 0.25;', '}', 'else if(dist <= fogStart) {', 'hsv.b = 1.0;', '}', 'else {', 'hsv.b = max((fogEnd - dist) / (fogEnd - fogStart), 0.25);', '}', 'vColor = hsv2rgb(hsv);', '}'], ['varying vec3 vColor;', 'varying float vDiscard;', 'void main() {', 'if(vDiscard > 0.5) discard;', 'gl_FragColor = vec4(vColor, 1.0);', '}']);
 
 Lore.Shaders['defaultAnimated'] = new Lore.Shader('DefaultAnimated', { size: new Lore.Uniform('size', 5.0, 'float'),
     fogStart: new Lore.Uniform('fogStart', 0.0, 'float'),
@@ -7784,12 +8157,12 @@ Lore.Shaders['coordinates'] = new Lore.Shader('Coordinates', {}, ['attribute vec
 Lore.Shaders['tree'] = new Lore.Shader('Tree', { size: new Lore.Uniform('size', 5.0, 'float'),
     fogStart: new Lore.Uniform('fogStart', 0.0, 'float'),
     fogEnd: new Lore.Uniform('fogEnd', 0.0, 'float'),
-    cutoff: new Lore.Uniform('cutoff', 0.0, 'float') }, ['uniform float size;', 'uniform float fogStart;', 'uniform float fogEnd;', 'uniform float cutoff;', 'attribute vec3 position;', 'attribute vec3 color;', 'varying vec3 vColor;', 'varying float vDiscard;', 'vec3 rgb2hsv(vec3 c) {', 'vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);', 'vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));', 'vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));', 'float d = q.x - min(q.w, q.y);', 'float e = 1.0e-10;', 'return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);', '}', 'vec3 hsv2rgb(vec3 c) {', 'vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);', 'vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);', 'return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);', '}', 'void main() {', 'vec3 hsv = vec3(color.r, color.g, 0.75);', 'float saturation = color.g;', 'float point_size = color.b;', 'gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);', 'vec4 mv_pos = modelViewMatrix * vec4(position, 1.0);', 'vDiscard = 0.0;', 'if(-mv_pos.z < cutoff || point_size <= 0.0) {', 'vDiscard = 1.0;', 'return;', '}', 'float dist = abs(mv_pos.z - fogStart);', 'gl_PointSize = size;', 'if(fogEnd > 0.0) {', 'hsv.b = clamp((fogEnd - dist) / (fogEnd - fogStart), 0.0, 1.0);', '}', 'vColor = hsv2rgb(hsv);', '}'], ['varying vec3 vColor;', 'varying float vDiscard;', 'void main() {', 'if(vDiscard > 0.5) discard;', 'gl_FragColor = vec4(vColor, 0.5);', '}']);
+    cutoff: new Lore.Uniform('cutoff', 0.0, 'float') }, ['uniform float size;', 'uniform float fogStart;', 'uniform float fogEnd;', 'uniform float cutoff;', 'attribute vec3 position;', 'attribute vec3 color;', 'varying vec3 vColor;', 'varying float vDiscard;', 'vec3 rgb2hsv(vec3 c) {', 'vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);', 'vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));', 'vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));', 'float d = q.x - min(q.w, q.y);', 'float e = 1.0e-10;', 'return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);', '}', 'vec3 hsv2rgb(vec3 c) {', 'vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);', 'vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);', 'return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);', '}', 'void main() {', 'vec3 hsv = vec3(color.r, color.g, 0.75);', 'float saturation = color.g;', 'float point_size = color.b;', 'gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);', 'vec4 mv_pos = modelViewMatrix * vec4(position, 1.0);', 'vDiscard = 0.0;', 'if(-mv_pos.z < cutoff || point_size <= 0.0) {', 'vDiscard = 1.0;', 'return;', '}', 'gl_PointSize = size;', 'if(fogEnd == 0.0) {', 'vColor = hsv2rgb(hsv);', 'return;', '}', 'float dist = abs(mv_pos.z);', 'if(dist >= fogEnd) {', 'hsv.b = 0.25;', '}', 'else if(dist <= fogStart) {', 'hsv.b = 1.0;', '}', 'else {', 'hsv.b = max((fogEnd - dist) / (fogEnd - fogStart), 0.25);', '}', 'vColor = hsv2rgb(hsv);', '}'], ['varying vec3 vColor;', 'varying float vDiscard;', 'void main() {', 'if(vDiscard > 0.5) discard;', 'gl_FragColor = vec4(vColor, 0.5);', '}']);
 
 Lore.Shaders['sphere'] = new Lore.Shader('Sphere', { size: new Lore.Uniform('size', 5.0, 'float'),
     fogStart: new Lore.Uniform('fogStart', 0.0, 'float'),
     fogEnd: new Lore.Uniform('fogEnd', 0.0, 'float'),
-    cutoff: new Lore.Uniform('cutoff', 0.0, 'float') }, ['uniform float size;', 'uniform float fogStart;', 'uniform float fogEnd;', 'uniform float cutoff;', 'attribute vec3 position;', 'attribute vec3 color;', 'varying vec3 vColor;', 'varying float vDiscard;', 'vec3 rgb2hsv(vec3 c) {', 'vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);', 'vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));', 'vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));', 'float d = q.x - min(q.w, q.y);', 'float e = 1.0e-10;', 'return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);', '}', 'vec3 hsv2rgb(vec3 c) {', 'vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);', 'vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);', 'return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);', '}', 'void main() {', 'vec3 hsv = vec3(color.r, color.g, 1.0);', 'float saturation = color.g;', 'float point_size = color.b;', 'gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);', 'vec4 mv_pos = modelViewMatrix * vec4(position, 1.0);', 'vDiscard = 0.0;', 'if(-mv_pos.z < cutoff || point_size <= 0.0 || mv_pos.z > 0.0) {', 'vDiscard = 1.0;', 'return;', '}', 'float dist = max(0.0, length(mv_pos) - fogStart);', 'gl_PointSize = point_size * size;', 'if(fogEnd > 0.0) {', 'hsv.b = clamp((fogEnd - dist) / (fogEnd - fogStart), 0.0, 1.0);', '}', 'vColor = hsv2rgb(hsv);', '}'], ['varying vec3 vColor;', 'varying float vDiscard;', 'float rand(vec2 co) {', 'return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);', '}', 'void main() {', 'if(vDiscard > 0.5) discard;', 'vec3 N;', 'N.xy = gl_PointCoord * 2.0 - vec2(1.0);', 'float mag = dot(N.xy, N.xy);', 'if (mag > 1.0) discard;   // discard fragments outside circle', 'N.z = sqrt(1.0 - mag);', 'vec3 light_dir = vec3(0.25, -0.25, 1.0);', 'float diffuse = max(0.25, dot(light_dir, N));', 'vec3 v = normalize(vec3(0.1, -0.2, 1.0));', 'vec3 h = normalize(light_dir + v);', 'float specular = pow(max(0.0, dot(N, h)), 100.0);', '// specular += 0.1 * rand(gl_PointCoord);', 'gl_FragColor = vec4(vColor * diffuse + specular * 0.5, 1.0);', '}']);
+    cutoff: new Lore.Uniform('cutoff', 0.0, 'float') }, ['uniform float size;', 'uniform float fogStart;', 'uniform float fogEnd;', 'uniform float cutoff;', 'attribute vec3 position;', 'attribute vec3 color;', 'varying vec3 vColor;', 'varying float vDiscard;', 'vec3 rgb2hsv(vec3 c) {', 'vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);', 'vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));', 'vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));', 'float d = q.x - min(q.w, q.y);', 'float e = 1.0e-10;', 'return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);', '}', 'vec3 hsv2rgb(vec3 c) {', 'vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);', 'vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);', 'return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);', '}', 'void main() {', 'vec3 hsv = vec3(color.r, color.g, 1.0);', 'float saturation = color.g;', 'float point_size = color.b;', 'gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);', 'vec4 mv_pos = modelViewMatrix * vec4(position, 1.0);', 'vDiscard = 0.0;', 'if(-mv_pos.z < cutoff || point_size <= 0.0 || mv_pos.z > 0.0) {', 'vDiscard = 1.0;', 'return;', '}', 'gl_PointSize = point_size * size;', 'if(fogEnd == 0.0) {', 'vColor = hsv2rgb(hsv);', 'return;', '}', 'float dist = abs(mv_pos.z);', 'if(dist >= fogEnd) {', 'hsv.b = 0.25;', '}', 'else if(dist <= fogStart) {', 'hsv.b = 1.0;', '}', 'else {', 'hsv.b = max((fogEnd - dist) / (fogEnd - fogStart), 0.25);', '}', 'vColor = hsv2rgb(hsv);', '}'], ['varying vec3 vColor;', 'varying float vDiscard;', 'float rand(vec2 co) {', 'return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);', '}', 'void main() {', 'if(vDiscard > 0.5) discard;', 'vec3 N;', 'N.xy = gl_PointCoord * 2.0 - vec2(1.0);', 'float mag = dot(N.xy, N.xy);', 'if (mag > 1.0) discard;   // discard fragments outside circle', 'N.z = sqrt(1.0 - mag);', 'vec3 light_dir = vec3(0.25, -0.25, 1.0);', 'float diffuse = max(0.25, dot(light_dir, N));', 'vec3 v = normalize(vec3(0.1, -0.2, 1.0));', 'vec3 h = normalize(light_dir + v);', 'float specular = pow(max(0.0, dot(N, h)), 100.0);', '// specular += 0.1 * rand(gl_PointCoord);', 'gl_FragColor = vec4(vColor * diffuse + specular * 0.5, 1.0);', '}']);
 
 Lore.Shaders['defaultEffect'] = new Lore.Shader('DefaultEffect', {}, ['attribute vec2 v_coord;', 'uniform sampler2D fbo_texture;', 'varying vec2 f_texcoord;', 'void main() {', 'gl_Position = vec4(v_coord, 0.0, 1.0);', 'f_texcoord = (v_coord + 1.0) / 2.0;', '}'], ['uniform sampler2D fbo_texture;', 'varying vec2 f_texcoord;', 'void main(void) {', 'vec4 color = texture2D(fbo_texture, f_texcoord);', 'gl_FragColor = color;', '}']);
 

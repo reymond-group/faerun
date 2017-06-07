@@ -588,7 +588,8 @@
       octreeHelper: oh
     });
 
-    console.log(lore);
+    // Remove selected from previous variant
+    clearSelected();
 
     bindings.dataTitle.innerHTML = currentDatabase.name;
     bindings.selectDatabase.parentElement.style.pointerEvents = 'auto';
