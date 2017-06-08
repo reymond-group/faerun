@@ -283,6 +283,39 @@
             </div>
         </div>
 
+        <div id="modal-first-visit" class="modal modal-fixed-footer">
+            <div class="modal-content">
+                <h4 class="flex-item"><i class="material-icons">info_outline</i>&nbsp;Welcome to Faerun</h4>
+                <div class="flex-item">
+                    <p class="faerun-info">This website uses cookies to ensure you get the best experience on our website. <a href="http://cookiesandyou.com/">Learn more</a></p>
+                </div>
+                <div class="flex-item">
+                    <div class="row">
+                        <div class="col s4">
+                            <img src="./images/main-menu.png" style="width: 100%"></img>
+                        </div>
+                        <div class="col s8">
+                            <p>
+                                <b>1.</b> To get started, open the main menu by clicking the hamburger menu to the top right of the screen.
+                            </p>
+                            <p>
+                                <b>2.</b> Select a database from the select element. All available fingerprints will be displayed once a database is selected.
+                            </p>
+                            <p>
+                                <b>3.</b> Select a variant (the positions of the vertices). Available maps will be loaded.
+                            </p>
+                            <p>
+                                <b>4.</b> Select a map (the color of the vertices). The menu closes automatically after selecting a map.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close waves-effect waves-red btn-flat ">Let's Start</a>
+            </div>
+        </div>
+
         <!-- Templates -->
         <script id="selected-bin-template" type="text/x-handlebars-template">
             <div id="selected-bin-item-{{layer}}-{{id}}" 
@@ -341,6 +374,8 @@
                         startingTop: '2%',
                         endingTop: '5%'
                     });
+
+                    $('#modal-first-visit').modal('open');
                 });
             })(jQuery);
         </script>
