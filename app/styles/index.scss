@@ -8,8 +8,14 @@
 /**
  * ID - Elements 
  */
+#button-toggle-select {
+    &.active {
+        background-color: $accent-color;
+    }
+}
+
 #hover-indicator {
-    z-index: 999;
+    z-index: 900;
     position: absolute;
     display: block;
     left: 10px;
@@ -22,7 +28,7 @@
 }
 
 #select-indicator {
-    z-index: 999;
+    z-index: 900;
     position: absolute;
     display: block;
     left: 10px;

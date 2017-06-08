@@ -107,7 +107,7 @@
   });
 
   bindings.buttonToggleSelect.addEventListener('click', function () {
-    Faerun.toggleClass(bindings.buttonToggleSelect, 'mdl-button--colored');
+    Faerun.toggleClass(bindings.buttonToggleSelect, 'active');
     if (lore.controls.touchMode === 'drag') {
       Faerun.showMobile(bindings.hoverStructure);
       lore.controls.touchMode = 'select';
@@ -118,6 +118,7 @@
   });
 
   bindings.buttonSelectHovered.addEventListener('click', function () {
+    console.log('select hovered');
     projections[0].octreeHelper.selectHovered();
   });
 

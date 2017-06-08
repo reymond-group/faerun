@@ -437,6 +437,7 @@ html, body {
 
         &:nth-child(8) {
             flex: 1 1 auto;
+            min-height: 108px;
             overflow-y: auto;
         }
     }
@@ -578,6 +579,10 @@ html, body {
                     padding-left: 22px !important;
                 }
             }
+
+            .checkbox-container {
+                opacity: 0.0;
+            }
         }
     }
 
@@ -706,7 +711,7 @@ html, body {
  */
 #loader {
     position: absolute;
-    z-index: 999999;
+    z-index: 9999;
     top: 0;
     left: 0;
     bottom: 0;
