@@ -68,7 +68,8 @@
             compoundInfo.innerHTML += '<p>' + schemblId + '</p>';
 
             if (databases) {
-              for (var database of databases) {
+              for (var i = 0; i < databases.length; i++) {
+                let database = databases[i];
                 let a = document.createElement('a');
 
                 a.innerHTML = database.name;
@@ -405,7 +406,8 @@
     let databases = databaseLinks[schemblId];
 
     if (databases) {
-      for (var database of databases) {
+      for (var i = 0; i < databases.length; i++) {
+        let database = databases[i];
         let a = document.createElement('a');
 
         a.innerHTML = database.name;
