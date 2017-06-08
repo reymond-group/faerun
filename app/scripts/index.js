@@ -96,6 +96,8 @@
 
   bindings.buttonRecenter.addEventListener('click', function () {
     lore.controls.setLookAt(center);
+    lore.controls.setZoom(1.0);
+    lore.controls.setFreeView();
   });
 
   bindings.buttonZoomIn.addEventListener('click', function () {
@@ -278,15 +280,20 @@
   }
 
   /**
-   * Add a layer to the available projections
+   * Add a layer to the available projections.
    *
-   * @param {any} projection - A projection item to be added to the available projections
+   * @param {any} projection - A projection item to be added to the available projections.
    */
   function addProjection(projection) {
     projections.push(projection);
     updateLayers();
   }
 
+  /**
+   * Set a projection object as the main projection.
+   *
+   * @param {any} projection A projection to be set as the main projection.
+   */
   function setMainProjection(projection) {
     if (projections[0]) {
       projections[0].octreeHelper.destruct();
@@ -462,7 +469,8 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     lore = Lore.init('lore', {
-      clearColor: '#121212'
+      clearColor: '#121212',
+      radius: 500
     });
 
     smilesDrawer = new SmilesDrawer.Drawer({width: 180, height: 180});
@@ -511,6 +519,7 @@
     }
 
     setCutoffRange(currentVariant.resolution * Math.sqrt(3));
+    lore.controls.setRadius(0.5 * currentVariant.resolution * Math.sqrt(3) + 2);
 
     // Setup the coordinate system
     let cs = Faerun.updateCoordinatesHelper(lore, currentVariant.resolution);
@@ -599,6 +608,9 @@
     // Unblock the select elements after loading
     Faerun.unblockElements(bindings.selectDatabase.parentElement, bindings.selectFingerprint.parentElement,
       bindings.selectVariant.parentElement, bindings.selectMap.parentElement);
+
+    // Set the view to a nice angle
+    lore.controls.setFreeView();
   }
 
   function onStatsLoaded(message) {
@@ -675,9 +687,11 @@
   }
 
   function onInfosSearched(message) {
-    for (let binIndex of message.binIndices) {
-      for (let result of binIndex) {
-        projections[0].octreeHelper.addSelected(result);
+    for (var i = 0; i < message.binIndices.length; i++) {
+      let binIndex = message.binIndices[i];
+
+      for (var j = 0; j < binIndex.length; j++) {
+        projections[0].octreeHelper.addSelected(binIndex[j]);
       }
     }
 

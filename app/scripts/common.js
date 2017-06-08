@@ -413,7 +413,11 @@ Faerun.getBindings = function () {
  * @param {Number} size - The size of the x, y and z coordinate axis
  * @return {any} Retruns an object containing the center (.center) of the CoordinatesHelper and the CoordiantesHelper itself (.helper)
  */
-Faerun.updateCoordinatesHelper = function (lore, size, ticks = 10, box = true, y = true) {
+Faerun.updateCoordinatesHelper = function (lore, size, ticks, box, y) {
+  ticks = ticks === undefined ? 0 : ticks;
+  box = box === undefined ? true : box;
+  y = y === undefined ? true : y;
+
   var coordinatesHelper = new Lore.CoordinatesHelper(lore, 'Coordinates', 'coordinates', {
     position: new Lore.Vector3f(0, 0, 0),
     axis: {
