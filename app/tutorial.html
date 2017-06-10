@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="description" content="A front-end template that helps you build fast, modern mobile web apps.">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+        <title>FAERUN Tutorial</title>
+        <!-- Add to homescreen for Chrome on Android -->
+        <!-- <meta name="mobile-web-app-capable" content="yes"> -->
+        <!-- <link rel="icon" sizes="192x192" href="images/android-desktop.png"> -->
+        <!-- Add to homescreen for Safari on iOS -->
+        <!-- <meta name="apple-mobile-web-app-capable" content="yes"> -->
+        <!-- <meta name="apple-mobile-web-app-status-bar-style" content="black"> -->
+        <!-- <meta name="apple-mobile-web-app-title" content="Faerun"> -->
+        <!-- <link rel="apple-touch-icon-precomposed" href="images/ios-desktop.png"> -->
+        <!-- Tile icon for Win8 (144x144 + tile color) -->
+        <!-- <meta name="msapplication-TileImage" content="images/touch/ms-touch-icon-144x144-precomposed.png"> -->
+        <!-- <meta name="msapplication-TileColor" content="#3372DF"> -->
+        <link rel="shortcut icon" href="images/favicon.ico">
+        <!-- SEO: If your mobile URL is different from the desktop URL, add a canonical link to the desktop page https://developers.google.com/webmasters/smartphone-sites/feature-phones -->
+        <!--
+        <link rel="canonical" href="http://www.example.com/">
+        -->
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,400,500,700">
+        
+        <link rel="stylesheet" href="styles/materialize/materialize.css">
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col s12">
+                    <h4>FAERUN Tutorial</h4>
+                </div>
+                <div class="col s12">
+                    <h5>Contents</h5>
+                </div>
+                <div class="col s12">
+                    <ol>
+                        <li><a href="#loading_data">Loading Data</a></li>
+                        <li><a href="#filtering_data">Filtering Data</a></li>
+                        <li><a href="#details_1">Details (1)</a></li>
+                        <li><a href="#details_2">Details (2)</a></li>
+                        <li><a href="#custom_data">Loading (Projecting) a Custom Set of Molecules</a></li>
+                        <li><a href="#knn_search">KNN Search</a></li>
+                    </ol>
+                </div>
+                <div class="col s12">
+                    <h5 id="loading_data">Loading Data</h5>
+                </div>
+                <div class="col s12">
+                    <img src="./images/tutorial/faerun_load.gif" style="width:100%"></img>
+                    <ol>
+                        <li>Select a database.</li>
+                        <li>Select a (molecular) fingerprint.</li>
+                        <li>Select a variant. Each variant is the product of a PCA dimensionality reduction from original fingerprint space to 3D. After projection, the data was digitized into two different resolutions: low (250 x 250 x 250) and high (500 x 500 x 500).</li>
+                        <li>After this step, the positional data is loaded (all data points have the same colour.</li>
+                        <li>It's strongly suggested that you now also select a map, colour coding the loaded data. The colour gradient (dark blue to magenta) always equals low to high.</li>
+                        <li>You can now select data points by double clicking them.</li>
+                    </ol>
+                </div>
+                <div class="col s12">
+                    <h5 id="filtering_data">Filtering Data</h5>
+                </div>
+                <div class="col s12">
+                    <img src="./images/tutorial/faerun_filter.gif" style="width:100%"></img>
+                    <ol>
+                        <li>Data filtering allows to explore the inside of the point cloud.</li>
+                        <li>Data can be filtered by using Depth Cutoff. Setting a minimum depth from the camera, thus slicing the point cloud.</li>
+                        <li>Data can alos be filtered by Color.</li>
+                    </ol>
+                </div>
+                <div class="col s12">
+                    <h5 id="details_1">Details (1)</h5>
+                </div>
+                <div class="col s12">
+                    <img src="./images/tutorial/faerun_details1.gif" style="width:100%"></img>
+                    <ol>
+                        <li>A data point (or bin) can be selected by double clicking it. Once selected, it appears in the selected bins list in the HUD.</li>
+                        <li>A selected item has three functions. Clicking the 'x' button removes the bin from the selected list. Clicking the button below the 'x' button centers the view on this bin. Clicking the item anywhere else, opens the detail view in a new browser tab.</li>
+                        <li>The details view loads the content of a bin, or if the bin has less than 10 compounds, the content of the bin and the 26 surrounding bins.</li>
+                        <li>Data points representing compounds are connected by the minimum spanning tree.</li>
+                        <li>Data points contained within the selected bin are strongly saturated (colourful) while those selected from surrounding bins have muted colours.</li>
+                    </ol>
+                </div>
+                <div class="col s12">
+                    <h5 id="details_1">Details (2)</h5>
+                </div>
+                <div class="col s12">
+                    <img src="./images/tutorial/faerun_details2.gif" style="width:100%"></img>
+                    <ol>
+                        <li>Compounds within a bin (or cluster of bins) can also be explored by displaying them as a list.</li>
+                        <li>The button "Download As CSV" downloads a CSV containing the displayed data.</li>
+                    </ol>
+                </div>
+                <div class="col s12">
+                    <h5 id="custom_data">Loading (Projecting) a Custom Set of Molecules</h5>
+                </div>
+                <div class="col s12">
+                    <img src="./images/tutorial/faerun_project.gif" style="width:100%"></img>
+                    <ol>
+                        <li>A custom set of molecules can be projected to the currently loaded space by clicking "Project" in the main menu.</li>
+                        <li>Choose a color for the projected data points.</li>
+                        <li>Choose a name for the set.</li>
+                        <li>Enter (or paste) a set of SMILES strings in the textarea, separated by new lines and click "PROJECT".</li>
+                        <li>The (currently selected) fingerprint is computed for the entered molecules.</li>
+                        <li>The  PCA model (matrices) associated with each fingerprint is (are) stored and applied to the calculated fingerprints.</li>
+                        <li>The projected points are probably hidden by the original data. Since the two filter sliders are always associated with the main data layer (SureChEMBL), they can be used to bring the newly projected data within view.</li>
+                    </ol>
+                </div>
+                <div class="col s12">
+                    <h5 id="knn_search">KNN Search</h5>
+                </div>
+                <div class="col s12">
+                    <img src="./images/tutorial/faerun_knn.gif" style="width:100%"></img>
+                    <ol>
+                        <li>Once a custom projection is loaded, make sure it is selected in the LAYERS list and all filters are off.</li>
+                        <li>In the main menu, click "KNN SEARCH". </li>
+                        <li>Choose a number of nearest neighbours (k) to serach for (for each projected compound).</li>
+                        <li>This step might take up to a couple of minutes, depending on the amount of projected compounds, the parameter k and the speed of your computer.</li>
+                        <li>Once the KNN search has finished, select SureChEMBL again in order to be able to select data points from this set (or layer).</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js"></script>
+    </body>
+</html>
