@@ -294,6 +294,7 @@ gulp.task('generate-service-worker', ['copy-sw-scripts'], () => {
       'scripts/sw/sw-toolbox.js',
       'scripts/sw/runtime-caching.js'
     ],
+    maximumFileSizeToCacheInBytes: 6097152,
     staticFileGlobs: [
       // Add/remove glob patterns to match your directory setup.
       `${rootDir}/images/**/*`,
