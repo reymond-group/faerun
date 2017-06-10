@@ -206,15 +206,22 @@
         </div>
 
         <!-- Dialogs -->
-        <div id="modal-search" class="modal modal-fixed-footer">
-            <div class="modal-content">
+        <div id="modal-search" class="modal modal-fixed-footer" style="height:90%;max-height:90%">
+            <div class="modal-content flex">
                 <h4 class="flex-item"><i class="material-icons">search</i>&nbsp;Search Compounds</h4>
                 <div class="flex-item">
                     <p class="faerun-info">You may enter one search query per line. A search query might include the ID, the SMILES or the fingerprint of
                         a compound. Each query can return multiple matches. The search is case-sensitive (ABC is not equal to abc).</p>
                 </div>
                 <div class="flex-item">
-                    <textarea id="textarea-search" data-binding-id="textareaSearch" type="text"></textarea>
+                    <div class="row">
+                        <div class="col s12">
+                            <label for="textarea-search">Search Strings</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-item stretch">
+                    <textarea id="textarea-search" data-binding-id="textareaSearch" class="faerun-textarea" autofocus="autofocus"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
@@ -225,7 +232,7 @@
 
         <div id="modal-project" class="modal modal-fixed-footer" style="height:90%;max-height:90%">
             <div class="modal-content flex">
-                <div class="title flex-item">Project Coaaampounds</div>
+                <div class="title flex-item">Project Compounds</div>
                 <div class="flex-item">
                     <div class="row">
                         <div class="col s12">
@@ -236,11 +243,11 @@
                     </div>
                     <div class="row">
                         <div id="colorpicker-dialog-project" data-binding-id="colorpickerDialogProject" class="colorpicker-container input-field col s6">
-                            <input type="text" id="colorpicker-dialog-project-input" data-binding-id="colorpickerDialogProjectInput">
+                            <input type="text" placeholder="" id="colorpicker-dialog-project-input" data-binding-id="colorpickerDialogProjectInput">
                             <label for="colorpicker-dialog-project-input">Pick Color ...</label>
                         </div>
                         <div class="name-container input-field col s6">
-                            <input type="text" id="name-dialog-project-input" data-binding-id="nameDialogProjectInput">
+                            <input type="text" placeholder="" id="name-dialog-project-input" data-binding-id="nameDialogProjectInput">
                             <label for="nameDialogProjectInput">Name</label>
                         </div>
                     </div>
@@ -270,8 +277,8 @@
                 </div>
                 <div class="flex-item">
                     <div class="row">
-                        <div class="name-container input-field col 12">
-                            <input type="text" id="kKNN" data-binding-id="kKNN" class="validate">
+                        <div class="name-container input-field col s12">
+                            <input type="text" placeholder="" id="kKNN" data-binding-id="kKNN" class="validate">
                             <label for="kKNN">Number of Neighbours (k)</label>
                         </div>
                     </div>
