@@ -528,7 +528,7 @@
 
     let ph = new Lore.PointHelper(lore, 'MainGeometry', 'sphere');
 
-    ph.setFogDistance(0, currentVariant.resolution * Math.sqrt(3));
+    ph.setFogDistance(100, currentVariant.resolution * Math.sqrt(3));
     ph.setPositionsXYZHSS(message.data[0], message.data[1], message.data[2], 0.6, 1.0, 1.0);
     ph.addFilter('hueRange', new Lore.InRangeFilter('color', 0, 0.22, 0.25));
 
