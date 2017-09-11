@@ -245,7 +245,7 @@ gulp.task('serve:distnolint', ['nolint'], () =>
 gulp.task('default', ['clean'], cb =>
   runSequence(
     'styles',
-    ['lint', 'html', 'scripts', 'images', 'copy'],
+    ['html', 'scripts', 'images', 'copy', 'copylibs', 'copyscripts', 'copyfonts'],
     'generate-service-worker',
     cb
   )
