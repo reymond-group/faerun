@@ -11,7 +11,7 @@ docker run -d -p 80:80 --name faerun daenuprobst/faerun
 ```
 This will use the default configuration. Using the default configuration means, that faerun will connect to the default services provided by our research group (http://www.gdb.unibe.ch). If you wish to provide your own service (e.g. containing other databases) you can provide a custom server address using the environment variable `SERVER`
 ```
-docker run -d -p 80:80 -e SERVER=ws://example.ch --name faerun daenuprobst/faerun
+docker run -d -p 80:80 -e SERVER=ws://example.ch/underdark --name faerun daenuprobst/faerun
 ```
 See how to deploy your own backend server [here](https://github.com/reymond-group/underdarkgo).
 
