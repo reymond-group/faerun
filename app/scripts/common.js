@@ -355,7 +355,6 @@ Faerun.translateAbsolute = function (element, x, y, center) {
   element.style.top = y + 'px';
 };
 
-
 Faerun.resize = function (element, width, height) {
   element.style.width = width + 'px';
   element.style.height = height + 'px';
@@ -635,7 +634,7 @@ Faerun.loadFingerprint = function (url, fp, smi, callback) {
     for (var i = 0; i < data.length; i++) {
       let item = data[i].split('_');
 
-      fps.push(item[1].trim().replace(/(^,)|(,$)/g, ''));
+      fps.push(item[1].trim().replace(/(^;)|(;$)/g, ''));
       smis.push(item[2].trim());
     }
 

@@ -378,7 +378,6 @@
       e.preventDefault();
     });
 
-
     let indicator = document.createElement('div');
 
     indicator.classList.add('select-indicator');
