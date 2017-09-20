@@ -344,6 +344,10 @@
             let srcId = response[k].src_id;
             let srcInfo = FaerunConfig.schembl.sources[srcId];
 
+            if(!srcInfo) {
+              continue;
+            }
+
             items.push({
               id: response[k].src_compound_id,
               name: srcInfo.name_label,
