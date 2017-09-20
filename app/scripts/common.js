@@ -635,7 +635,7 @@ Faerun.loadFingerprint = function (url, fp, smi, callback) {
     for (var i = 0; i < data.length; i++) {
       let item = data[i].split('_');
 
-      fps.push(item[1].trim());
+      fps.push(item[1].trim().replace(/(^,)|(,$)/g, ''));
       smis.push(item[2].trim());
     }
 
