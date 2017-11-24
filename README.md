@@ -1,4 +1,7 @@
 ![Faerun](https://github.com/reymond-group/faerun/blob/master/app/images/logo.png?raw=true)
+
+If you use this code or application, please cite the original paper published by Bioinformatics: ![10.1093/bioinformatics/btx760](http://dx.doi.org/10.1093/bioinformatics/btx760)
+
 # Faerun
 Visualizing large high-dimensional datasets.
 
