@@ -2,6 +2,8 @@
 # Faerun
 Visualizing large high-dimensional datasets.
 
+**For a complete overview and detailed installation instructions for this project, please visit the [project website](http://doc.gdb.tools/fun).**
+
 This is the front-end of the FUn framework. A reference implementation visualizing over 10 million compunds exported from the [SureChEMBL database](https://www.surechembl.org) can be found at [faerun.gdb.tools](http://faerun.gdb.tools). The backend can be found in its own [github repository](https://github.com/reymond-group/underdarkgo).
 
 ## Getting Started
