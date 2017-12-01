@@ -128,12 +128,14 @@
     Faerun.initFullscreenSwitch(bindings.switchFullscreen);
     smilesDrawer = new SmilesDrawer.Drawer({
       width: 180,
-      height: 180
+      height: 180,
+      bondThickness: 1.5
     });
 
     smilesDrawerBig = new SmilesDrawer.Drawer({
       width: 250,
-      height: 250
+      height: 250,
+      bondThickness: 1.5
     });
 
 

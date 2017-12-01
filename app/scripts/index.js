@@ -472,8 +472,8 @@
       radius: 500
     });
 
-    smilesDrawer = new SmilesDrawer.Drawer({width: 180, height: 180});
-    smallSmilesDrawer = new SmilesDrawer.Drawer({width: 48, height: 48, atomVisualization: 'balls'});
+    smilesDrawer = new SmilesDrawer.Drawer({width: 180, height: 180, bondThickness: 1.5});
+    smallSmilesDrawer = new SmilesDrawer.Drawer({width: 48, height: 48, atomVisualization: 'balls', bondThickness: 1.5});
 
     Faerun.initFullscreenSwitch(bindings.switchFullscreen);
     Faerun.initViewSelect(bindings.selectView, lore);
