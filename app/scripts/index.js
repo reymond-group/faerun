@@ -17,17 +17,54 @@
   let selectSmiles = {};
   let selectedBins = [];
   let socketWorker = new Worker('scripts/socketWorker.js');
+  let initialLoad = true;
 
   let bindings = Faerun.getBindings();
 
   // Events
+  bindings.largePreview.addEventListener('change', function() {
+    Faerun.largePreview = !Faerun.largePreview;
+
+    if (Faerun.largePreview) {
+      Faerun.show(bindings.overlayStructureContainer);
+    } else {
+      Faerun.hide(bindings.overlayStructureContainer);
+    }
+  });
+
   bindings.switchColor.addEventListener('change', function () {
     if (bindings.switchColor.checked) {
-      lore.setClearColor(Lore.Color.fromHex('#DADFE1'));
+      lore.setClearColor(Lore.Core.Color.fromHex('#ffffff'));
+      for (var i = 0; i < projections.length; i++) {
+        projections[i].pointHelper.setFog([1.0, 1.0, 1.0, 1.0], 6.0 - currentVariant.resolution / 500);
+      }
     } else {
-      lore.setClearColor(Lore.Color.fromHex('#121212'));
+      lore.setClearColor(Lore.Core.Color.fromHex('#121212'));
+      for (var i = 0; i < projections.length; i++) {
+        projections[i].pointHelper.setFog([0.05, 0.05, 0.05, 1.0], 6.0 - currentVariant.resolution / 500);
+      }
     }
   }, false);
+
+  $(bindings.buttonShare).on('click', function() {
+    let value = 'http://' + window.location.hostname;
+
+    if (window.location.port && window.location.port !== 80) {
+      value += ':' + window.location.port;
+    }
+
+    value += '?variant=' + currentVariant.id;
+
+    if (currentMap) {
+      value += '&map=' + currentMap.id.split('.')[3];
+    }
+
+    value += '&zoom=' + lore.controls.camera.zoom;
+    value += '&lookat=' + lore.controls.lookAt.getX() + ',' + lore.controls.lookAt.getY() + ',' + lore.controls.lookAt.getZ();
+    value += '&view=' + lore.controls.spherical.components[1] + ',' + lore.controls.spherical.components[2];
+
+    bindings.urlDialogProjectInput.value = value;
+  });
 
   $(bindings.selectDatabase).on('change', function () {
     currentDatabase = config.databases[bindings.selectDatabase.value];
@@ -88,7 +125,7 @@
       return;
     }
 
-    val = Lore.Color.gdbHueShift(val);
+    val = Lore.Core.Color.gdbHueShift(val);
     filter.setMin(val - 0.002);
     filter.setMax(val + 0.002);
     filter.filter();
@@ -120,7 +157,6 @@
   });
 
   bindings.buttonSelectHovered.addEventListener('click', function () {
-    console.log('select hovered');
     projections[0].octreeHelper.selectHovered();
   });
 
@@ -135,7 +171,7 @@
     }
 
     let queries = bindings.textareaSearch.value.split('\n');
-    console.log('Queries:', queries);
+
     if (queries.length < 1 || queries[0] === '') {
       bindings.toastError.MaterialSnackbar.showSnackbar({
         message: 'Please enter at least one query ...'
@@ -223,12 +259,6 @@
 
     $(bindings.selectVariant).material_select();
 
-    if (fingerprint.variants.length === 1) {
-      bindings.selectVariant.value = 0;
-      loadStats(0);
-      loadVariant(0);
-    }
-
     // Also clear maps
     Faerun.removeChildren(bindings.selectMap);
     Faerun.appendOption(bindings.selectMap, null, 'Select a map');
@@ -313,7 +343,7 @@
   function createSelected(idx, id, layer) {
     let selected = projections[0].octreeHelper.selected[idx];
     let hue = projections[0].pointHelper.getHue(id);
-    let rgb = Lore.Color.hslToRgb(hue, 1.0, 0.5);
+    let rgb = Lore.Core.Color.hslToRgb(hue, 1.0, 0.5);
 
     for (let i = 0; i < rgb.length; i++) {
       rgb[i] = Math.round(rgb[i] * 255);
@@ -505,6 +535,11 @@
   function onInit(message) {
     config = message;
     populateDatabases();
+
+    let variant = Faerun.getUrlParam('variant');
+    if (variant) {
+      loadVariantFromUrl(variant);
+    }
   }
 
   /**
@@ -525,13 +560,13 @@
     center = cs.center;
     coordinatesHelper = cs.helper;
 
-    let ph = new Lore.PointHelper(lore, 'MainGeometry', 'sphere');
+    let ph = new Lore.Helpers.PointHelper(lore, 'MainGeometry', 'sphere');
 
-    ph.setFogDistance(100, currentVariant.resolution * Math.sqrt(3));
+    ph.setFog([0.05, 0.05, 0.05, 1.0], 6.0 - currentVariant.resolution / 500);
     ph.setPositionsXYZHSS(message.data[0], message.data[1], message.data[2], 0.6, 1.0, 1.0);
-    ph.addFilter('hueRange', new Lore.InRangeFilter('color', 0, 0.22, 0.25));
+    ph.addFilter('hueRange', new Lore.Filters.InRangeFilter('color', 0, 0.22, 0.25));
 
-    let oh = new Lore.OctreeHelper(lore, 'OctreeGeometry', 'default', ph, {
+    let oh = new Lore.Helpers.OctreeHelper(lore, 'OctreeGeometry', 'defaultSquare', ph, {
       visualize: false
     });
 
@@ -610,6 +645,8 @@
 
     // Set the view to a nice angle
     lore.controls.setFreeView();
+    lore.controls.zoomIn();
+    lore.controls.zoomOut();
   }
 
   function onStatsLoaded(message) {
@@ -650,7 +687,7 @@
 
     projections[0].pointHelper.setRGB(message.data[0], message.data[1], message.data[2]);
 
-    Faerun.setTitle(currentDatabase.name + ' &middot; ' + currentMap.name);
+    Faerun.setTitle(currentDatabase.name + ' &middot; ' + currentFingerprint.name + ' &middot; ' + currentMap.name);
     bindings.selectMap.parentElement.style.pointerEvents = 'auto';
     Faerun.hide(bindings.loader);
 
@@ -660,6 +697,32 @@
 
     // Hide the sidenav once the map is loaded
     $('.button-toggle-nav').sideNav('hide');
+
+    // On initial load, also check wheter view parameters have been passed
+    if (initialLoad) {
+      initialLoad = false;
+
+      let zoom = Faerun.getUrlParam('zoom');
+      if (zoom) {
+        lore.controls.setZoom(zoom);
+        // Workaround as point-scaling is weird after setZoom
+        // TODO: Inverstigate and fix in lore
+        lore.controls.zoomIn();
+        lore.controls.zoomOut();
+      }
+
+      let lookAt = Faerun.getUrlParam('lookat');
+      if (lookAt) {
+        let coords = lookAt.split(',');
+        lore.controls.setLookAt(new Lore.Math.Vector3f(coords[0], coords[1], coords[2]));
+      }
+
+      let view = Faerun.getUrlParam('view');
+      if (view) {
+        let coords = view.split(',');
+        lore.controls.setView(coords[0], coords[1]);
+      }
+    }
   }
 
   /**
@@ -683,6 +746,18 @@
     SmilesDrawer.parse(message.smiles, function(tree) {
       sd.draw(tree, target, 'dark');
     });
+
+    // If enabled, draw overlay structure
+    if (Faerun.largePreview) {
+      let smilesDrawerOverlay = new SmilesDrawer.Drawer({
+        width: $(bindings.overlayStructureContainer).width(),
+        height: $(bindings.overlayStructureContainer).height()
+      });
+
+      SmilesDrawer.parse(message.smiles, function(tree) {
+        smilesDrawerOverlay.draw(tree, 'overlay-structure', 'dark');
+      });
+    }
   }
 
   function onInfosSearched(message) {
@@ -836,11 +911,11 @@
     };
 
     loadChunk(function () {
-      let ph = new Lore.PointHelper(lore, 'ProjectionGeometry' + projections.length, 'defaultAnimated');
-      ph.setFogDistance(0, currentVariant.resolution * Math.sqrt(3));
+      let ph = new Lore.Helpers.PointHelper(lore, 'ProjectionGeometry' + projections.length, 'defaultAnimated');
+      ph.setFog([0.05, 0.05, 0.05, 1.0], 6.0);
       ph.setPositionsXYZHSS(x, y, z, hsl.h, hsl.s, 1.0);
 
-      let oh = new Lore.OctreeHelper(lore, 'ProjectionOctreeGeometry' + projections.length, 'default', ph);
+      let oh = new Lore.Helpers.OctreeHelper(lore, 'ProjectionOctreeGeometry' + projections.length, 'defaultSquare', ph);
 
       let layer = projections.length;
 
@@ -890,7 +965,37 @@
         variantId: currentVariant.id
       }
     });
+
     populateMaps(currentVariant);
+  }
+
+  function loadVariantFromUrl(variantId) {
+    let vi = variantId.split('.');
+
+    currentDatabase = config.databases.find(db => db.id === vi[0]);
+    currentFingerprint = currentDatabase.fingerprints.find(fp => fp.id === vi[0] + '.' + vi[1]);
+    currentVariant = currentFingerprint.variants.find(va => va.id === variantId);
+
+    // Set indices
+    $(bindings.selectDatabase).val(config.databases.findIndex(db => db.id === vi[0]));
+    $(bindings.selectDatabase).change();
+    $(bindings.selectDatabase).material_select();
+    $(bindings.selectFingerprint).val(currentDatabase.fingerprints.findIndex(fp => fp.id === vi[0] + '.' + vi[1]));
+    $(bindings.selectFingerprint).change();
+    $(bindings.selectFingerprint).material_select();
+    $(bindings.selectVariant).val(currentFingerprint.variants.findIndex(va => va.id === variantId));
+    $(bindings.selectVariant).change();
+    $(bindings.selectVariant).material_select();
+
+    populateMaps(currentVariant);
+
+    let map = Faerun.getUrlParam('map');
+    if (map) {
+      currentMap = currentVariant.maps.find(mp => mp.id === variantId + '.' + map);
+      $(bindings.selectMap).val(currentVariant.maps.findIndex(mp => mp.id === variantId + '.' + map));
+      $(bindings.selectMap).change();
+      $(bindings.selectMap).material_select();
+    }
   }
 
   function loadStats(variantIndex) {

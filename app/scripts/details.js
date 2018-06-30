@@ -11,9 +11,6 @@
   let idToSchemblId = {};
   let center = null;
   let projections = [];
-  let selectIndicators = [];
-  let selectCanvas = {};
-  let selectSmiles = {};
   let treeWorker = new Worker('libs/kmst/kmst-worker.js');
   let socketWorker = new Worker('scripts/socketWorker.js');
   let params = Faerun.parseUrlParams();
@@ -25,11 +22,30 @@
   let bindings = Faerun.getBindings();
 
   // Events
+  bindings.largePreview.addEventListener('change', function() {
+    Faerun.largePreview = !Faerun.largePreview;
+
+    if (Faerun.largePreview) {
+      Faerun.show(bindings.overlayStructureContainer);
+    } else {
+      Faerun.hide(bindings.overlayStructureContainer);
+    }
+  });
+
   bindings.switchColor.addEventListener('change', function () {
     if (bindings.switchColor.checked) {
-      lore.setClearColor(Lore.Color.fromHex('#DADFE1'));
+      lore.setClearColor(Lore.Core.Color.fromHex('#ffffff'));
+      treeHelper.setFog([1.0, 1.0, 1.0, 1.0], 8.0);
+      for (var i = 0; i < projections.length; i++) {
+        projections[i].pointHelper.setFog([1.0, 1.0, 1.0, 1.0], 8.0);
+      }
+      
     } else {
-      lore.setClearColor(Lore.Color.fromHex('#121212'));
+      lore.setClearColor(Lore.Core.Color.fromHex('#121212'));
+      treeHelper.setFog([0.05, 0.05, 0.05, 1.0], 8.0);
+      for (var i = 0; i < projections.length; i++) {
+        projections[i].pointHelper.setFog([0.05, 0.05, 0.05, 1.0], 8.0);
+      }
     }
   }, false);
 
@@ -46,6 +62,7 @@
       setTimeout(function () {
         for (var i = 0; i < smilesData.length; i++) {
           let smiles = smilesData[i];
+          let id = idsData[i];
           let compoundWrapper = document.createElement('div');
           let compoundInfo = document.createElement('div');
           let canvas = document.createElement('canvas');
@@ -53,7 +70,7 @@
 
           compoundWrapper.classList.add('compound-wrapper');
           compoundInfo.classList.add('compound-info');
-          compoundInfo.setAttribute('data-schemblid', idToSchemblId[i]);
+          compoundInfo.setAttribute('data-schemblid', idToSchemblId[i] || id);
           canvas.setAttribute('id', 'canvas-' + i);
           compoundWrapper.appendChild(canvas);
           compoundWrapper.appendChild(compoundInfo);
@@ -65,7 +82,7 @@
             let schemblId = compoundInfo.getAttribute('data-schemblid');
             let databases = databaseLinks[schemblId];
 
-            compoundInfo.innerHTML += '<p>' + schemblId + '</p>';
+            compoundInfo.innerHTML += '<p>' + schemblId || id + '</p>';
 
             if (databases) {
               for (var i = 0; i < databases.length; i++) {
@@ -77,6 +94,14 @@
 
                 compoundInfo.appendChild(a);
               }
+            } else if (id.toLowerCase().indexOf('chembl') > -1) {
+              let a = document.createElement('a');
+              let database = FaerunConfig.chembl.sources['1'];
+
+              a.innerHTML = database.name_label;
+              a.setAttribute('href', database.base_id_url + id);
+
+              compoundInfo.appendChild(a);
             } else {
               compoundInfo.innerHTML = 'Could not load remote info for ' + schemblId;
             }
@@ -144,8 +169,7 @@
     Faerun.show(bindings.loader);
 
     treeWorker.onmessage = function (e) {
-      treeHelper = new Lore.TreeHelper(lore, 'TreeGeometry', 'tree');
-      treeHelper.setFogDistance(0, coords.scale * Math.sqrt(3));
+      treeHelper = new Lore.Helpers.TreeHelper(lore, 'TreeGeometry', 'tree');
       var x = new Array(e.data.length * 2);
       var y = new Array(e.data.length * 2);
       var z = new Array(e.data.length * 2);
@@ -164,6 +188,7 @@
       }
 
       treeHelper.setPositionsXYZHSS(x, y, z, binColor, 0.25, 1.0);
+      treeHelper.setFog([0.05, 0.05, 0.05, 1.0], 8.0);
     };
 
     socketWorker.onmessage = function (e) {
@@ -244,21 +269,21 @@
 
     treeWorker.postMessage(tmpArr);
 
-    let pointHelper = new Lore.PointHelper(lore, 'TestGeometry', 'sphere', {
+    let pointHelper = new Lore.Helpers.PointHelper(lore, 'TestGeometry', 'sphere', {
       pointScale: 10
     });
 
-    pointHelper.setFogDistance(0, coords.scale * Math.sqrt(3));
+    pointHelper.setFog([0.05, 0.05, 0.05, 1.0], 8.0);
     pointHelper.setPositionsXYZHSS(coords.x, coords.y, coords.z, binColor, 0.3, 1.0);
 
     let firstBinIndex = parseInt(params.binIndex.split(',')[0], 10);
     for (var i = 0; i < coords.x.length; i++) {
       if (message.binIndices[i] === firstBinIndex) {
-        pointHelper.updateColor(i, new Lore.Color(binColor, 1.0, 1.0));
+        pointHelper.updateColor(i, new Lore.Core.Color(binColor, 1.0, 1.0));
       }
     }
 
-    let octreeHelper = new Lore.OctreeHelper(lore, 'OctreeGeometry', 'default', pointHelper, {multiSelect: false});
+    let octreeHelper = new Lore.Helpers.OctreeHelper(lore, 'OctreeGeometry', 'defaultSquare', pointHelper, {multiSelect: false});
 
     octreeHelper.addEventListener('hoveredchanged', function (e) {
       if (!e.e) {
@@ -303,7 +328,14 @@
     });
 
     bindings.loadingMessage.innerHTML = 'Loading remote info ...';
-    initMoleculeList();
+
+    // If we use schembl ids, load this, else don't
+
+    if (idsData[0].trim().split('_')[0].indexOf('schembl') > -1) {
+      initMoleculeList();
+    } else {
+      Faerun.hide(bindings.loader);
+    }
   }
 
   /**
@@ -313,13 +345,15 @@
     let length = smilesData.length;
 
     for (var i = 0; i < smilesData.length; i++) {
-      let smile = smilesData[i].trim();
       let schemblIds = idsData[i].trim();
 
       // Only take the first one for now
       let schemblId = schemblIds.split('_')[0];
-      let schemblUrl = Faerun.schemblUrl + idsData[i].trim();
-      let structureViewId = 'structure-view' + i;
+
+      // If the id is not a schembl id
+      if (schemblId.toLowerCase().indexOf('schembl') === -1) {
+        continue;
+      }
 
       schemblIdToId[schemblId] = i;
       idToSchemblId[i] = schemblId;
@@ -399,33 +433,56 @@
 
   function updatePanel(index) {
     let smiles = smilesData[index];
-    let schemblId = idToSchemblId[index];
+    let id = idsData[index];
 
     SmilesDrawer.parse(smiles, function (tree) {
       smilesDrawer.draw(tree, 'hover-structure-drawing', 'dark');
     });
 
+    // If enabled, draw overlay structure
+    if (Faerun.largePreview) {
+      let smilesDrawerOverlay = new SmilesDrawer.Drawer({
+        width: $(bindings.overlayStructureContainer).width(),
+        height: $(bindings.overlayStructureContainer).height()
+      });
+
+      SmilesDrawer.parse(smiles, function(tree) {
+        smilesDrawerOverlay.draw(tree, 'overlay-structure', 'dark');
+      });
+    }
+
     bindings.infoSmiles.innerHTML = smiles;
 
     $(bindings.infoDatabases).empty();
 
-    let databases = databaseLinks[schemblId];
+    if (idToSchemblId.length > index) {
+      let schemblId = idToSchemblId[index];
+      let databases = databaseLinks[schemblId];
 
-    if (databases) {
-      for (var i = 0; i < databases.length; i++) {
-        let database = databases[i];
-        let a = document.createElement('a');
+      if (databases) {
+        for (var i = 0; i < databases.length; i++) {
+          let database = databases[i];
+          let a = document.createElement('a');
 
-        a.innerHTML = database.name;
-        a.setAttribute('href', database.url);
+          a.innerHTML = database.name;
+          a.setAttribute('href', database.url);
 
-        bindings.infoDatabases.appendChild(a);
+          bindings.infoDatabases.appendChild(a);
+        }
+      } else {
+        let info = document.createElement('p');
+
+        info.classList.add('info');
+        info.innerHTML = 'Could not load remote info for ' + schemblId;
       }
-    } else {
-      let info = document.createElement('p');
+    } else if (id.toLowerCase().indexOf('chembl') !== -1) {
+      let a = document.createElement('a');
+      let database = FaerunConfig.chembl.sources['1'];
 
-      info.classList.add('info');
-      info.innerHTML = 'Could not load remote info for ' + schemblId;
+      a.innerHTML = database.name_label;
+      a.setAttribute('href', database.base_id_url + id);
+
+      bindings.infoDatabases.appendChild(a);
     }
   }
 })();

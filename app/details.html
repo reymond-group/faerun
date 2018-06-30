@@ -1,4 +1,5 @@
 <!doctype html>
+
 <html lang="en">
 
     <head>
@@ -26,8 +27,8 @@
         <script src="libs/socketio/socket.io-1.4.5.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
         <script src="libs/saveAsPolyfill/FileSaver.min.js"></script>
-        <script src="libs/lore/lore.js"></script>
-        <script src="libs/smilesDrawer/smiles-drawer.min.js"></script>
+        <script src="https://unpkg.com/lore-engine@1.0.12/dist/lore.min.js"></script>
+        <script src="https://unpkg.com/smiles-drawer@1.0.8/dist/smiles-drawer.min.js"></script>
         <script src="libs/handlebars/handlebars-v4.0.5.js"></script>
 
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
@@ -66,6 +67,10 @@
                 <input type="checkbox" id="switch-color" data-binding-id="switchColor" />
                 <label for="switch-color">Light Background</label>
             </p>
+            <p>
+                <input type="checkbox" id="large-preview" data-binding-id="largePreview" />
+                <label for="large-preview">Overlay Molecule Preview</label>
+            </p>
 
             <p class="faerun-controls-header" style="margin-top:18px;"><i class="material-icons">build</i><span>TOOLS</span></p>
             <div class="spacer"></div>
@@ -93,6 +98,14 @@
             <main>
                 <!-- The 3D canvas -->
                 <canvas id="lore" data-binding-id="lore"></canvas>
+
+                <div id="overlay-structure-container" data-binding-id="overlayStructureContainer" class="hidden">
+                    <canvas id="overlay-structure" data-binding-id="overlayStructure"></canvas>
+                </div>
+
+                <div id="viz">
+                    <a href="http://viz.gdb.tools">viz.gdb.tools</a>
+                </div>
             </main>
         </div>
 
@@ -131,7 +144,7 @@
                 <p class="info-title">Databases</p>
                 <p id="info-databases" data-binding-id="infoDatabases" class="info"></p>
                 <p class="info-title">SMILES</p>
-                <p id="info-smiles" data-binding-id="infoSmiles" class="info"></p>
+                <p id="info-smiles" data-binding-id="infoSmiles" class="info smiles"></p>
             </div>
             <div class="flex-item">
                 

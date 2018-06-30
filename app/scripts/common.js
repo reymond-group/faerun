@@ -3,6 +3,8 @@
  */
 function Faerun() {}
 
+Faerun.largePreview = false;
+
 /**
  * Initializes a TypedArray based on the type and length. This allows the dynamic creation of
  * differently typed TypedArrays. Returns a Float32Array if no valid type is provided.
@@ -417,8 +419,8 @@ Faerun.updateCoordinatesHelper = function (lore, size, ticks, box, y) {
   box = box === undefined ? true : box;
   y = y === undefined ? true : y;
 
-  var coordinatesHelper = new Lore.CoordinatesHelper(lore, 'Coordinates', 'coordinates', {
-    position: new Lore.Vector3f(0, 0, 0),
+  var coordinatesHelper = new Lore.Helpers.CoordinatesHelper(lore, 'Coordinates', 'coordinates', {
+    position: new Lore.Math.Vector3f(0, 0, 0),
     axis: {
       x: {
         length: size
@@ -447,7 +449,7 @@ Faerun.updateCoordinatesHelper = function (lore, size, ticks, box, y) {
   });
 
   var halfSize = size / 2.0;
-  var center = new Lore.Vector3f(halfSize, halfSize, halfSize);
+  var center = new Lore.Math.Vector3f(halfSize, halfSize, halfSize);
   lore.controls.setRadius((size * Math.sqrt(3)) / 2.0 + 100);
   lore.controls.setLookAt(center);
 
@@ -776,4 +778,9 @@ Faerun.drawHistogram = function (element, values, max) {
 
 Faerun.formatNumber = function (str) {
   return str.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
+Faerun.getUrlParam = function (name) {
+  var url = new URL(window.location.href);
+  return url.searchParams.get(name);
 };

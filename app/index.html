@@ -26,8 +26,8 @@
         <script src="libs/socketio/socket.io-1.4.5.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
         <script src="libs/saveAsPolyfill/FileSaver.min.js"></script>
-        <script src="libs/lore/lore.js"></script>
-        <script src="libs/smilesDrawer/smiles-drawer.min.js"></script>
+        <script src="https://unpkg.com/lore-engine@1.0.12/dist/lore.min.js"></script>
+        <script src="https://unpkg.com/smiles-drawer@1.0.8/dist/smiles-drawer.min.js"></script>
         <script src="libs/handlebars/handlebars-v4.0.5.js"></script>
         <script src="libs/firstimpression/firstimpression.min.js"></script>
 
@@ -82,9 +82,17 @@
                 <input type="checkbox" id="switch-color" data-binding-id="switchColor" />
                 <label for="switch-color">Light Background</label>
             </p>
+            <p>
+                <input type="checkbox" id="large-preview" data-binding-id="largePreview" />
+                <label for="large-preview">Overlay Molecule Preview</label>
+            </p>
 
             <p class="faerun-controls-header" style="margin-top:18px;"><i class="material-icons">build</i><span>TOOLS</span></p>
             <div class="spacer"></div>
+            <a href="#modal-share" id="button-share" data-binding-id="buttonShare" class="waves-effect waves-light btn-flat">
+                <i class="material-icons left">share</i>Share
+            </a>
+            <br />
             <a href="#modal-search" id="button-search" data-binding-id="buttonSearch" class="waves-effect waves-light btn-flat">
                 <i class="material-icons left">search</i>Search
             </a>
@@ -132,6 +140,14 @@
             <main>
                 <!-- The 3D canvas -->
                 <canvas id="lore" data-binding-id="lore"></canvas>
+
+                <div id="overlay-structure-container" data-binding-id="overlayStructureContainer" class="hidden">
+                    <canvas id="overlay-structure" data-binding-id="overlayStructure"></canvas>
+                </div>
+
+                <div id="viz">
+                    <a href="http://viz.gdb.tools">viz.gdb.tools</a>
+                </div>
             </main>
         </div>
 
@@ -210,6 +226,22 @@
         </div>
 
         <!-- Dialogs -->
+        <div id="modal-share" class="modal modal-fixed-footer" style="height:300px;max-height:300px">
+            <div class="modal-content flex">
+                <h4 class="flex-item"><i class="material-icons">share</i>&nbsp;Share Current View</h4>
+                <div class="flex-item">
+                    <p class="faerun-info">Copy and share the URL shown below.</p>
+                </div>
+                <div class="flex-item stretch">
+                    <div class="url-container input-field col s12">
+                        <input type="text" placeholder="URL" id="url-dialog-project-input" data-binding-id="urlDialogProjectInput">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+            </div>
+        </div>
         <div id="modal-search" class="modal modal-fixed-footer" style="height:90%;max-height:90%">
             <div class="modal-content flex">
                 <h4 class="flex-item"><i class="material-icons">search</i>&nbsp;Search Compounds</h4>

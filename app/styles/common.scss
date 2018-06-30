@@ -309,6 +309,7 @@ html, body {
 
         .title {
             flex: 1 1 auto;
+            overflow: hidden;
 
             span {
                 display: inline-block;
@@ -519,6 +520,13 @@ html, body {
         a {
             display: block;
         }
+    }
+
+    p.smiles {
+        white-space: nowrap;
+        word-wrap: normal !important;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
     }
 
     #layer-container {
@@ -734,6 +742,31 @@ html, body {
             color: lighten($panel-color, 35%);
             margin-top: 10px;
         }
+    }
+}
+
+#overlay-structure-container {
+    position: absolute;
+    z-index: 9999;
+    top: 100px;
+    left: 300px;
+    right: 100px;
+    bottom: 100px;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+#viz {
+    position: absolute;
+    z-index: 9999;
+    bottom: 2px;
+    right: 12px;
+
+    a {
+        color: $accent-color;
+        text-decoration: none;
+        font-family: Consolas, monaco, monospace;
+        font-size: 0.7em;
     }
 }
 
