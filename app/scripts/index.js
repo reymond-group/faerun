@@ -556,9 +556,9 @@
     lore.controls.setRadius(0.5 * currentVariant.resolution * Math.sqrt(3) + 2);
 
     // Setup the coordinate system
-    let cs = Faerun.updateCoordinatesHelper(lore, currentVariant.resolution);
-    center = cs.center;
-    coordinatesHelper = cs.helper;
+    // let cs = Faerun.updateCoordinatesHelper(lore, currentVariant.resolution);
+    // center = cs.center;
+    // coordinatesHelper = cs.helper;
 
     let ph = new Lore.Helpers.PointHelper(lore, 'MainGeometry', 'sphere');
 
