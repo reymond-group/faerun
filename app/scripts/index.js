@@ -22,6 +22,16 @@
   let bindings = Faerun.getBindings();
 
   // Events
+  bindings.coordinatesBox.addEventListener('change', function() {
+    Faerun.coordinatesBox = !Faerun.coordinatesBox;
+
+    if (Faerun.coordinatesBox) {
+      coordinatesHelper.geometry.isVisible = true;
+    } else {
+      coordinatesHelper.geometry.isVisible = false;
+    }
+  });
+
   bindings.largePreview.addEventListener('change', function() {
     Faerun.largePreview = !Faerun.largePreview;
 
@@ -556,9 +566,10 @@
     lore.controls.setRadius(0.5 * currentVariant.resolution * Math.sqrt(3) + 2);
 
     // Setup the coordinate system
-    // let cs = Faerun.updateCoordinatesHelper(lore, currentVariant.resolution);
-    // center = cs.center;
-    // coordinatesHelper = cs.helper;
+    let cs = Faerun.updateCoordinatesHelper(lore, currentVariant.resolution);
+    center = cs.center;
+    coordinatesHelper = cs.helper;
+    coordinatesHelper.geometry.isVisible = false;
 
     let ph = new Lore.Helpers.PointHelper(lore, 'MainGeometry', 'sphere');
 
