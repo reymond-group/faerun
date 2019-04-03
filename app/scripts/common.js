@@ -81,7 +81,10 @@ Faerun.csvToArray = function (str, dataTypes) {
 
 Faerun.parseUrlParams = function () {
   var search = location.search.substring(1);
-  return JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/\=/g, '":"') + '"}');
+  if (search) 
+    return JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/\=/g, '":"') + '"}');
+  else
+    return {};
 };
 
 Faerun.getCoords = function (arr, scale) {
@@ -419,7 +422,7 @@ Faerun.updateCoordinatesHelper = function (lore, size, ticks, box, y) {
   box = box === undefined ? true : box;
   y = y === undefined ? true : y;
 
-  var coordinatesHelper = new Lore.Helpers.CoordinatesHelper(lore, 'Coordinates', 'coordinates', {
+  var coordinatesHelper = new Lore.Helpers.CoordinatesHelper(lore, 'Coordinates', {
     position: new Lore.Math.Vector3f(0, 0, 0),
     axis: {
       x: {

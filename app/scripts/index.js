@@ -18,8 +18,33 @@
   let selectedBins = [];
   let socketWorker = new Worker('scripts/socketWorker.js');
   let initialLoad = true;
+  let params = Faerun.parseUrlParams();
+  let enableSnap = params.enableSnap ? true : false;
+  let snapX = params.snapX ? parseInt(params.snapX) : 0;
+  let snapY = params.snapX ? parseInt(params.snapX) : 0;
 
   let bindings = Faerun.getBindings();
+
+  if (!enableSnap) {
+    bindings.buttonDl.style.display = 'none';
+  } else {
+    bindings.buttonDl.addEventListener('click', function (e) {
+      if (snapX > 0 && snapY > 0) {
+        lore.updateViewport(0, 0, snapX, snapY);
+      }
+
+      let canvas = document.getElementById('lore');
+      let dataURL = lore.canvas.toDataURL('image/png');
+      bindings.buttonDl.href = dataURL;
+      bindings.buttonDl.download = 'faerun.png'
+
+      // var image = new Image();
+      // image.src = dataURL;
+
+      // document.getElementById('button-dl').appendChild(image);
+    });
+  }
+
 
   // Events
   bindings.coordinatesBox.addEventListener('change', function() {
@@ -509,7 +534,8 @@
   document.addEventListener('DOMContentLoaded', function () {
     lore = Lore.init('lore', {
       clearColor: '#121212',
-      radius: 500
+      radius: 500,
+      preserveDrawingBuffer: enableSnap
     });
 
     smilesDrawer = new SmilesDrawer.Drawer({width: 180, height: 180, bondThickness: 1.5});
@@ -696,7 +722,13 @@
       message.data[i] = Faerun.initArrayFromBuffer(message.dataTypes[i], message.data[i]);
     }
 
-    projections[0].pointHelper.setRGB(message.data[0], message.data[1], message.data[2]);
+    for (let i = 0; i < message.data[0].length; i++) {
+      message.data[0][i] = Math.floor(message.data[0][i] * 255);
+      message.data[1][i] = Math.floor(message.data[1][i] * 255);
+      message.data[2][i] = Math.floor(message.data[2][i] * 255);
+    }
+
+    projections[0].pointHelper.setRGBFromArrays(message.data[0], message.data[1], message.data[2]);
 
     Faerun.setTitle(currentDatabase.name + ' &middot; ' + currentFingerprint.name + ' &middot; ' + currentMap.name);
     bindings.selectMap.parentElement.style.pointerEvents = 'auto';

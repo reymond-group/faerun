@@ -187,7 +187,7 @@
         z.push(coords.z[b]);
       }
 
-      treeHelper.setPositionsXYZHSS(x, y, z, binColor, 0.25, 1.0);
+      treeHelper.setXYZHS(x, y, z, binColor, 1.0);
       treeHelper.setFog([0.05, 0.05, 0.05, 1.0], 8.0);
     };
 
@@ -273,15 +273,26 @@
       pointScale: 10
     });
 
-    pointHelper.setFog([0.05, 0.05, 0.05, 1.0], 8.0);
-    pointHelper.setPositionsXYZHSS(coords.x, coords.y, coords.z, binColor, 0.3, 1.0);
+    let r = [];
+    let g = [];
+    let b = [];
 
     let firstBinIndex = parseInt(params.binIndex.split(',')[0], 10);
     for (var i = 0; i < coords.x.length; i++) {
+      let rgb = [0, 0, 0];
       if (message.binIndices[i] === firstBinIndex) {
-        pointHelper.updateColor(i, new Lore.Core.Color(binColor, 1.0, 1.0));
+        rgb = Lore.Core.Color.hslToRgb(binColor, 1.0, 0.5);
+      } else {
+        rgb = Lore.Core.Color.hslToRgb(binColor, 0.25, 0.5);
       }
+
+      r.push(rgb[0]);
+      g.push(rgb[1]);
+      b.push(rgb[2]);
     }
+
+    pointHelper.setFog([0.05, 0.05, 0.05, 1.0], 8.0);
+    pointHelper.setXYZRGBS(coords.x, coords.y, coords.z, r, g, b, 1.0);
 
     let octreeHelper = new Lore.Helpers.OctreeHelper(lore, 'OctreeGeometry', 'defaultSquare', pointHelper, {multiSelect: false});
 
