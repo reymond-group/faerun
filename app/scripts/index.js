@@ -33,10 +33,12 @@
         lore.updateViewport(0, 0, snapX, snapY);
       }
 
-      let canvas = document.getElementById('lore');
-      let dataURL = lore.canvas.toDataURL('image/png');
-      bindings.buttonDl.href = dataURL;
-      bindings.buttonDl.download = 'faerun.png'
+      setTimeout(function() {
+        let canvas = document.getElementById('lore');
+        let dataURL = lore.canvas.toDataURL('image/png');
+        bindings.buttonDl.href = dataURL;
+        bindings.buttonDl.download = 'faerun.png'
+      }, 1000);
 
       // var image = new Image();
       // image.src = dataURL;
