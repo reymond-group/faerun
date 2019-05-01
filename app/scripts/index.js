@@ -21,7 +21,7 @@
   let params = Faerun.parseUrlParams();
   let enableSnap = params.enableSnap ? true : false;
   let snapX = params.snapX ? parseInt(params.snapX) : 0;
-  let snapY = params.snapX ? parseInt(params.snapX) : 0;
+  let snapY = params.snapY ? parseInt(params.snapY) : 0;
 
   let bindings = Faerun.getBindings();
 
