@@ -27,7 +27,7 @@
 import path from 'path';
 import gulp from 'gulp';
 import del from 'del';
-import runSequence from 'run-sequence';
+const runSequence = require('gulp4-run-sequence');
 import browserSync from 'browser-sync';
 import swPrecache from 'sw-precache';
 import gulpLoadPlugins from 'gulp-load-plugins';
@@ -38,59 +38,77 @@ const $ = gulpLoadPlugins();
 const reload = browserSync.reload;
 
 // Lint JavaScript
-gulp.task('lint', () =>
-  gulp.src(['app/scripts/**/*.js', '!node_modules/**'])
-    .pipe($.eslint())
-    .pipe($.eslint.format())
-    .pipe($.if(!browserSync.active, $.eslint.failAfterError()))
-);
+gulp.task('lint', function () {
+  return new Promise(function(resolve, reject) {
+    gulp.src(['app/scripts/**/*.js', '!node_modules/**'])
+      .pipe($.eslint())
+      .pipe($.eslint.format())
+      .pipe($.if(!browserSync.active, $.eslint.failAfterError()))
+    resolve();
+  });
+});
 
 // Optimize images
-gulp.task('images', () =>
-  gulp.src('app/images/**/*')
-    .pipe($.cache($.imagemin({
-      progressive: true,
-      interlaced: true
-    })))
-    .pipe(gulp.dest('dist/images'))
-    .pipe($.size({title: 'images'}))
-);
+gulp.task('images', function () {
+  return new Promise(function(resolve, reject) {
+    gulp.src('app/images/**/*')
+      .pipe($.cache($.imagemin({
+        progressive: true,
+        interlaced: true
+      })))
+      .pipe(gulp.dest('dist/images'))
+      .pipe($.size({title: 'images'}))
+    resolve();
+  });
+});
 
 // Copy all files at the root level (app)
-gulp.task('copy', () =>
-  gulp.src([
-    'app/*',
-    '!app/*.html',
-    'node_modules/apache-server-configs/dist/.htaccess'
-  ], {
-    dot: true
-  }).pipe(gulp.dest('dist'))
-    .pipe($.size({title: 'copy'}))
-);
+gulp.task('copy', function () {
+  return new Promise(function(resolve, reject) {
+    gulp.src([
+      'app/*',
+      '!app/*.html',
+      'node_modules/apache-server-configs/dist/.htaccess'
+    ], {
+      dot: true
+    }).pipe(gulp.dest('dist'))
+      .pipe($.size({title: 'copy'}))
+    resolve();
+  });
+});
 
 // Copy the libs
-gulp.task('copylibs', () =>
-  gulp.src([
-    'app/libs/**/*'
-  ]).pipe(gulp.dest('dist/libs'))
-);
+gulp.task('copylibs', function () {
+  return new Promise(function(resolve, reject) {
+    gulp.src([
+      'app/libs/**/*'
+    ]).pipe(gulp.dest('dist/libs'))
+    resolve();
+  });
+});
 
 // Copy the scripts, I do not want to concat them
-gulp.task('copyscripts', () =>
-  gulp.src([
-    'app/scripts/*.js'
-  ]).pipe(gulp.dest('dist/scripts'))
-);
+gulp.task('copyscripts', function () {
+  return new Promise(function(resolve, reject) {
+    gulp.src([
+      'app/scripts/*.js'
+    ]).pipe(gulp.dest('dist/scripts'))
+    resolve();
+  });
+});
 
 // Copy the fonts
-gulp.task('copyfonts', () =>
-  gulp.src([
-    'app/styles/fonts/roboto/*'
-  ]).pipe(gulp.dest('dist/styles/fonts/roboto'))
-);
+gulp.task('copyfonts', function () {
+  return new Promise(function(resolve, reject) {
+    gulp.src([
+      'app/styles/fonts/roboto/*'
+    ]).pipe(gulp.dest('dist/styles/fonts/roboto'))
+    resolve();
+  });
+});
 
 // Compile and automatically prefix stylesheets
-gulp.task('styles', () => {
+gulp.task('styles', function () {
   const AUTOPREFIXER_BROWSERS = [
     'ie >= 10',
     'ie_mob >= 10',
@@ -104,6 +122,7 @@ gulp.task('styles', () => {
   ];
 
   // For best performance, don't add Sass partials to `gulp.src`
+  // Removed return before gulp.src ...
   return gulp.src([
     'app/styles/**/*.scss',
     'app/styles/**/*.css'
@@ -127,39 +146,43 @@ gulp.task('styles', () => {
 // Concatenate and minify JavaScript. Optionally transpiles ES2015 code to ES5.
 // to enable ES2015 support remove the line `"only": "gulpfile.babel.js",` in the
 // `.babelrc` file.
-gulp.task('scripts', () =>
-    gulp.src([
-      // Note: Since we are not using useref in the scripts build pipeline,
-      //       you need to explicitly list your scripts here in the right order
-      //       to be correctly concatenated
-      // './app/libs/lore/lore.min.js',
-      // './app/libs/mdl-selectified/mdl-slectified.min.js',
-      // './app/libs/smilesDrawer/smiles.js',
-      // './app/libs/smilesDrawer/smilesDrawer.js',
-      // './app/libs/socketio/socket.io-1.4.5.js',
-      // './app/scripts/main.js',
-      // './app/scripts/faerun-common.js',
-      // './app/scripts/index.js',
-      // './app/scripts/details.js',
-      // './app/scripts/socketWorkerDetails.js',
-      // './app/scripts/socketWorkerIndex.js'
-      // Other scripts
-    ])
-      .pipe($.newer('.tmp/scripts'))
-      .pipe($.sourcemaps.init())
-      .pipe($.babel())
-      .pipe($.sourcemaps.write())
-      .pipe(gulp.dest('.tmp/scripts'))
-      .pipe($.concat('main.min.js'))
-      .pipe($.uglify({preserveComments: 'some'}))
-      // Output files
-      .pipe($.size({title: 'scripts'}))
-      .pipe($.sourcemaps.write('.'))
-      .pipe(gulp.dest('dist/scripts'))
-);
+gulp.task('scripts', function () {
+  return new Promise(function(resolve, reject) {
+    // return gulp.src([
+    //   // Note: Since we are not using useref in the scripts build pipeline,
+    //   //       you need to explicitly list your scripts here in the right order
+    //   //       to be correctly concatenated
+    //   './app/libs/lore/lore.min.js',
+    //   './app/libs/mdl-selectified/mdl-slectified.min.js',
+    //   './app/libs/smilesDrawer/smiles.js',
+    //   './app/libs/smilesDrawer/smilesDrawer.js',
+    //   './app/libs/socketio/socket.io-1.4.5.js',
+    //   './app/scripts/main.js',
+    //   './app/scripts/faerun-common.js',
+    //   './app/scripts/index.js',
+    //   './app/scripts/details.js',
+    //   './app/scripts/socketWorkerDetails.js',
+    //   './app/scripts/socketWorkerIndex.js'
+    //   // Other scripts
+    // ])
+    //   .pipe($.newer('.tmp/scripts'))
+    //   .pipe($.sourcemaps.init())
+    //   .pipe($.babel())
+    //   .pipe($.sourcemaps.write())
+    //   .pipe(gulp.dest('.tmp/scripts'))
+    //   .pipe($.concat('main.min.js'))
+    //   .pipe($.uglify({preserveComments: 'some'}))
+    //   // Output files
+    //   .pipe($.size({title: 'scripts'}))
+    //   .pipe($.sourcemaps.write('.'))
+    //   .pipe(gulp.dest('dist/scripts'))
+    resolve();
+  });
+});
 
 // Scan your HTML for assets & optimize them
-gulp.task('html', () => {
+gulp.task('html', function () {
+  // Removed return before gulp.src
   return gulp.src('app/**/*.html')
     .pipe($.useref({
       searchPath: '{.tmp,app}',
@@ -184,95 +207,118 @@ gulp.task('html', () => {
 });
 
 // Clean output directory
-gulp.task('clean', () => del(['.tmp', 'dist/*', '!dist/.git'], {dot: true}));
-
-// Watch files for changes & reload
-gulp.task('serve', ['scripts', 'styles'], () => {
-  browserSync({
-    notify: false,
-    // Customize the Browsersync console logging prefix
-    logPrefix: 'WSK',
-    // Allow scroll syncing across breakpoints
-    scrollElementMapping: ['main', '.mdl-layout'],
-    // Run as an https by uncommenting 'https: true'
-    // Note: this uses an unsigned certificate which on first access
-    //       will present a certificate warning in the browser.
-    // https: true,
-    server: ['.tmp', 'app'],
-    port: 3000
+gulp.task('clean', function () {
+  return new Promise(function(resolve, reject) {
+    del(['.tmp', 'dist/*', '!dist/.git'], {dot: true})
+    resolve();
   });
-
-  gulp.watch(['app/**/*.html'], reload);
-  gulp.watch(['app/styles/**/*.{scss,css}'], ['styles', reload]);
-  gulp.watch(['app/scripts/**/*.js'], ['lint', 'scripts', reload]);
-  gulp.watch(['app/images/**/*'], reload);
 });
 
-// Build and serve the output from the dist build
-gulp.task('serve:dist', ['default'], () =>
-  browserSync({
-    notify: false,
-    logPrefix: 'WSK',
-    // Allow scroll syncing across breakpoints
-    scrollElementMapping: ['main', '.mdl-layout'],
-    // Run as an https by uncommenting 'https: true'
-    // Note: this uses an unsigned certificate which on first access
-    //       will present a certificate warning in the browser.
-    // https: true,
-    server: 'dist',
-    port: 3001
-  })
-);
+// Watch files for changes & reload
+gulp.task('serve', gulp.series(['scripts', 'styles'], function () {
+  return new Promise(function(resolve, reject) {
+    browserSync({
+      notify: false,
+      // Customize the Browsersync console logging prefix
+      logPrefix: 'WSK',
+      // Allow scroll syncing across breakpoints
+      scrollElementMapping: ['main', '.mdl-layout'],
+      // Run as an https by uncommenting 'https: true'
+      // Note: this uses an unsigned certificate which on first access
+      //       will present a certificate warning in the browser.
+      // https: true,
+      server: ['.tmp', 'app'],
+      port: 3000
+    });
 
-// Build and serve the output from the dist build
-gulp.task('serve:distnolint', ['nolint'], () =>
-  browserSync({
-    notify: false,
-    logPrefix: 'WSK',
-    // Allow scroll syncing across breakpoints
-    scrollElementMapping: ['main', '.mdl-layout'],
-    // Run as an https by uncommenting 'https: true'
-    // Note: this uses an unsigned certificate which on first access
-    //       will present a certificate warning in the browser.
-    // https: true,
-    server: 'dist',
-    port: 3001
-  })
-);
-
+    gulp.watch(['app/**/*.html'], reload);
+    gulp.watch(['app/styles/**/*.{scss,css}'], ['styles', reload]);
+    gulp.watch(['app/scripts/**/*.js'], ['lint', 'scripts', reload]);
+    gulp.watch(['app/images/**/*'], reload);
+    resolve();
+  });
+}));
 
 // Build production files, the default task
-gulp.task('default', ['clean'], cb =>
-  runSequence(
-    'styles',
-    ['html', 'scripts', 'images', 'copy', 'copylibs', 'copyscripts', 'copyfonts'],
-    'generate-service-worker',
-    cb
-  )
-);
+gulp.task('default',  gulp.series(['clean'], function (cb) {
+  return new Promise(function(resolve, reject) {
+    runSequence(
+      'styles',
+      ['html', 'scripts', 'images', 'copy', 'copylibs', 'copyscripts', 'copyfonts'],
+      'generate-service-worker',
+      cb
+    )
+    resolve();
+  });
+}));
 
-gulp.task('nolint', ['clean'], cb =>
-  runSequence(
-    'styles',
-    ['html', 'scripts', 'images', 'copy', 'copylibs', 'copyscripts', 'copyfonts'],
-    'generate-service-worker',
-    cb
-  )
-);
+// Build and serve the output from the dist build
+gulp.task('serve:dist',  gulp.series(['default'], function () {
+  return new Promise(function(resolve, reject) {
+    browserSync({
+      notify: false,
+      logPrefix: 'WSK',
+      // Allow scroll syncing across breakpoints
+      scrollElementMapping: ['main', '.mdl-layout'],
+      // Run as an https by uncommenting 'https: true'
+      // Note: this uses an unsigned certificate which on first access
+      //       will present a certificate warning in the browser.
+      // https: true,
+      server: 'dist',
+      port: 3001
+    })
+    resolve();
+  });
+}));
+
+gulp.task('nolint',  gulp.series(['clean'], function (cb) {
+  return new Promise(function(resolve, reject) {
+    runSequence(
+      'styles',
+      ['html', 'scripts', 'images', 'copy', 'copylibs', 'copyscripts', 'copyfonts'],
+      'generate-service-worker',
+      cb
+    )
+    resolve();
+  });
+}));
+
+// Build and serve the output from the dist build
+gulp.task('serve:distnolint',  gulp.series(['nolint'], function () {
+  return new Promise(function(resolve, reject) {
+    browserSync({
+      notify: false,
+      logPrefix: 'WSK',
+      // Allow scroll syncing across breakpoints
+      scrollElementMapping: ['main', '.mdl-layout'],
+      // Run as an https by uncommenting 'https: true'
+      // Note: this uses an unsigned certificate which on first access
+      //       will present a certificate warning in the browser.
+      // https: true,
+      server: 'dist',
+      port: 3001
+    })
+    resolve();
+  });
+}));
 
 // Run PageSpeed Insights
-gulp.task('pagespeed', cb =>
-  // Update the below URL to the public URL of your site
-  pagespeed('example.com', {
-    strategy: 'mobile'
-    // By default we use the PageSpeed Insights free (no API key) tier.
-    // Use a Google Developer API key if you have one: http://goo.gl/RkN0vE
-    // key: 'YOUR_API_KEY'
-  }, cb)
-);
+gulp.task('pagespeed', function (cb) {
+  return new Promise(function(resolve, reject) {
+    // Update the below URL to the public URL of your site
+    pagespeed('example.com', {
+      strategy: 'mobile'
+      // By default we use the PageSpeed Insights free (no API key) tier.
+      // Use a Google Developer API key if you have one: http://goo.gl/RkN0vE
+      // key: 'YOUR_API_KEY'
+    }, cb)
+    resolve();
+  });
+});
 
 // Copy over the scripts that are used in importScripts as part of the generate-service-worker task.
-gulp.task('copy-sw-scripts', () => {
+gulp.task('copy-sw-scripts', function () {
+  // Removed return before gulp.src
   return gulp.src(['node_modules/sw-toolbox/sw-toolbox.js', 'app/scripts/sw/runtime-caching.js'])
     .pipe(gulp.dest('dist/scripts/sw'));
 });
@@ -282,10 +328,11 @@ gulp.task('copy-sw-scripts', () => {
 // Generate a service worker file that will provide offline functionality for
 // local resources. This should only be done for the 'dist' directory, to allow
 // live reload to work as expected when serving from the 'app' directory.
-gulp.task('generate-service-worker', ['copy-sw-scripts'], () => {
+gulp.task('generate-service-worker',  gulp.series(['copy-sw-scripts'], function () {
   const rootDir = 'dist';
   const filepath = path.join(rootDir, 'service-worker.js');
 
+  // Removed return bewore swPrecache.write
   return swPrecache.write(filepath, {
     // Used to avoid cache conflicts when serving on localhost.
     cacheId: pkg.name || 'web-starter-kit',
@@ -307,7 +354,7 @@ gulp.task('generate-service-worker', ['copy-sw-scripts'], () => {
     // glob always use '/'.
     stripPrefix: rootDir + '/'
   });
-});
+}));
 
 // Load custom tasks from the `tasks` directory
 // Run: `npm install --save-dev require-dir` from the command-line
