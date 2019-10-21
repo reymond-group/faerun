@@ -33,7 +33,7 @@
         lore.updateViewport(0, 0, snapX, snapY);
       }
 
-      setTimeout(function() {
+      setTimeout(function () {
         let canvas = document.getElementById('lore');
         let dataURL = lore.canvas.toDataURL('image/png');
         bindings.buttonDl.href = dataURL;
@@ -49,7 +49,7 @@
 
 
   // Events
-  bindings.coordinatesBox.addEventListener('change', function() {
+  bindings.coordinatesBox.addEventListener('change', function () {
     Faerun.coordinatesBox = !Faerun.coordinatesBox;
 
     if (Faerun.coordinatesBox) {
@@ -59,7 +59,7 @@
     }
   });
 
-  bindings.largePreview.addEventListener('change', function() {
+  bindings.largePreview.addEventListener('change', function () {
     Faerun.largePreview = !Faerun.largePreview;
 
     if (Faerun.largePreview) {
@@ -83,7 +83,7 @@
     }
   }, false);
 
-  $(bindings.buttonShare).on('click', function() {
+  $(bindings.buttonShare).on('click', function () {
     let value = 'http://' + window.location.hostname;
 
     if (window.location.port && window.location.port !== 80) {
@@ -137,7 +137,7 @@
     Faerun.show(bindings.loader);
   });
 
-  $('#download-bins').click(function() {
+  $('#download-bins').click(function () {
     socketWorker.postMessage({
       cmd: 'load:bin',
       msg: {
@@ -258,7 +258,7 @@
       Faerun.appendOption(bindings.selectDatabase, i, database.name);
     }
 
-    $(bindings.selectDatabase).material_select();
+    $(bindings.selectDatabase).formSelect();
   }
 
   /**
@@ -276,7 +276,7 @@
       Faerun.appendOption(bindings.selectFingerprint, i, fingerprint.name);
     }
 
-    $(bindings.selectFingerprint).material_select();
+    $(bindings.selectFingerprint).formSelect();
   }
 
   /**
@@ -294,12 +294,12 @@
       Faerun.appendOption(bindings.selectVariant, i, variant.name);
     }
 
-    $(bindings.selectVariant).material_select();
+    $(bindings.selectVariant).formSelect();
 
     // Also clear maps
     Faerun.removeChildren(bindings.selectMap);
     Faerun.appendOption(bindings.selectMap, null, 'Select a map');
-    $(bindings.selectMap).material_select();
+    $(bindings.selectMap).formSelect();
   }
 
   /**
@@ -317,7 +317,7 @@
       Faerun.appendOption(bindings.selectMap, i, map.name);
     }
 
-    $(bindings.selectMap).material_select();
+    $(bindings.selectMap).formSelect();
   }
 
   /**
@@ -402,7 +402,7 @@
     selectCanvas[layer + '-' + id] = structure;
 
     Faerun.hover(item, function () {
-      SmilesDrawer.parse(selectSmiles[layer + '-' + id], function(tree) {
+      SmilesDrawer.parse(selectSmiles[layer + '-' + id], function (tree) {
         smilesDrawer.draw(tree, 'hover-structure-drawing', 'dark');
       });
 
@@ -425,10 +425,10 @@
       }
 
       window.open('details.html?binIndex=' + indices +
-                  '&databaseId=' + currentDatabase.id +
-                  '&fingerprintId=' + currentFingerprint.id +
-                  '&variantId=' + currentVariant.id +
-                  '&hue=' + item.getAttribute('data-hue'), '_blank');
+        '&databaseId=' + currentDatabase.id +
+        '&fingerprintId=' + currentFingerprint.id +
+        '&variantId=' + currentVariant.id +
+        '&hue=' + item.getAttribute('data-hue'), '_blank');
     });
 
     closer.addEventListener('click', function (e) {
@@ -457,14 +457,14 @@
     selectIndicators.push(indicator);
     document.body.appendChild(indicator);
 
-    item.addEventListener('mouseenter', function(e) {
+    item.addEventListener('mouseenter', function (e) {
       $('.select-indicator').removeClass('current');
       $('#select-container .item').removeClass('current');
       $(this).addClass('current');
       $(indicator).addClass('current');
     });
 
-    indicator.addEventListener('mouseenter', function(e) {
+    indicator.addEventListener('mouseenter', function (e) {
       var item = $('#' + $(this).attr('data-item'));
       var scrollContainer = $('#select-container').parent();
 
@@ -472,7 +472,7 @@
       $('.select-indicator').removeClass('current');
       $(this).addClass('current');
       item.addClass('current');
-      scrollContainer.animate({scrollTop: (item.offset().top - item.offsetParent().offset().top) + 'px'}, 200);
+      scrollContainer.animate({ scrollTop: (item.offset().top - item.offsetParent().offset().top) + 'px' }, 200);
     });
 
     updateSelected();
@@ -540,8 +540,8 @@
       preserveDrawingBuffer: enableSnap
     });
 
-    smilesDrawer = new SmilesDrawer.Drawer({width: 180, height: 180, bondThickness: 1.5});
-    smallSmilesDrawer = new SmilesDrawer.Drawer({width: 48, height: 48, atomVisualization: 'balls', bondThickness: 1.5});
+    smilesDrawer = new SmilesDrawer.Drawer({ width: 180, height: 180, bondThickness: 1.5 });
+    smallSmilesDrawer = new SmilesDrawer.Drawer({ width: 48, height: 48, atomVisualization: 'balls', bondThickness: 1.5 });
 
     Faerun.initFullscreenSwitch(bindings.switchFullscreen);
     Faerun.initViewSelect(bindings.selectView, lore);
@@ -710,7 +710,7 @@
 
     output = output.substring(0, output.length);
 
-    let blob = new Blob([output], {type: 'text/plain;charset=utf-8'});
+    let blob = new Blob([output], { type: 'text/plain;charset=utf-8' });
     saveAs(blob, 'faerun_export_' + currentVariant.id + '.csv');
   }
 
@@ -788,7 +788,7 @@
       $('#hover-bin-size').html(message.binSize);
     }
 
-    SmilesDrawer.parse(message.smiles, function(tree) {
+    SmilesDrawer.parse(message.smiles, function (tree) {
       sd.draw(tree, target, 'dark');
     });
 
@@ -799,7 +799,7 @@
         height: $(bindings.overlayStructureContainer).height()
       });
 
-      SmilesDrawer.parse(message.smiles, function(tree) {
+      SmilesDrawer.parse(message.smiles, function (tree) {
         smilesDrawerOverlay.draw(tree, 'overlay-structure', 'dark');
       });
     }
@@ -974,7 +974,7 @@
 
         let target = 'hover-structure-drawing';
 
-        SmilesDrawer.parse(projections[layer].smiles[e.e.index], function(tree) {
+        SmilesDrawer.parse(projections[layer].smiles[e.e.index], function (tree) {
           smilesDrawer.draw(tree, target, 'dark');
         });
 
@@ -1024,13 +1024,13 @@
     // Set indices
     $(bindings.selectDatabase).val(config.databases.findIndex(db => db.id === vi[0]));
     $(bindings.selectDatabase).change();
-    $(bindings.selectDatabase).material_select();
+    $(bindings.selectDatabase).formSelect();
     $(bindings.selectFingerprint).val(currentDatabase.fingerprints.findIndex(fp => fp.id === vi[0] + '.' + vi[1]));
     $(bindings.selectFingerprint).change();
-    $(bindings.selectFingerprint).material_select();
+    $(bindings.selectFingerprint).formSelect();
     $(bindings.selectVariant).val(currentFingerprint.variants.findIndex(va => va.id === variantId));
     $(bindings.selectVariant).change();
-    $(bindings.selectVariant).material_select();
+    $(bindings.selectVariant).formSelect();
 
     populateMaps(currentVariant);
 
@@ -1039,7 +1039,7 @@
       currentMap = currentVariant.maps.find(mp => mp.id === variantId + '.' + map);
       $(bindings.selectMap).val(currentVariant.maps.findIndex(mp => mp.id === variantId + '.' + map));
       $(bindings.selectMap).change();
-      $(bindings.selectMap).material_select();
+      $(bindings.selectMap).formSelect();
     }
   }
 
