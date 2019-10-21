@@ -3,36 +3,24 @@
 
 /* Style Placeholders */
 
-::-webkit-input-placeholder {
-  color: $placeholder-text-color;
-}
-
-:-moz-placeholder { /* Firefox 18- */
-  color: $placeholder-text-color;
-}
-
-::-moz-placeholder {  /* Firefox 19+ */
-  color: $placeholder-text-color;
-}
-
-:-ms-input-placeholder {
+::placeholder {
   color: $placeholder-text-color;
 }
 
 /* Text inputs */
 
 input:not([type]),
-input[type=text],
-input[type=password],
-input[type=email],
-input[type=url],
-input[type=time],
-input[type=date],
-input[type=datetime],
-input[type=datetime-local],
-input[type=tel],
-input[type=number],
-input[type=search],
+input[type=text]:not(.browser-default),
+input[type=password]:not(.browser-default),
+input[type=email]:not(.browser-default),
+input[type=url]:not(.browser-default),
+input[type=time]:not(.browser-default),
+input[type=date]:not(.browser-default),
+input[type=datetime]:not(.browser-default),
+input[type=datetime-local]:not(.browser-default),
+input[type=tel]:not(.browser-default),
+input[type=number]:not(.browser-default),
+input[type=search]:not(.browser-default),
 textarea.materialize-textarea {
 
   // General Styles
@@ -48,7 +36,7 @@ textarea.materialize-textarea {
   padding: $input-padding;
   box-shadow: none;
   box-sizing: content-box;
-  transition: $input-transition;
+  transition: box-shadow .3s, border .3s;
 
   // Disabled input style
   &:disabled,
@@ -74,52 +62,88 @@ textarea.materialize-textarea {
     color: $input-focus-color;
   }
 
+  // Hide helper text on data message
+  &.valid ~ .helper-text[data-success],
+  &:focus.valid ~ .helper-text[data-success],
+  &.invalid ~ .helper-text[data-error],
+  &:focus.invalid ~ .helper-text[data-error] {
+    @extend %hidden-text;
+  }
+
   // Valid Input Style
   &.valid,
   &:focus.valid {
-    border-bottom: 1px solid $input-success-color;
-    box-shadow: 0 1px 0 0 $input-success-color;
+    @extend %valid-input-style;
   }
 
   // Custom Success Message
-  &.valid + label:after,
-  &:focus.valid + label:after {
-    content: attr(data-success);
+  &.valid ~ .helper-text:after,
+  &:focus.valid ~ .helper-text:after {
+    @extend %custom-success-message;
+  }
+  &:focus.valid ~ label {
     color: $input-success-color;
-    opacity: 1;
   }
 
   // Invalid Input Style
   &.invalid,
   &:focus.invalid {
-    border-bottom: $input-invalid-border;
-    box-shadow: 0 1px 0 0 $input-error-color;
+    @extend %invalid-input-style;
   }
 
   // Custom Error message
-  &.invalid + label:after,
-  &:focus.invalid + label:after {
-    content: attr(data-error);
+  &.invalid ~ .helper-text:after,
+  &:focus.invalid ~ .helper-text:after {
+    @extend %custom-error-message;
+  }
+  &:focus.invalid ~ label {
     color: $input-error-color;
-    opacity: 1;
   }
 
   // Full width label when using validate for error messages
   &.validate + label {
     width: 100%;
-    pointer-events: none;
   }
 
   // Form Message Shared Styles
   & + label:after {
-    display: block;
-    content: "";
-    position: absolute;
-    top: 60px;
-    opacity: 0;
-    transition: .2s opacity ease-out, .2s color ease-out;
+    @extend %input-after-style;
   }
 }
+
+
+/* Validation Sass Placeholders */
+%valid-input-style {
+  border-bottom: 1px solid $input-success-color;
+  box-shadow: 0 1px 0 0 $input-success-color;
+}
+%invalid-input-style {
+  border-bottom: $input-invalid-border;
+  box-shadow: 0 1px 0 0 $input-error-color;
+}
+%hidden-text {
+  color: transparent;
+  user-select: none;
+  pointer-events: none;
+}
+%custom-success-message {
+  content: attr(data-success);
+  color: $input-success-color;
+}
+%custom-error-message {
+  content: attr(data-error);
+  color: $input-error-color;
+}
+%input-after-style {
+  display: block;
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  opacity: 0;
+  transition: .2s opacity ease-out, .2s color ease-out;
+}
+
 
 // Styling for input field wrapper
 .input-field {
@@ -149,29 +173,56 @@ textarea.materialize-textarea {
 
   position: relative;
   margin-top: 1rem;
+  margin-bottom: 1rem;
 
-  label {
+  & > label {
     color: $input-border-color;
     position: absolute;
-    top: 0.8rem;
+    top: 0;
     left: 0;
     font-size: 1rem;
     cursor: text;
-    transition: .2s ease-out;
+    transition: transform .2s ease-out, color .2s ease-out;
+    transform-origin: 0% 100%;
     text-align: initial;
+    transform: translateY(12px);
 
     &:not(.label-icon).active {
-      font-size: $label-font-size;
-      transform: translateY(-140%);
+      transform: translateY(-14px) scale(.8);
+      transform-origin: 0 0;
     }
+  }
+
+  // Autofill + date + time inputs
+  & > input[type]:-webkit-autofill:not(.browser-default):not([type="search"]) + label,
+  & > input[type=date]:not(.browser-default) + label,
+  & > input[type=time]:not(.browser-default) + label {
+    transform: translateY(-14px) scale(.8);
+    transform-origin: 0 0;
+  }
+
+  .helper-text {
+    &::after {
+      opacity: 1;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    position: relative;
+    min-height: 18px;
+    display: block;
+    font-size: 12px;
+    color: rgba(0,0,0,.54);
   }
 
   // Prefix Icons
   .prefix {
     position: absolute;
     width: $input-height;
-    font-size: 2rem;
+    font-size: $input-icon-size;
     transition: color .2s;
+    top: ($input-height - $input-icon-size) / 2;
 
     &.active { color: $input-focus-color; }
   }
@@ -180,6 +231,7 @@ textarea.materialize-textarea {
   .prefix ~ textarea,
   .prefix ~ label,
   .prefix ~ .validate ~ label,
+  .prefix ~ .helper-text,
   .prefix ~ .autocomplete-content {
     margin-left: 3rem;
     width: 92%;
@@ -209,10 +261,17 @@ textarea.materialize-textarea {
 .input-field input[type=search] {
   display: block;
   line-height: inherit;
-  padding-left: 4rem;
-  width: calc(100% - 4rem);
+  transition: .3s background-color;
 
-  &:focus {
+  .nav-wrapper & {
+    height: inherit;
+    padding-left: 4rem;
+    width: calc(100% - 4rem);
+    border: 0;
+    box-shadow: none;
+  }
+
+  &:focus:not(.browser-default) {
     background-color: $input-background;
     border: 0;
     box-shadow: none;
@@ -225,7 +284,8 @@ textarea.materialize-textarea {
     }
   }
 
-  & + label {
+  & + .label-icon {
+    transform: none;
     left: 1rem;
   }
 
@@ -236,7 +296,7 @@ textarea.materialize-textarea {
     right: 1rem;
     color: transparent;
     cursor: pointer;
-    font-size: 2rem;
+    font-size: $input-icon-size;
     transition: .3s color;
   }
 }
@@ -251,16 +311,18 @@ textarea {
   background-color: transparent;
 
   &.materialize-textarea {
+    line-height: normal;
     overflow-y: hidden; /* prevents scroll bar flash */
-    padding: .8rem 0 1.6rem 0; /* prevents text jump on Enter keypress */
+    padding: .8rem 0 .8rem 0; /* prevents text jump on Enter keypress */
     resize: none;
     min-height: $input-height;
+    box-sizing: border-box;
   }
 }
 
 // For textarea autoresize
 .hiddendiv {
-  display: none;
+  visibility: hidden;
   white-space: pre-wrap;
   word-wrap: break-word;
   overflow-wrap: break-word; /* future version of deprecated 'word-wrap' */
@@ -269,16 +331,12 @@ textarea {
   // Reduces repaints
   position: absolute;
   top: 0;
+  z-index: -1;
 }
 
 
 /* Autocomplete */
 .autocomplete-content {
-  margin-top: -1 * $input-margin-bottom;
-  display: block;
-  opacity: 1;
-  position: static;
-
   li {
     .highlight { color: #444; }
 
@@ -288,4 +346,9 @@ textarea {
       margin: 5px 15px;
     }
   }
+}
+
+/* Character Counter */
+.character-counter {
+  min-height: 18px;
 }

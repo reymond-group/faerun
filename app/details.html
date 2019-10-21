@@ -2,213 +2,228 @@
 
 <html lang="en">
 
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="description" content="A front-end template that helps you build fast, modern mobile web apps.">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-        <title>FAERUN</title>
-        <!-- Add to homescreen for Chrome on Android -->
-        <!-- <meta name="mobile-web-app-capable" content="yes"> -->
-        <!-- <link rel="icon" sizes="192x192" href="images/android-desktop.png"> -->
-        <!-- Add to homescreen for Safari on iOS -->
-        <!-- <meta name="apple-mobile-web-app-capable" content="yes"> -->
-        <!-- <meta name="apple-mobile-web-app-status-bar-style" content="black"> -->
-        <!-- <meta name="apple-mobile-web-app-title" content="Faerun"> -->
-        <!-- <link rel="apple-touch-icon-precomposed" href="images/ios-desktop.png"> -->
-        <!-- Tile icon for Win8 (144x144 + tile color) -->
-        <!-- <meta name="msapplication-TileImage" content="images/touch/ms-touch-icon-144x144-precomposed.png"> -->
-        <!-- <meta name="msapplication-TileColor" content="#3372DF"> -->
-        <link rel="shortcut icon" href="images/favicon.ico">
-        <!-- SEO: If your mobile URL is different from the desktop URL, add a canonical link to the desktop page https://developers.google.com/webmasters/smartphone-sites/feature-phones -->
-        <!--
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="A front-end template that helps you build fast, modern mobile web apps.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <title>FAERUN</title>
+    <!-- Add to homescreen for Chrome on Android -->
+    <!-- <meta name="mobile-web-app-capable" content="yes"> -->
+    <!-- <link rel="icon" sizes="192x192" href="images/android-desktop.png"> -->
+    <!-- Add to homescreen for Safari on iOS -->
+    <!-- <meta name="apple-mobile-web-app-capable" content="yes"> -->
+    <!-- <meta name="apple-mobile-web-app-status-bar-style" content="black"> -->
+    <!-- <meta name="apple-mobile-web-app-title" content="Faerun"> -->
+    <!-- <link rel="apple-touch-icon-precomposed" href="images/ios-desktop.png"> -->
+    <!-- Tile icon for Win8 (144x144 + tile color) -->
+    <!-- <meta name="msapplication-TileImage" content="images/touch/ms-touch-icon-144x144-precomposed.png"> -->
+    <!-- <meta name="msapplication-TileColor" content="#3372DF"> -->
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <!-- SEO: If your mobile URL is different from the desktop URL, add a canonical link to the desktop page https://developers.google.com/webmasters/smartphone-sites/feature-phones -->
+    <!--
         <link rel="canonical" href="http://www.example.com/">
         -->
-        <script src="libs/socketio/socket.io-1.4.5.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-        <script src="libs/saveAsPolyfill/FileSaver.min.js"></script>
-        <script src="https://unpkg.com/lore-engine@1.0.24/dist/lore.min.js"></script>
-        <script src="https://unpkg.com/smiles-drawer@1.0.8/dist/smiles-drawer.min.js"></script>
-        <script src="libs/handlebars/handlebars-v4.0.5.js"></script>
+    <script src="libs/socketio/socket.io-1.4.5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="libs/saveAsPolyfill/FileSaver.min.js"></script>
+    <script src="https://unpkg.com/lore-engine@1.0.24/dist/lore.min.js"></script>
+    <script src="https://unpkg.com/smiles-drawer@1.0.8/dist/smiles-drawer.min.js"></script>
+    <script src="libs/handlebars/handlebars-v4.0.5.js"></script>
 
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
-        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,400,500,700">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.4.6/dialog-polyfill.min.css" />
-        
-        <link rel="stylesheet" href="styles/materialize/materialize.css">
-        <link rel="stylesheet" href="styles/index.css">
-    </head>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,400,500,700">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.4.6/dialog-polyfill.min.css" />
 
-    <body>
-        <!-- The slide-out menu -->
-        <div id="slide-out" class="side-nav">
-            <p class="faerun-controls-header"><i class="material-icons">open_in_browser</i><span>DATA</span></p>
+    <link rel="stylesheet" href="styles/materialize/materialize.css">
+    <link rel="stylesheet" href="styles/index.css">
+</head>
 
-            
-            <p class="faerun-controls-header"><i class="material-icons">brush</i><span>LOOK</span></p>
-            <div class="input-field select">
-                <select id="select-view" data-binding-id="selectView" name="select-view">
-                    <option value="free">Free View</option>
-                    <option value="top">Top View</option>
-                    <option value="left">Left View</option>
-                    <option value="right">Right View</option>
-                    <option value="front">Front View</option>
-                    <option value="back">Back View</option>
-                </select>
-                <label for="select-view">View</label>
-            </div>
-            <p class="faerun-controls-header"><i class="material-icons">settings</i><span>SETTINGS</span></p>
-            <p>
-                <input type="checkbox" id="switch-fullscreen" data-binding-id="switchFullscreen" />
-                <label for="switch-fullscreen">Fullscreen</label>
-            </p>
-            <p>
-                <input type="checkbox" id="switch-color" data-binding-id="switchColor" />
-                <label for="switch-color">Light Background</label>
-            </p>
-            <p>
-                <input type="checkbox" id="large-preview" data-binding-id="largePreview" />
-                <label for="large-preview">Overlay Molecule Preview</label>
-            </p>
+<body>
+    <!-- The slide-out menu -->
+    <div id="slide-out" class="sidenav">
+        <p class="faerun-controls-header"><i class="material-icons">open_in_browser</i><span>DATA</span></p>
 
-            <p class="faerun-controls-header" style="margin-top:18px;"><i class="material-icons">build</i><span>TOOLS</span></p>
-            <div class="spacer"></div>
-            <a href="#all-compounds" id="button-all-compounds" class="waves-effect waves-light btn-flat">
-                <i class="material-icons left">view_module</i>Show All Compounds
-            </a>
-            <br />
-            <a id="download-csv" class="waves-effect waves-light btn-flat">
-                <i class="material-icons left">file_download</i>Download As CSV
-            </a>
+
+        <p class="faerun-controls-header"><i class="material-icons">brush</i><span>LOOK</span></p>
+        <div class="input-field select">
+            <select id="select-view" data-binding-id="selectView" name="select-view">
+                <option value="free">Free View</option>
+                <option value="top">Top View</option>
+                <option value="left">Left View</option>
+                <option value="right">Right View</option>
+                <option value="front">Front View</option>
+                <option value="back">Back View</option>
+            </select>
+            <label for="select-view">View</label>
         </div>
-        <div class="page">
-            <header>
-                <div class="title">
-                    <span><img src="images/logo.png" />FAERUN</span>
-                    <span>&nbsp;</span>
-                    <span id="data-title" data-binding-id="dataTitle">Details</span>
-                </div>
-                <div class="more">
-                </div>
-                <div class="hamburger">
-                    <a href="#" data-activates="slide-out" class="button-toggle-nav white-text"><i class="material-icons">menu</i></a>
-                </div>
-            </header>
-            <main>
-                <!-- The 3D canvas -->
-                <canvas id="lore" data-binding-id="lore"></canvas>
+        <p class="faerun-controls-header"><i class="material-icons">settings</i><span>SETTINGS</span></p>
+        <p>
+            <input type="checkbox" id="switch-fullscreen" data-binding-id="switchFullscreen" />
+            <label for="switch-fullscreen">Fullscreen</label>
+        </p>
+        <p>
+            <input type="checkbox" id="switch-color" data-binding-id="switchColor" />
+            <label for="switch-color">Light Background</label>
+        </p>
+        <p>
+            <input type="checkbox" id="large-preview" data-binding-id="largePreview" />
+            <label for="large-preview">Overlay Molecule Preview</label>
+        </p>
 
-                <div id="overlay-structure-container" data-binding-id="overlayStructureContainer" class="hidden">
-                    <canvas id="overlay-structure" data-binding-id="overlayStructure"></canvas>
-                </div>
+        <p class="faerun-controls-header" style="margin-top:18px;"><i class="material-icons">build</i><span>TOOLS</span>
+        </p>
+        <div class="spacer"></div>
+        <a href="#all-compounds" id="button-all-compounds" class="waves-effect waves-light btn-flat">
+            <i class="material-icons left">view_module</i>Show All Compounds
+        </a>
+        <br />
+        <a id="download-csv" class="waves-effect waves-light btn-flat">
+            <i class="material-icons left">file_download</i>Download As CSV
+        </a>
+    </div>
+    <div class="page">
+        <header>
+            <div class="title">
+                <span><img src="images/logo.png" />FAERUN</span>
+                <span>&nbsp;</span>
+                <span id="data-title" data-binding-id="dataTitle">Details</span>
+            </div>
+            <div class="more">
+            </div>
+            <div class="hamburger">
+                <a href="#" data-target="slide-out" class="sidenav-trigger white-text"><i
+                        class="material-icons">menu</i></a>
+            </div>
+        </header>
+        <main>
+            <!-- The 3D canvas -->
+            <canvas id="lore" data-binding-id="lore"></canvas>
 
-                <div id="viz">
-                    <a href="http://viz.gdb.tools">viz.gdb.tools</a>
-                </div>
-            </main>
+            <div id="overlay-structure-container" data-binding-id="overlayStructureContainer" class="hidden">
+                <canvas id="overlay-structure" data-binding-id="overlayStructure"></canvas>
+            </div>
+
+            <div id="viz">
+                <a href="http://viz.gdb.tools">viz.gdb.tools</a>
+            </div>
+        </main>
+    </div>
+
+    <!-- Mobile Options -->
+    <div class="fixed-action-btn">
+        <a class="btn-floating btn-large">
+            <i class="large material-icons">toys</i>
+        </a>
+        <ul>
+            <li><a id="button-recenter" data-binding-id="buttonRecenter"
+                    class="waves-effect waves-light btn-floating"><i class="material-icons">all_out</i></a></li>
+            <li><a id="button-zoomin" data-binding-id="buttonZoomIn" class="waves-effect waves-light btn-floating"><i
+                        class="material-icons">zoom_in</i></a></li>
+            <li><a id="button-zoomout" data-binding-id="buttonZoomOut" class="waves-effect waves-light btn-floating"><i
+                        class="material-icons">zoom_out</i></a></li>
+            <li><a id="button-toggle-select" data-binding-id="buttonToggleSelect"
+                    class="waves-effect waves-light btn-floating"><i class="material-icons">touch_app</i></a></li>
+            <li><a id="button-select-hovered" data-binding-id="buttonSelectHovered"
+                    class="waves-effect waves-light btn-floating"><i class="material-icons">add</i></a></li>
+        </ul>
+    </div>
+
+    <!-- The left panel HUD -->
+    <div id="faerun-panel" data-binding-id="faerunPanel" class="faerun-panel">
+        <div class="flex-item">
+            <div class="title"><i class="material-icons">camera</i>Hovered Compound</div>
         </div>
-
-        <!-- Mobile Options -->
-        <div class="fixed-action-btn">
-            <a class="btn-floating btn-large">
-                <i class="large material-icons">toys</i>
-            </a>
-            <ul>
-                <li><a id="button-recenter" data-binding-id="buttonRecenter" class="waves-effect waves-light btn-floating"><i class="material-icons">all_out</i></a></li>
-                <li><a id="button-zoomin" data-binding-id="buttonZoomIn" class="waves-effect waves-light btn-floating"><i class="material-icons">zoom_in</i></a></li>
-                <li><a id="button-zoomout" data-binding-id="buttonZoomOut" class="waves-effect waves-light btn-floating"><i class="material-icons">zoom_out</i></a></li>
-                <li><a id="button-toggle-select" data-binding-id="buttonToggleSelect" class="waves-effect waves-light btn-floating"><i class="material-icons">touch_app</i></a></li>
-                <li><a id="button-select-hovered" data-binding-id="buttonSelectHovered" class="waves-effect waves-light btn-floating"><i class="material-icons">add</i></a></li>
-            </ul>
+        <div id="hover-structure" data-binding-id="hoverStructure" class="flex-item">
+            <canvas id="hover-structure-drawing" data-binding-id="hoverStructureDrawing" width="180"
+                height="180"></canvas>
         </div>
-
-        <!-- The left panel HUD -->
-        <div id="faerun-panel" data-binding-id="faerunPanel" class="faerun-panel"> 
-            <div class="flex-item">
-                <div class="title"><i class="material-icons">camera</i>Hovered Compound</div>
-            </div>
-            <div id="hover-structure" data-binding-id="hoverStructure" class="flex-item">
-                <canvas id="hover-structure-drawing" data-binding-id="hoverStructureDrawing" width="180" height="180"></canvas>
-            </div>
-            <div class="flex-item">
-            </div>
-            <div id="layers" data-binding-id="layers" class="flex-item">
-            </div>
-            <div class="flex-item">
-            </div>
-            <div class="flex-item">
-            </div>
-            <div class="flex-item">
-                <div class="title"><i class="material-icons">info</i>Compound Info</div>
-                <p class="info-title">Databases</p>
-                <p id="info-databases" data-binding-id="infoDatabases" class="info"></p>
-                <p class="info-title">SMILES</p>
-                <p id="info-smiles" data-binding-id="infoSmiles" class="info smiles"></p>
-            </div>
-            <div class="flex-item">
-                
-            </div>
+        <div class="flex-item">
         </div>
-
-        <!-- The loader that is shown when data is transferred -->
-        <div id="loader" data-binding-id="loader" class="hidden">
-            <div id="loader-inner">
-                <p id="loading-message" data-binding-id="loadingMessage"></p>
-                <div class="progress">
-                    <div class="indeterminate" style="width:200px"></div>
-                </div>
-            </div>
+        <div id="layers" data-binding-id="layers" class="flex-item">
         </div>
-
-        <!-- Data overlays -->
-        <span id="hover-indicator" data-binding-id="hoverIndicator" class="hidden"></span>
-        <span id="select-indicator" data-binding-id="selectIndicator" class="hidden"></span>
-
-        <!-- Toasts -->
-        <div id="toast-error" data-binding-id="toastError" class="mdl-js-snackbar mdl-snackbar">
-            <div class="mdl-snackbar__text"></div>
-            <button class="mdl-snackbar__action" type="button"></button>
+        <div class="flex-item">
         </div>
+        <div class="flex-item">
+        </div>
+        <div class="flex-item">
+            <div class="title"><i class="material-icons">info</i>Compound Info</div>
+            <p class="info-title">Databases</p>
+            <p id="info-databases" data-binding-id="infoDatabases" class="info"></p>
+            <p class="info-title">SMILES</p>
+            <p id="info-smiles" data-binding-id="infoSmiles" class="info smiles"></p>
+        </div>
+        <div class="flex-item">
 
-        <!-- Dialogs -->
-        <div id="all-compounds" class="modal modal-fixed-footer">
-            <div id="compounds-container" class="modal-content">
-                
-            </div>
-            <div class="modal-footer">
-                <a href="#!" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        </div>
+    </div>
+
+    <!-- The loader that is shown when data is transferred -->
+    <div id="loader" data-binding-id="loader" class="hidden">
+        <div id="loader-inner">
+            <p id="loading-message" data-binding-id="loadingMessage"></p>
+            <div class="progress">
+                <div class="indeterminate" style="width:200px"></div>
             </div>
         </div>
+    </div>
 
-        <script src="config.js"></script>
-        <script src="scripts/jsonp.js"></script>
-        <script src="scripts/common.js"></script>
-        <script src="scripts/details.js"></script>
+    <!-- Data overlays -->
+    <span id="hover-indicator" data-binding-id="hoverIndicator" class="hidden"></span>
+    <span id="select-indicator" data-binding-id="selectIndicator" class="hidden"></span>
 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js"></script>
-        <script>
-            // Initialization stuff for materialize.css
-            (function($){
-                $(function(){
-                    $('.button-toggle-nav').sideNav({
-                        menuWidth: 300,
-                        edge: 'right',
-                        closeOnClick: true,
-                        draggable: true
-                    });
+    <!-- Toasts -->
+    <div id="toast-error" data-binding-id="toastError" class="mdl-js-snackbar mdl-snackbar">
+        <div class="mdl-snackbar__text"></div>
+        <button class="mdl-snackbar__action" type="button"></button>
+    </div>
 
-                    $('select').material_select();
+    <!-- Dialogs -->
+    <div id="all-compounds" class="modal modal-fixed-footer">
+        <div id="compounds-container" class="modal-content">
 
-                    $('.tooltipped').tooltip({delay: 50});
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        </div>
+    </div>
 
-                    $('.modal').modal({
-                        startingTop: '2%',
-                        endingTop: '5%'
-                    });
+    <script src="config.js"></script>
+    <script src="scripts/jsonp.js"></script>
+    <script src="scripts/common.js"></script>
+    <script src="scripts/details.js"></script>
+
+    <script src="libs/materialize/materialize.min.js"></script>
+    <script>
+        // Initialization stuff for materialize.css
+        document.addEventListener('DOMContentLoaded', function () {
+            var elems = document.querySelectorAll('.sidenav');
+            var instances = M.Sidenav.init(elems, {
+                menuWidth: 300,
+                edge: 'right',
+                closeOnClick: true,
+                draggable: true
+            });
+        });
+
+        (function ($) {
+            $(function () {
+                $('.sidenav').sidenav();
+
+                $('select').formSelect();
+
+                $('.tooltipped').tooltip({ delay: 50 });
+
+                $('.modal').modal({
+                    startingTop: '2%',
+                    endingTop: '5%'
                 });
-            })(jQuery);
-        </script>
-    </body>
+            });
+        })(jQuery);
+    </script>
+</body>
 
-</html>        
+</html>

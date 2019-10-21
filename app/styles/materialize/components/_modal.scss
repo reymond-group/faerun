@@ -1,5 +1,9 @@
 .modal {
-  @extend .z-depth-4;
+  &:focus {
+    outline: none;
+  }
+
+  @extend .z-depth-5;
 
   display: none;
   position: fixed;
@@ -36,9 +40,9 @@
     padding: 4px 6px;
     height: 56px;
     width: 100%;
+    text-align: right;
 
     .btn, .btn-flat {
-      float: right;
       margin: 6px 0;
     }
   }
@@ -46,7 +50,7 @@
 .modal-overlay {
   position: fixed;
   z-index: 999;
-  top: -100px;
+  top: -25%;
   left: 0;
   bottom: 0;
   right: 0;
