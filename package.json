@@ -44,6 +44,6 @@
   "dependencies": {
     "gulp-sass": "^4.0.2",
     "node-bourbon": ">=4.2.8",
-    "node-sass": ">=4.11.0"
+    "node-sass": ">=4.13.1"
   }
 }
